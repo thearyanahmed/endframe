@@ -16,6 +16,17 @@ If we could determine the current location of the mobile client (eg: Area5), and
 
 That way our load balancer / service can simply route the request to that specific partion, giving us performance boost and less resoruce is used. The trade off would be simpy to add logical elements in the code to make sure we push to the right partion and keep in mind a single trip can be in multiple partions (not at the same time) when the rider crosses **AreaX** to **AreaY**. 
 
+
+**Scalability**
+
+The backend (server) should be separated from the client. So we can indendently scale up/down based on requirement. The location service would get a lot of hits, along with key value store. We want to separate the Key/Value store so we have a single source of truth.
+
+I'm planning to use Redis, simply because of fast data access and our system is also write heavy. Though we can use kafka, which is fast enough itself with a drive disk, kafka does not allow geo* based operations. Which will be needed to query to get the locations of scooters.
+
+**Data store**
+
+We have 3 different data stores here, kafka, redis and I would also want to use a RDMS. RDMS we because end of the day, we want our data to persist.
+
 ## Task
 A company called Scootin' Aboot will deploy electric scooters in Ottawa and
 Montreal. Design and implement a backend service that exposes a REST-like
