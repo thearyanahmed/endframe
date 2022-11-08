@@ -36,13 +36,34 @@ func NewRouter() http.Handler {
 				_, _ = w.Write([]byte(fmt.Sprintf("lat: %s,long: %s", chi.URLParam(r, "lat"), chi.URLParam(r, "long"))))
 			})
 
-			// Update ride position
-			r.Post("/update/ride-position", func(w http.ResponseWriter, r *http.Request) {
+			// This endpoint spawns a ride from taking lat long and some other values from
+			// the rider app.
+			r.Post("/ride/spwan", func(w http.ResponseWriter, r *http.Request) {
+				
+			})
+
+			// This endpoint takes input from the input, validates it.
+			// Upon succesful validation, it creates creates 1 database entry, updates redis & go kafka().
+			r.Post("/ride/start", func(w http.ResponseWriter, r *http.Request) {
+
+			})
+
+			// Update ride position takes a ride uuid, updates ride details on kafka.
+			// But also need to to push to redis because users can query rides-near-by.
+			// That query will be done from redis.
+			r.Post("/notify/position", func(w http.ResponseWriter, r *http.Request) {
 				w.Write([]byte("update ride position"))
 			})
 
-			
+			// Validate the request, update to redis, kafka and database.
+			r.Post("/ride/end", func(w http.ResponseWriter, r *http.Request) {
 
+			})
+
+			// Takes uuid, finds the details of the ride
+			r.Get("/ride/{uuid}/view", func(w http.ResponseWriter, r *http.Request) {
+				w.Write([]byte("get ride details"))
+			})
 		})
 	})
 
