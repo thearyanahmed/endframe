@@ -8,9 +8,10 @@ import (
 )
 
 type Response struct {
-	Code    int        `json:"code"`
-	Message string     `json:"message"`
-	Details url.Values `json:"details,omitempty"`
+	HttpCode int        `json:"-"`
+	Code     int        `json:"code"`
+	Message  string     `json:"message"`
+	Details  url.Values `json:"details,omitempty"`
 }
 
 func (_ *Response) Render(w http.ResponseWriter, r *http.Request) error {
@@ -18,7 +19,7 @@ func (_ *Response) Render(w http.ResponseWriter, r *http.Request) error {
 }
 
 func ErrorResponse(w http.ResponseWriter, r *http.Request, er *Response) {
-	render.Status(r, er.Code)
+	render.Status(r, er.HttpCode)
 	RenderJsonResponse(w, r, er.Code, er)
 }
 

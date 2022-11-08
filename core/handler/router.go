@@ -18,17 +18,11 @@ func NewRouter() http.Handler {
 
 	r.Route("/core/api", func(r chi.Router) {
 		r.Route("/v1", func(r chi.Router) {
-			// content type middleware?
+			// Return health check status of this services and pings redis, kafka and db(ping all related services)
+			r.Get("/health-check", NewHealthCheckHandler().ServeHTTP)
 
 			// @todo Add client authorization token middleware. Have different tokens for different routes.
 			// use static tokens for simplicity
-
-			// Return health check status of this services and pings redis, kafka and db? (ping all related services)
-			// @q: ping user goroutines?
-			r.Get("/health-check", func(w http.ResponseWriter, r *http.Request) {
-				_, _ = w.Write([]byte("hello world"))
-			})
-
 			// This endpoint should return all available vehichles within an area
 			// also should support filter by query params
 			// optional: perhaps we can also filter by the radius
@@ -39,7 +33,7 @@ func NewRouter() http.Handler {
 			// This endpoint spawns a ride from taking lat long and some other values from
 			// the rider app.
 			r.Post("/ride/spwan", func(w http.ResponseWriter, r *http.Request) {
-				
+
 			})
 
 			// This endpoint takes input from the input, validates it.
