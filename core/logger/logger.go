@@ -17,8 +17,8 @@ func Setup(conf loggerConfig) {
 	log.SetLevel(getLogLevelFromString(conf.GetLogLevel()))
 }
 
-func Logger() log.Logger {
-	return log.Logger{}
+func Logger() *log.Logger {
+	return &log.Logger{}
 }
 
 func getLogLevelFromString(level string) log.Level {

@@ -10,10 +10,10 @@ import (
 
 type authorizeRiderMiddleware struct {
 	authToken string
-	logger    log.Logger
+	logger    *log.Logger
 }
 
-func NewAuthorizeRiderMiddleware(token string, logger log.Logger) *authorizeRiderMiddleware {
+func NewAuthorizeRiderMiddleware(token string, logger *log.Logger) *authorizeRiderMiddleware {
 	return &authorizeRiderMiddleware{
 		authToken: token,
 		logger:    logger,

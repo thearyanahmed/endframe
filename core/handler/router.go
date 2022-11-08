@@ -9,11 +9,12 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/thearyanahmed/nordsec/core/config"
 	coreMiddleware "github.com/thearyanahmed/nordsec/core/middleware"
+	"github.com/thearyanahmed/nordsec/core/service"
 
 	"github.com/go-chi/chi/v5"
 )
 
-func NewRouter(conf *config.Specification, logger log.Logger) http.Handler {
+func NewRouter(conf *config.Specification, svcAggregator *service.ServiceAggregator, logger *log.Logger) http.Handler {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
@@ -37,8 +38,9 @@ func NewRouter(conf *config.Specification, logger log.Logger) http.Handler {
 			// This endpoint spawns a ride from taking lat long and some other values from
 			// the rider app.
 			// This simulates the idea of a rider, who just came online
-			r.With(coreMiddleware.NewAuthorizeRiderMiddleware(conf.RiderApiKey, logger).Handle).
-				Post("/ride/activate", NewActiveRideHandler().ServeHTTP)
+			r.With(coreMiddleware.ValidateContentTypeMiddleware).
+				With(coreMiddleware.NewAuthorizeRiderMiddleware(conf.RiderApiKey, logger).Handle).
+				Post("/ride/activate", NewActivateRideHandler(svcAggregator.RideService, logger).ServeHTTP)
 
 			// This endpoint takes input from the input, validates it.
 			// Upon succesful validation, it creates creates 1 database entry, updates redis & go kafka().

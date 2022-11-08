@@ -13,6 +13,7 @@ import (
 	"github.com/thearyanahmed/nordsec/core/config"
 	"github.com/thearyanahmed/nordsec/core/handler"
 	"github.com/thearyanahmed/nordsec/core/logger"
+	"github.com/thearyanahmed/nordsec/core/service"
 )
 
 func main() {
@@ -24,7 +25,13 @@ func main() {
 
 	logger.Setup(conf)
 
-	router := handler.NewRouter(conf, logger.Logger())
+	svcAggregator, err := service.NewServiceAggregator(conf, logger.Logger())
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	router := handler.NewRouter(conf, svcAggregator, logger.Logger())
 
 	address := conf.AppAddress()
 
