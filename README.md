@@ -6,20 +6,20 @@
 ## My Thoughts 
 **Using Kafka**
 
-For the server side app, I want to use kafka. As it is append only log, it is create a series of events out of the box. So, we will be able to plot the location(s) of scooters in an orderly sequence.
+For the server side app, I want to use kafka. As it is append-only log, it is to create a series of events out of the box. So, we will be able to plot the location(s) of scooters in an orderly sequence.
 
-**Namespacing/Partioning**
+**Namespacing/Portioning**
 
-Having proper namespcaing / partioning based on location, our loadbalancers can improve significantly in performance. Imagine this theory, suppose we have a 10x10 KM area, where 1x1KM is Name Area1 to AreaN. 
+Having proper namespacing / portioning based on location, our load-balancers can improve significantly in performance. Imagine this theory, suppose we have a 10x10 KM area, where 1x1KM is Name Area1 to AreaN. 
 
-If we could determine the current location of the mobile client (eg: Area5), and in our data store, we namespace/ prefix the records in `Partion Area5` : Append only log all the scooters that are currently in that area. So scooterID, lat, long etc. 
+If we could determine the current location of the mobile client (eg: Area5), and in our data store, we namespace/prefix the records in `Partion Area5` : Append only log all the scooters that are currently in that area. So scooterID, lat, long etc. 
 
-That way our load balancer / service can simply route the request to that specific partion, giving us performance boost and less resoruce is used. The trade off would be simpy to add logical elements in the code to make sure we push to the right partion and keep in mind a single trip can be in multiple partions (not at the same time) when the rider crosses **AreaX** to **AreaY**. 
+That way our load balancer / service can simply route the request to that specific portion, giving us performance boost and less resource is used. The trade-off would be simpy to add logical elements in the code to make sure we push to the right partion and keep in mind a single trip can be in multiple partitions (not at the same time) when the rider crosses **AreaX** to **AreaY**. 
 
 
 **Scalability**
 
-The backend (server) should be separated from the client. So we can indendently scale up/down based on requirement. The location service would get a lot of hits, along with key value store. We want to separate the Key/Value store so we have a single source of truth.
+The backend (server) should be separated from the client. So we can independently scale up/down based on requirement. The location service would get a lot of hits, along with key value store. We want to separate the Key/Value store so we have a single source of truth.
 
 I'm planning to use Redis, simply because of fast data access and our system is also write heavy. Though we can use kafka, which is fast enough itself with a drive disk, kafka does not allow geo* based operations. Which will be needed to query to get the locations of scooters.
 
