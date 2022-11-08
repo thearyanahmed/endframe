@@ -6,7 +6,7 @@ DOCKER_COMPOSE_EXISTS := $(shell command -v docker-compose 2> /dev/null)
 .PHONY: up stop ps ssh-core run-core build-core deps-core test-core ssh-rider run-rider build-rider deps-rider test-rider ssh-client run-client build-client deps-client test-client
 
 up:
-	@docker-compose up -d
+	@docker-compose up # -d # @todo remove -d
 
 stop:
 	@docker-compose stop

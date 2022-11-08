@@ -9,6 +9,11 @@ services:
     command: make run-core
     depends_on:
       - redis
+    environment:
+      APP_PORT: '${CORE_PORT}'
+      REDIS_HOST: '${REDIS_HOST}'
+      REDIS_PORT: '${REDIS_PORT}'
+      REDIS_PASSWORD: '${REDIS_PASSWORD}'
     ports:
       - "${CORE_PORT:-8080}:8080"
     volumes:

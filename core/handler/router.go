@@ -2,21 +2,25 @@ package handler
 
 import (
 	"fmt"
-	"log"
+	"github.com/go-chi/chi/v5/middleware"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 )
 
-func NewRouter() {
+func NewRouter() http.Handler {
 	r := chi.NewRouter()
 
+	r.Use(middleware.RequestID)
+	r.Use(middleware.Logger)
+
 	r.Get("/health-check", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hello world"))
+		_, _ = w.Write([]byte("hello world"))
 	})
 
-	fmt.Println("serving")
-	if err := http.ListenAndServe("0.0.0.0:8080", r); err != nil {
-		log.Fatal(err)
-	}
+	r.Get("/test", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(fmt.Sprintf("request id: %s", middleware.GetReqID(r.Context()))))
+	})
+
+	return r
 }
