@@ -16,6 +16,10 @@ type (
 		RedisHost string `envconfig:"REDIS_HOST" required:"true"`
 		RedisPort string `envconfig:"REDIS_PORT" required:"true"`
 		RedisPass string `envconfig:"REDIS_PASSWORD" required:"true"`
+
+		LogLevel string `envconfig:"LOG_LEVEL" required:"false"`
+
+		RiderApiKey string `envconfig:"RIDER_API_KEY" required:"true"`
 	}
 )
 
@@ -40,4 +44,8 @@ func (c *Specification) RedisAddr() string {
 
 func (c *Specification) RedisPassword() string {
 	return c.RedisPass
+}
+
+func (c *Specification) GetLogLevel() string {
+	return c.LogLevel
 }
