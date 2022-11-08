@@ -19,7 +19,8 @@ type (
 
 		LogLevel string `envconfig:"LOG_LEVEL" required:"false"`
 
-		RiderApiKey string `envconfig:"RIDER_API_KEY" required:"true"`
+		RiderApiKey  string `envconfig:"RIDER_API_KEY" required:"true"`
+		ClientApiKey string `envconfig:"CLIENT_API_KEY" required:"true"`
 	}
 )
 
