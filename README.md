@@ -8,9 +8,9 @@
 
 For the server side app, I want to use kafka. As it is append-only log, it is to create a series of events out of the box. So, we will be able to plot the location(s) of scooters in an orderly sequence.
 
-**Namespacing/Portioning**
+**Namespacing/Partioning**
 
-Having proper namespacing / portioning based on location, our load-balancers can improve significantly in performance. Imagine this theory, suppose we have a 10x10 KM area, where 1x1KM is Name Area1 to AreaN. 
+Having proper namespacing / partioning based on location, our load-balancers can improve significantly in performance. Imagine this theory, suppose we have a 10x10 KM area, where 1x1KM is Name Area1 to AreaN. 
 
 If we could determine the current location of the mobile client (eg: Area5), and in our data store, we namespace/prefix the records in `Partion Area5` : Append only log all the scooters that are currently in that area. So scooterID, lat, long etc. 
 

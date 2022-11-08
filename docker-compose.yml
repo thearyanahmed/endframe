@@ -22,18 +22,7 @@ services:
     volumes:
       - ./:/app
 
-  # rider:
-  #   container_name: rider
-  #   build:
-  #     dockerfile: rider.Dockerfile
-  #     context: .
-  #   command: make run-core
-  #   depends_on:
-  #     - core
-  #   ports:
-  #     - "${RIDER_PORT:-8082}:8080"
-  #   volumes:
-  #     - ./:/app
+  
 
   redis:
     image: redis:6.2-alpine
