@@ -3,7 +3,7 @@ RIDER_CONTAINER = rider
 CLIENT_CONTAINER = client
 DOCKER_COMPOSE_EXISTS := $(shell command -v docker-compose 2> /dev/null)
 
-.PHONY: up stop ps ssh-core run-core build-core deps-core test-core ssh-rider run-rider build-rider deps-rider test-rider ssh-client run-client build-client deps-client test-client
+.PHONY: up stop ps simulate ssh-core run-core build-core deps-core test-core ssh-rider run-rider build-rider deps-rider test-rider ssh-client run-client build-client deps-client test-client
 
 up:
 	@docker-compose up # -d # @todo remove -d
@@ -14,6 +14,9 @@ stop:
 ps:
 	@docker-compose ps
 
+simulate:
+	@echo "running outside of container for now."
+	go run cmd/client/main.go
 # core
 ssh-core:
 	@docker-compose exec $(CORE_CONTAINER) bash
