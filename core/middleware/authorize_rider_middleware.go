@@ -45,7 +45,11 @@ func (m *authorizeRiderMiddleware) Handle(next http.Handler) http.Handler {
 			presenter.ErrorResponse(w, r, presenter.ErrUnauthorized())
 			return
 		}
-
+		go func() {
+			m.logger.
+				WithField("req-id", middleware.GetReqID(r.Context())).
+				Trace("authorized to rider app")
+		}()
 		next.ServeHTTP(w, r)
 	})
 }
