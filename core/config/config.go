@@ -39,11 +39,11 @@ func (c *Specification) AppAddress() string {
 	return fmt.Sprintf("0.0.0.0:%s", c.App.Port)
 }
 
-func (c *Specification) RedisAddr() string {
+func (c *Specification) GetRedisAddr() string {
 	return fmt.Sprintf("%s:%s", c.RedisHost, c.RedisPort)
 }
 
-func (c *Specification) RedisPassword() string {
+func (c *Specification) GetRedisPassword() string {
 	return c.RedisPass
 }
 
