@@ -4,12 +4,16 @@ import (
 	"fmt"
 	"net/http"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/thearyanahmed/nordsec/core/config"
+	coreMiddleware "github.com/thearyanahmed/nordsec/core/middleware"
 
 	"github.com/go-chi/chi/v5"
 )
 
-func NewRouter() http.Handler {
+func NewRouter(conf *config.Specification, logger log.Logger) http.Handler {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
@@ -26,15 +30,15 @@ func NewRouter() http.Handler {
 			// This endpoint should return all available vehichles within an area
 			// also should support filter by query params
 			// optional: perhaps we can also filter by the radius
-			r.Get("/rides-near-by/{lat}/{long}/", func(w http.ResponseWriter, r *http.Request) {
+			r.Get("/rides-near-by/{lat}/{long}/", func(w http.ResponseWriter, r *http.Request) { // client user's app
 				_, _ = w.Write([]byte(fmt.Sprintf("lat: %s,long: %s", chi.URLParam(r, "lat"), chi.URLParam(r, "long"))))
 			})
 
 			// This endpoint spawns a ride from taking lat long and some other values from
 			// the rider app.
-			r.Post("/ride/spwan", func(w http.ResponseWriter, r *http.Request) {
-
-			})
+			// This simulates the idea of a rider, who just came online
+			r.With(coreMiddleware.NewAuthorizeRiderMiddleware(conf.RiderApiKey, logger).Handle).
+				Post("/ride/activate", NewActiveRideHandler().ServeHTTP)
 
 			// This endpoint takes input from the input, validates it.
 			// Upon succesful validation, it creates creates 1 database entry, updates redis & go kafka().

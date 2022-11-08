@@ -3,14 +3,16 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/thearyanahmed/nordsec/core/config"
-	"github.com/thearyanahmed/nordsec/core/handler"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/thearyanahmed/nordsec/core/config"
+	"github.com/thearyanahmed/nordsec/core/handler"
+	"github.com/thearyanahmed/nordsec/core/logger"
 )
 
 func main() {
@@ -20,7 +22,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	router := handler.NewRouter()
+	logger.Setup(conf)
+
+	router := handler.NewRouter(conf, logger.Logger())
 
 	address := conf.AppAddress()
 
