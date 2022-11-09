@@ -53,3 +53,15 @@ authenticate with the server using a static API key (i.e. no individual
 credentials necessary but will most probably be introduced as the project
 develops further).
 
+```json
+
+db.rides.find({ 
+    coordinates: { 
+        "$geoWithin" : { 
+            "$box" : [
+                [ 52.3980, 13.493 ], 
+                [ 52.452, 13.492  ]]
+            } 
+        }
+    })
+```
