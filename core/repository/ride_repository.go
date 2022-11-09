@@ -16,7 +16,7 @@ func NewRideRepository(ds *redis.Client) *RideRepository {
 	}
 }
 
-func (r *RideRepository) UpdateLocation(ctx context.Context, uuid string, lat, long float64) (RideSchema, error) {
+func (r *RideRepository) UpdateLocation(ctx context.Context, uuid string, lat, long float64) (RideLocationSchema, error) {
 	loc := redis.GeoLocation{
 		Name:      uuid,
 		Latitude:  lat,
@@ -27,7 +27,7 @@ func (r *RideRepository) UpdateLocation(ctx context.Context, uuid string, lat, l
 	_, err := r.datastore.GeoAdd(ctx, "test", &loc).Result()
 
 	if err != nil {
-		return RideSchema{}, err
+		return RideLocationSchema{}, err
 	}
 
 	return FromRedisGeoLocation(loc), err
