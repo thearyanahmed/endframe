@@ -6,6 +6,7 @@ import (
 
 	"github.com/thearyanahmed/nordsec/core/entity"
 	"github.com/thearyanahmed/nordsec/core/presenter"
+	"github.com/thearyanahmed/nordsec/core/serializer"
 )
 
 type activateRideUsecase interface {
@@ -25,7 +26,14 @@ func NewActivateRideHandler(usecase activateRideUsecase) *activateRideHandler {
 func (h *activateRideHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// validate the request
 	// check if lat long is valid
-	loc, err := h.usecase.UpdateRideLocation(r.Context(), "uuid-1234-5678", -76.61219090223312378, 39.29038444452294954)
+	formRequest := &serializer.UpdateRideLocationRequest{}
+
+	if formErrors := serializer.ValidatePostForm(r, formRequest); len(formErrors) > 0 {
+		presenter.ErrorResponse(w, r, presenter.ErrorValidationFailed(formErrors))
+		return
+	}
+
+	loc, err := h.usecase.UpdateRideLocation(r.Context(), formRequest.UUID, formRequest.Latitude, formRequest.Longitude)
 
 	// also need to trigger event
 	if err != nil {

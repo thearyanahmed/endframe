@@ -32,13 +32,20 @@ func FromErr(err error) *Response {
 }
 
 func ErrorResponse(w http.ResponseWriter, r *http.Request, er *Response) {
-	render.Status(r, er.HttpStatusCode)
 	RenderJsonResponse(w, r, er.HttpStatusCode, er)
 }
 
 func RenderJsonResponse(w http.ResponseWriter, r *http.Request, statusCode int, data interface{}) {
 	render.Status(r, statusCode)
 	render.JSON(w, r, data)
+}
+
+func ErrorValidationFailed(validationErrors url.Values) *Response {
+	return &Response{
+		HttpStatusCode: http.StatusBadRequest,
+		Message:        "validation failed",
+		Details:        validationErrors,
+	}
 }
 
 func ErrInvalidContentType() *Response {

@@ -1,10 +1,11 @@
 package serializer
 
 import (
-	"github.com/gorilla/schema"
-	"github.com/thedevsaddam/govalidator"
 	"net/http"
 	"net/url"
+
+	"github.com/gorilla/schema"
+	"github.com/thedevsaddam/govalidator"
 )
 
 type RequestValidatorInterface interface {
