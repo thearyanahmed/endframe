@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/thearyanahmed/nordsec/core/config"
+	"github.com/thearyanahmed/nordsec/core/db"
 	"github.com/thearyanahmed/nordsec/core/handler"
 	"github.com/thearyanahmed/nordsec/core/logger"
 	"github.com/thearyanahmed/nordsec/core/service"
@@ -25,7 +26,13 @@ func main() {
 
 	logger.Setup(conf)
 
-	svcAggregator, err := service.NewServiceAggregator(conf, logger.Logger())
+	_, database, err := db.ConnectToMongo(context.TODO(), "mongodb://db:27017", "geo_hex")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	svcAggregator, err := service.NewServiceAggregator(conf, database, logger.Logger())
 
 	if err != nil {
 		log.Fatal(err)

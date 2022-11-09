@@ -1,28 +1,23 @@
 package repository
 
 import (
-	"github.com/go-redis/redis/v8"
 	"github.com/thearyanahmed/nordsec/core/entity"
 )
 
 type RideLocationSchema struct {
-	UUID      string
-	Latitude  float64
-	Longitude float64
+	UUID        string      `bson:"_id"`
+	Coordinates Coordinates `bson:"coordinates"`
 }
 
-func FromRedisGeoLocation(geo redis.GeoLocation) RideLocationSchema {
-	return RideLocationSchema{
-		UUID:      geo.Name,
-		Latitude:  geo.Latitude,
-		Longitude: geo.Longitude,
-	}
+type Coordinates struct {
+	Latitude  float64 `bson:"latitude"`
+	Longitude float64 `bson:"longitude"`
 }
 
 func (r *RideLocationSchema) ToEntity() entity.RideLocationEntity {
 	return entity.RideLocationEntity{
 		UUID:      r.UUID,
-		Latitude:  r.Latitude,
-		Longitude: r.Longitude,
+		Latitude:  r.Coordinates.Latitude,
+		Longitude: r.Coordinates.Longitude,
 	}
 }

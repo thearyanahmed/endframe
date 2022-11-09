@@ -11,6 +11,7 @@ import (
 
 type activateRideUsecase interface {
 	UpdateRideLocation(ctx context.Context, rideUuid string, lat, long float64) (entity.RideLocationEntity, error)
+	FindById(ctx context.Context, uuid string) (entity.RideLocationEntity, error)
 }
 
 type activateRideHandler struct {
@@ -33,6 +34,19 @@ func (h *activateRideHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	// rideLocation, err := h.usecase.FindById(r.Context(), formRequest.UUID)
+
+	// if err != nil {
+	// 	if err == mongo.ErrNoDocuments {
+	// 		// create new
+	// 		presenter.ErrorResponse(w, r, presenter.FromErr(err))
+	// 		return
+	// 	}
+
+	// }
+	// fmt.Print(rideLocation, err)
+	// w.Write([]byte("end"))
+	// return
 	loc, err := h.usecase.UpdateRideLocation(r.Context(), formRequest.UUID, formRequest.Latitude, formRequest.Longitude)
 
 	// also need to trigger event

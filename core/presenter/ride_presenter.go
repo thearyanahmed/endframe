@@ -5,8 +5,8 @@ import (
 )
 
 type RideLocationUpdateResponse struct {
-	Message string `json:"message"`
-	Details LocationDetails
+	Message string          `json:"message"`
+	Details LocationDetails `json:"details"`
 }
 
 type LocationDetails struct {
