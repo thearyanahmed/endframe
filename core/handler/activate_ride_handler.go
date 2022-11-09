@@ -1,34 +1,36 @@
 package handler
 
 import (
+	"context"
 	"net/http"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/thearyanahmed/nordsec/core/presenter"
 )
 
 type activateRideUsecase interface {
-	UpdateRideStatus()
+	UpdateRideLocation(ctx context.Context, rideUuid string, lat, long float64) error
 }
 
 type activateRideHandler struct {
 	usecase activateRideUsecase
-	logger  *log.Logger
 }
 
-func NewActivateRideHandler(usecase activateRideUsecase, logger *log.Logger) *activateRideHandler {
+func NewActivateRideHandler(usecase activateRideUsecase) *activateRideHandler {
 	return &activateRideHandler{
 		usecase: usecase,
-		logger:  logger,
 	}
 }
 
 func (h *activateRideHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// validate the request
-	// put to redis
-	// put to kafka
-	// return a response
+	// check if lat long is valid
+	err := h.usecase.UpdateRideLocation(r.Context(), "cities", -76.61219090223312378, 39.29038444452294954)
 
-	h.usecase.UpdateRideStatus()
+	if err != nil {
+		presenter.ErrorResponse(w, r, presenter.FromErr(err))
+		return
+	}
 
-	w.Write([]byte("done, check console log"))
+	res := presenter.RideLocationUpdateResponse{Message: "ride location updated"}
+	presenter.RenderJsonResponse(w, r, http.StatusOK, res)
 }

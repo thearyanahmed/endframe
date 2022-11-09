@@ -40,7 +40,7 @@ func NewRouter(conf *config.Specification, svcAggregator *service.ServiceAggrega
 			// This simulates the idea of a rider, who just came online
 			r.With(coreMiddleware.ValidateContentTypeMiddleware).
 				With(coreMiddleware.NewAuthorizeRiderMiddleware(conf.RiderApiKey, logger).Handle).
-				Post("/ride/activate", NewActivateRideHandler(svcAggregator.RideService, logger).ServeHTTP)
+				Post("/ride/activate", NewActivateRideHandler(svcAggregator.RideService).ServeHTTP)
 
 			// This endpoint takes input from the input, validates it.
 			// Upon succesful validation, it creates creates 1 database entry, updates redis & go kafka().
