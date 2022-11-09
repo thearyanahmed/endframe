@@ -1,3 +1,5 @@
+include .env
+
 CORE_CONTAINER = core
 RIDER_CONTAINER = rider
 CLIENT_CONTAINER = client
@@ -15,8 +17,8 @@ ps:
 	@docker-compose ps
 
 simulate:
-	@echo "running outside of container for now."
-	go run cmd/client/main.go
+	@echo "[+] Running outside of container. Spawnning 1000 riders."
+	@go run cmd/rider/main.go 1000 ${RIDER_API_KEY} ${CORE_URL}
 # core
 ssh-core:
 	@docker-compose exec $(CORE_CONTAINER) bash
