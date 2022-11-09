@@ -24,6 +24,13 @@ func ErrUnauthorized() *Response {
 	}
 }
 
+func FromErr(err error) *Response {
+	return &Response{
+		HttpStatusCode: http.StatusUnprocessableEntity, // @todo update here
+		Message:        err.Error(),
+	}
+}
+
 func ErrorResponse(w http.ResponseWriter, r *http.Request, er *Response) {
 	render.Status(r, er.HttpStatusCode)
 	RenderJsonResponse(w, r, er.HttpStatusCode, er)
