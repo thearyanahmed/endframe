@@ -1,6 +1,8 @@
 package presenter
 
 import (
+	"fmt"
+
 	"github.com/thearyanahmed/nordsec/core/entity"
 )
 
@@ -10,9 +12,9 @@ type RideLocationUpdateResponse struct {
 }
 
 type LocationDetails struct {
-	UUID      string  `json:"uuid"`
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
+	UUID      string `json:"uuid"`
+	Latitude  string `json:"latitude"`
+	Longitude string `json:"longitude"`
 }
 
 func FromRideLocationEntity(e entity.RideLocationEntity) RideLocationUpdateResponse {
@@ -20,8 +22,8 @@ func FromRideLocationEntity(e entity.RideLocationEntity) RideLocationUpdateRespo
 		Message: "ride location updated",
 		Details: LocationDetails{
 			UUID:      e.UUID,
-			Latitude:  e.Latitude,
-			Longitude: e.Longitude,
+			Latitude:  fmt.Sprintf("%.8f", e.Latitude),
+			Longitude: fmt.Sprintf("%.8f", e.Longitude),
 		},
 	}
 }
