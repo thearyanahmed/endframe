@@ -15,9 +15,122 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/google/uuid"
+	"github.com/mmcloughlin/geohash"
 )
 
+type Coord struct {
+	Latitude  float64
+	Longitude float64
+}
+
 func main() {
+	//cord := getRandomCoordinates()
+	//
+	//gh := geohash.Encode(cord.Latitude, cord.Longitude)
+	//
+	//neighbours := geohash.Neighbors(gh)
+	//
+	//fmt.Printf("geohash: %s\nlat:%v,lon:%v\n", gh, cord.Latitude, cord.Longitude)
+	//
+	//fmt.Println("neighbours")
+	//for _, v := range neighbours {
+	//	fmt.Println(v)
+	//}
+
+	twoPair := getTwoPair()
+	fmt.Println(twoPair)
+
+	box := makeBox(getCorners(twoPair))
+
+	fmt.Println(box)
+
+	centerX, centerY := box.Center()
+
+	encodedCenter := geohash.EncodeWithPrecision(centerX, centerY, 6)
+	fmt.Println(encodedCenter)
+
+	neighbours := geohash.Neighbors(encodedCenter)
+
+	fmt.Println("neighbours")
+	for _, v := range neighbours {
+		fmt.Println(v)
+	}
+}
+
+func getCorners(dataset []Coord) (float64, float64, float64, float64) {
+	minX, minY := dataset[0].Latitude, dataset[0].Longitude
+
+	maxX, maxY := dataset[2].Latitude, dataset[3].Longitude
+
+	return minX, minY, maxX, maxY
+}
+
+func makeBox(minX, minY, maxX, maxY float64) geohash.Box {
+	return geohash.Box{
+		MinLat: minX,
+		MaxLat: maxX,
+		MinLng: minY,
+		MaxLng: maxY,
+	}
+}
+
+func getTwoPair() []Coord {
+	var cord []Coord
+
+	// (0,0) bottom left
+	cord = append(cord, Coord{
+		Latitude:  latInRange(52.10000, 52.30000),
+		Longitude: lonInRange(13.10000, 13.30000),
+	})
+
+	// (6,0)
+	cord = append(cord, Coord{
+		Latitude:  latInRange(52.10000, 52.30000),
+		Longitude: lonInRange(13.10000, 13.30000),
+	})
+
+	// (6,6) // top right
+	cord = append(cord, Coord{
+		Latitude:  latInRange(52.31000, 52.50000),
+		Longitude: lonInRange(13.40000, 13.60000),
+	})
+
+	cord = append(cord, Coord{
+		Latitude:  latInRange(52.10000, 52.30000),
+		Longitude: lonInRange(13.60000, 13.90000),
+	})
+
+	return cord
+}
+
+func latInRange(a, b float64) float64 {
+	c, _ := gofakeit.LatitudeInRange(a, b)
+
+	return c
+}
+
+func lonInRange(a, b float64) float64 {
+	c, _ := gofakeit.LongitudeInRange(a, b)
+
+	return c
+}
+
+func getRandomCoordinates() Coord {
+	lat, _ := gofakeit.LatitudeInRange(latitudeRange())
+	lon, _ := gofakeit.LongitudeInRange(longitudeRange())
+
+	return Coord{lat, lon}
+}
+
+func latitudeRange() (float64, float64) {
+	return 52.30000, 52.50000
+}
+
+func longitudeRange() (float64, float64) {
+	return 13.46000, 13.54000
+}
+
+func spawnRiders() {
 	if len(os.Args) < 4 {
 		log.Fatal("missing required parameters. see readme.", os.Args)
 	}
@@ -106,12 +219,4 @@ func makeRequest(i int, ch chan<- string, apiKey, endpoint string, wg *sync.Wait
 	}
 
 	ch <- string(body)
-}
-
-func latitudeRange() (float64, float64) {
-	return 52.30000, 52.50000
-}
-
-func longitudeRange() (float64, float64) {
-	return 13.46000, 13.54000
 }
