@@ -37,9 +37,8 @@ func (r *RideRepository) UpdateLocation(ctx context.Context, ghash string, trip 
 	return err
 }
 
-func (r *RideRepository) getIds(ctx context.Context, ids []string) {
-	data := r.datastore.MGet(ctx, ids...).Val()
-	fmt.Println("MGET() DATA", data)
+func (r *RideRepository) getIds(ctx context.Context, ids []string) ([]interface{}, error) {
+	return r.datastore.MGet(ctx, ids...).Result()
 }
 
 func (r *RideRepository) GetRideEvents(ctx context.Context, geohashKeys []string, keyLen int) ([]RideEventSchema, error) {
@@ -66,6 +65,35 @@ func (r *RideRepository) GetRideEvents(ctx context.Context, geohashKeys []string
 	return collection, nil
 }
 
+func (r *RideRepository) applyStateFilter(ctx context.Context, m map[string]RideEventSchema) map[string]RideEventSchema {
+	var keys []string
+
+	for k, _ := range m {
+		keys = append(keys, k)
+	}
+
+	keyLen := len(keys)
+	if keyLen == 0 {
+		return m
+	}
+
+	res, err := r.getIds(ctx, keys)
+
+	if err != nil {
+		return m
+	}
+
+	for i := 0; i < keyLen; i++ {
+		if res[i] != nil {
+			eventSchema := m[keys[i]]
+			eventSchema.State = fmt.Sprintf("%v", res[i])
+			m[keys[i]] = eventSchema
+		}
+	}
+
+	return m
+}
+
 func (r *RideRepository) GetRideEventsFromMultiGeohash(ctx context.Context, geohashKeys []string) (interface{}, error) {
 	// get all rides from redis
 	// use concurrency with waitGroups
@@ -82,19 +110,24 @@ func (r *RideRepository) GetRideEventsFromMultiGeohash(ctx context.Context, geoh
 		return map[string]RideEventSchema{}, nil
 	}
 
+	// flat array, includes duplicate elements of the same event(ride event schema)
 	collection, err := r.GetRideEvents(ctx, geohashKeys, glen)
 
 	if err != nil {
 		return map[string]RideEventSchema{}, err
 	}
 
+	// from the duplicate ones, filter out
+	// @improvement: maybe we can have something like r.applyFilter(function, data)
+	m := r.applyUniqueFilter(collection)
+
 	// @todo apply PostFilters
-	// @todo sort the collection by timestamp
+	m = r.applyStateFilter(ctx, m)
 
-	//sort.Slice(collection, func(i, j int) bool {
-	//	return collection[i].Timestamp < collection[j].Timestamp
-	//})
+	return m, nil
+}
 
+func (r *RideRepository) applyUniqueFilter(collection []RideEventSchema) map[string]RideEventSchema {
 	m := make(map[string]RideEventSchema)
 
 	for _, c := range collection {
@@ -106,10 +139,10 @@ func (r *RideRepository) GetRideEventsFromMultiGeohash(ctx context.Context, geoh
 			}
 		}
 	}
-
-	return m, nil
+	return m
 }
 
+// @todo find a better name
 func (r *RideRepository) getRidesFromGeohash(ctx context.Context, ch chan []string, wg *sync.WaitGroup, geohashKey string, from, till int64) {
 	defer wg.Done()
 
@@ -120,6 +153,7 @@ func (r *RideRepository) getRidesFromGeohash(ctx context.Context, ch chan []stri
 	}
 }
 
+// @todo find a better name
 func mapZRangeValueToRideEventSchemaCollection(result []string) []RideEventSchema {
 	var events []RideEventSchema
 
