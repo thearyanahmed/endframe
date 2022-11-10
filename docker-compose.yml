@@ -22,13 +22,13 @@ services:
     volumes:
       - ./:/app
 
-  db:
-    image: mongo:latest
-    container_name: db
-    ports:
-      - "${DB_PORT:-27017}:27017"
-    volumes:
-      - db_volume:/data/db
+#  db:
+#    image: mongo:latest
+#    container_name: db
+#    ports:
+#      - "${DB_PORT:-27017}:27017"
+#    volumes:
+#      - db_volume:/data/db
 
   redis:
     image: redis:6.2-alpine
