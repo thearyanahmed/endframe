@@ -1,45 +1,74 @@
 package location
 
 import (
+	"context"
 	"fmt"
+	"github.com/go-redis/redis/v8"
 	"github.com/mmcloughlin/geohash"
 )
 
 type Service struct {
-	hashLength uint
-
-	ds datastore
+	geohashLength uint
+	repo          rideRepository
 }
 
-type datastore struct {
-	ridesKey string
+type rideRepository interface {
+	UpdateLocation(ctx context.Context, ghash string, trip RideEventSchema) error
+	GetRideEventsFromMultiGeohash(ctx context.Context, geohashKeys []string) ([]RideEventSchema, error)
 }
 
-func NewGeoHash() Service {
-	ds := datastore{
-		ridesKey: "trips",
+// NewLocationService
+// @todo use a builder pattern to build out the service?
+func NewLocationService(ds *redis.Client) *Service {
+	repo := NewRideRepository(ds, "trips")
+
+	return &Service{
+		geohashLength: uint(6),
+		repo:          repo,
 	}
-
-	return Service{
-		hashLength: uint(6),
-		ds:         ds,
-	}
 }
 
-func (s *Service) UpdateRideLocation(rideId string, location Coordinate) error {
+func getGeoHash(lat, lon float64, precision uint) string {
+	return geohash.EncodeWithPrecision(lat, lon, precision)
+}
+
+func (s *Service) RecordRideEvent(ctx context.Context, event RideEvent) (RideEvent, error) {
 	// get the location geohash
-	ghash := location.Geohash(s.hashLength)
+	ghash := getGeoHash(event.Lat, event.Lon, s.geohashLength)
 
 	err := geohash.Validate(ghash)
 
 	if err != nil {
-		fmt.Println(err)
-		return err
+		return RideEvent{}, err
 	}
 
-	return nil
+	loc := fromRideEventEntity(event).WithNewUuid()
+
+	err = s.repo.UpdateLocation(ctx, ghash, *loc)
+
+	if err != nil {
+		return RideEvent{}, err
+	}
+
+	return loc.ToEntity(), nil
 }
 
-func GetRidesIn(area Area) {
+func (s *Service) GetRidesInArea(ctx context.Context, area Area) ([]RideEvent, error) {
+	// first get the data in area
+	// then apply the filters if any
+	neighbours := area.GetNeighbourGeohashFromCenter(s.geohashLength)
 
+	fmt.Println("AREA", area)
+	fmt.Println("neighbours", neighbours)
+
+	rides, err := s.repo.GetRideEventsFromMultiGeohash(ctx, neighbours)
+
+	if err != nil {
+		fmt.Println("ERROR ->", err)
+		return []RideEvent{}, err
+	}
+
+	fmt.Println(rides, err)
+
+	return fromRideEventCollection(rides), nil
 }
