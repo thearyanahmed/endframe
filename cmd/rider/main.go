@@ -24,19 +24,6 @@ type Coord struct {
 }
 
 func main() {
-	//cord := getRandomCoordinates()
-	//
-	//gh := geohash.Encode(cord.Latitude, cord.Longitude)
-	//
-	//neighbours := geohash.Neighbors(gh)
-	//
-	//fmt.Printf("geohash: %s\nlat:%v,lon:%v\n", gh, cord.Latitude, cord.Longitude)
-	//
-	//fmt.Println("neighbours")
-	//for _, v := range neighbours {
-	//	fmt.Println(v)
-	//}
-
 	twoPair := getTwoPair()
 	fmt.Println(twoPair)
 
@@ -53,7 +40,8 @@ func main() {
 
 	fmt.Println("neighbours")
 	for _, v := range neighbours {
-		fmt.Println(v)
+		lat, lon := geohash.Decode(v)
+		fmt.Printf("lat: %.5f lon: %.5f geo: %v\n", lat, lon, v)
 	}
 }
 

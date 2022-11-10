@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"github.com/go-redis/redis/v8"
 	"github.com/thearyanahmed/nordsec/core/entity"
 )
 
@@ -19,5 +20,17 @@ func (r *RideLocationSchema) ToEntity() entity.RideLocationEntity {
 		UUID:      r.UUID,
 		Latitude:  r.Coordinates.Latitude,
 		Longitude: r.Coordinates.Longitude,
+	}
+}
+
+func FromRedisGeoLocation(geo redis.GeoLocation) RideLocationSchema {
+	coordinate := Coordinates{
+		Latitude:  geo.Latitude,
+		Longitude: geo.Longitude,
+	}
+
+	return RideLocationSchema{
+		UUID:        geo.Name,
+		Coordinates: coordinate,
 	}
 }

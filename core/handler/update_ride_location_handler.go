@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/thearyanahmed/nordsec/services/location"
 	"net/http"
+	"time"
 
 	"github.com/thearyanahmed/nordsec/core/entity"
 	"github.com/thearyanahmed/nordsec/core/presenter"
@@ -30,26 +31,24 @@ func NewActivateRideHandler(usecase activateRideUsecase, locSvc *location.Servic
 func (h *activateRideHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// validate the request
 	// check if lat long is valid
-	formRequest := &serializer.UpdateRideLocationRequest{}
+	// @todo find a better name
+	eventRequest := &serializer.RecordRideEventRequest{}
 
-	if formErrors := serializer.ValidatePostForm(r, formRequest); len(formErrors) > 0 {
+	if formErrors := serializer.ValidatePostForm(r, eventRequest); len(formErrors) > 0 {
 		presenter.ErrorResponse(w, r, presenter.ErrorValidationFailed(formErrors))
 		return
 	}
 
-	//loc, err := h.usecase.UpdateRideLocation(r.Context(), formRequest.UUID, formRequest.Latitude, formRequest.Longitude)
-	//
-	//// also need to trigger event
-	//if err != nil {
-	//	presenter.ErrorResponse(w, r, presenter.FromErr(err))
-	//	return
-	//}
-
-	cord := location.Coordinate{
-		Lat: formRequest.Latitude,
-		Lon: formRequest.Longitude,
+	rideEvent := location.RideEvent{
+		RideUuid:      eventRequest.RideUuid,
+		Lat:           eventRequest.Longitude,
+		Lon:           eventRequest.Longitude,
+		PassengerUuid: "",
+		State:         "available",
+		Timestamp:     time.Now().Unix(),
 	}
-	loc, err := h.locationSvc.UpdateRideLocation(r.Context(), formRequest.UUID, "", "available", cord)
+
+	loc, err := h.locationSvc.RecordRideEvent(r.Context(), rideEvent)
 
 	if err != nil {
 		presenter.ErrorResponse(w, r, presenter.FromErr(err))

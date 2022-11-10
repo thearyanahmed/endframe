@@ -1,19 +1,27 @@
 package serializer
 
 import (
+	"github.com/thearyanahmed/nordsec/services/location"
 	"github.com/thedevsaddam/govalidator"
 )
 
-type UpdateRideLocationRequest struct {
-	UUID      string  `json:"uuid" schema:"uuid"`
+type RecordRideEventRequest struct {
+	RideUuid  string  `json:"ride_uuid" schema:"ride_uuid"`
 	Latitude  float64 `json:"latitude" schema:"latitude"`
 	Longitude float64 `json:"longitude" schema:"longitude"`
 }
 
-func (r *UpdateRideLocationRequest) Rules() govalidator.MapData {
+func (r *RecordRideEventRequest) Rules() govalidator.MapData {
 	return govalidator.MapData{
-		"uuid":      []string{"required", "uuid_v4"},
+		"ride_uuid": []string{"required", "uuid_v4"},
 		"latitude":  []string{"required", "lat"},
 		"longitude": []string{"required", "lon"},
+	}
+}
+
+func (r *RecordRideEventRequest) ToLocationCoordinate() location.Coordinate {
+	return location.Coordinate{
+		Lat: r.Latitude,
+		Lon: r.Longitude,
 	}
 }

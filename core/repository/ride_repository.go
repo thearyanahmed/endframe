@@ -2,54 +2,42 @@ package repository
 
 import (
 	"context"
-
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"github.com/go-redis/redis/v8"
 )
 
 type RideRepository struct {
-	datastore *mongo.Collection
+	datastore *redis.Client
 }
 
-func NewRideRepository(ds *mongo.Collection) *RideRepository {
+func NewRideRepository(ds *redis.Client) *RideRepository {
 	return &RideRepository{
 		datastore: ds,
 	}
 }
 
 func (r *RideRepository) FindById(ctx context.Context, uuid string) (RideLocationSchema, error) {
-	var rideLocation RideLocationSchema
+	//var rideLocation RideLocationSchema
 
-	if err := r.datastore.FindOne(ctx, bson.M{"_id": uuid}).Decode(&rideLocation); err != nil {
-		return RideLocationSchema{}, nil
-	}
+	//if err := r.datastore.FindOne(ctx, bson.M{"_id": uuid}).Decode(&rideLocation); err != nil {
+	return RideLocationSchema{}, nil
+	//}
 
-	return rideLocation, nil
+	//return rideLocation, nil
 }
 
 func (r *RideRepository) UpdateLocation(ctx context.Context, uuid string, lat, lon float64) (RideLocationSchema, error) {
-	cord := Coordinates{
+	loc := redis.GeoLocation{
+		Name:      uuid,
 		Latitude:  lat,
 		Longitude: lon,
 	}
 
-	schema := RideLocationSchema{
-		UUID:        uuid,
-		Coordinates: cord,
-	}
-
-	updateWith := bson.D{{Key: "$set", Value: schema}}
-
-	filter := bson.M{"_id": uuid}
-	opts := options.Update().SetUpsert(true)
-
 	// @todo need to update list name
-	_, err := r.datastore.UpdateOne(ctx, filter, updateWith, opts)
+	_, err := r.datastore.GeoAdd(ctx, "test", &loc).Result()
 
 	if err != nil {
 		return RideLocationSchema{}, err
 	}
 
-	return schema, err
+	return FromRedisGeoLocation(loc), nil
 }

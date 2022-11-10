@@ -4,28 +4,25 @@
 - [https://www.memurai.com/blog/geospatial-queries-in-redis](https://www.memurai.com/blog/geospatial-queries-in-redis)
 
 ## My Thoughts 
-**Using Kafka**
+We want to use redis with geohash. Given an 
 
-For the server side app, I want to use kafka. As it is append-only log, it is to create a series of events out of the box. So, we will be able to plot the location(s) of scooters in an orderly sequence.
+**Geohash Tile Sizes**
+```bash
+Length	Tile Size
+1	5,009.4km x 4,992.6km
+2	1,252.3km x 624.1km
+3	156.5km x 156km
+4	39.1km x 19.5km
+5	4.9km x 4.9km
+6	1.2km x 609.4m # | Our default value 
+7	152.9m x 152.4m
+8	38.2m x 19m
+9	4.8m x 4.8m
+10	1.2m x 59.5cm
+11	14.9cm x 14.9cm
+12	3.7cm x 1.9cm
+```
 
-**Namespacing/Partioning**
-
-Having proper namespacing / partioning based on location, our load-balancers can improve significantly in performance. Imagine this theory, suppose we have a 10x10 KM area, where 1x1KM is Name Area1 to AreaN. 
-
-If we could determine the current location of the mobile client (eg: Area5), and in our data store, we namespace/prefix the records in `Partion Area5` : Append only log all the scooters that are currently in that area. So scooterID, lat, long etc. 
-
-That way our load balancer / service can simply route the request to that specific portion, giving us performance boost and less resource is used. The trade-off would be simpy to add logical elements in the code to make sure we push to the right partion and keep in mind a single trip can be in multiple partitions (not at the same time) when the rider crosses **AreaX** to **AreaY**. 
-
-
-**Scalability**
-
-The backend (server) should be separated from the client. So we can independently scale up/down based on requirement. The location service would get a lot of hits, along with key value store. We want to separate the Key/Value store so we have a single source of truth.
-
-I'm planning to use Redis, simply because of fast data access and our system is also write heavy. Though we can use kafka, which is fast enough itself with a drive disk, kafka does not allow geo* based operations. Which will be needed to query to get the locations of scooters.
-
-**Data store**
-
-We have 3 different data stores here, kafka, redis and I would also want to use a RDMS. RDMS we because end of the day, we want our data to persist.
 
 ## Task
 A company called Scootin' Aboot will deploy electric scooters in Ottawa and
@@ -53,15 +50,12 @@ authenticate with the server using a static API key (i.e. no individual
 credentials necessary but will most probably be introduced as the project
 develops further).
 
-```json
-
-db.rides.find({ 
-    coordinates: { 
-        "$geoWithin" : { 
-            "$box" : [
-                [ 52.3980, 13.493 ], 
-                [ 52.452, 13.492  ]]
-            } 
-        }
-    })
+```javascript
+ZADD s4 1 "{\"state\":\"roaming\",\"timestamp\":\"1\", \"pos\":\"1\", \"ride_id\":\"ride-01\"}"
+ZADD s4 2 "{\"state\":\"in_route\",\"timestamp\":\"2\", \"pos\":\"1\", \"ride_id\":\"ride-01\"}"
+ZADD s4 2 "{\"state\":\"roaming\",\"timestamp\":\"2\", \"pos\":\"1\", \"ride_id\":\"ride-02\"}"
+ZADD s4 3 "{\"state\":\"in_route\",\"timestamp\":\"3\", \"pos\":\"2\", \"ride_id\":\"ride-01\"}"
+ZADD s4 4 "{\"state\":\"in_route\",\"timestamp\":\"4\", \"pos\":\"3\", \"ride_id\":\"ride-01\"}"
+ZADD s4 5 "{\"state\":\"cool_down\",\"timestamp\":\"5\", \"pos\":\"3\", \"ride_id\":\"ride-01\"}"
+ZADD s4 6 "{\"state\":\"roaming\",\"timestamp\":\"6\", \"pos\":\"4\", \"ride_id\":\"ride-01\"}"
 ```

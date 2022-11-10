@@ -4,25 +4,30 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/thearyanahmed/nordsec/core/config"
 	"github.com/thearyanahmed/nordsec/core/repository"
-	"go.mongodb.org/mongo-driver/mongo"
+	"github.com/thearyanahmed/nordsec/services/location"
 )
 
 type ServiceAggregator struct {
 	*RideService
+	LocationSvc *location.Service
 }
 
-func NewServiceAggregator(config *config.Specification, db *mongo.Database, logger *log.Logger) (*ServiceAggregator, error) {
-	// redis, err := repository.NewRedisClient(config.GetRedisAddr(), config.GetRedisPassword())
+func NewServiceAggregator(config *config.Specification, logger *log.Logger) (*ServiceAggregator, error) {
+	// @todo extract to different layer
+	redis, err := repository.NewRedisClient(config.GetRedisAddr(), config.GetRedisPassword())
 
-	// if err != nil {
-	// 	return &ServiceAggregator{}, err
-	// }
+	if err != nil {
+		return &ServiceAggregator{}, err
+	}
 
-	rideRepo := repository.NewRideRepository(db.Collection("rides_db_test"))
+	rideRepo := repository.NewRideRepository(redis)
 	rideSvc := NewRideService(rideRepo, logger)
+
+	locSvc := location.NewLocationService(redis)
 
 	aggregator := &ServiceAggregator{
 		RideService: rideSvc,
+		LocationSvc: locSvc,
 	}
 
 	return aggregator, nil
