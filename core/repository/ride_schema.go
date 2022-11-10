@@ -17,7 +17,7 @@ type Coordinates struct {
 
 func (r *RideLocationSchema) ToEntity() entity.RideLocationEntity {
 	return entity.RideLocationEntity{
-		UUID:      r.UUID,
+		RideUuid:  r.UUID,
 		Latitude:  r.Coordinates.Latitude,
 		Longitude: r.Coordinates.Longitude,
 	}

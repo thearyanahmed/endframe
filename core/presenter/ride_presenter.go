@@ -21,7 +21,7 @@ func FromRideLocationEntity(e entity.RideLocationEntity) RideLocationUpdateRespo
 	return RideLocationUpdateResponse{
 		Message: "ride location updated",
 		Details: LocationDetails{
-			UUID:      e.UUID,
+			UUID:      e.RideUuid,
 			Latitude:  fmt.Sprintf("%.8f", e.Latitude),
 			Longitude: fmt.Sprintf("%.8f", e.Longitude),
 		},

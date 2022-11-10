@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"fmt"
+	"github.com/thearyanahmed/nordsec/services/location"
 
 	"github.com/thearyanahmed/nordsec/core/entity"
 	"github.com/thearyanahmed/nordsec/core/repository"
@@ -26,6 +28,7 @@ func NewRideService(repo rideRepository, logger shared.LoggerInterface) *RideSer
 }
 
 func (s *RideService) UpdateRideLocation(ctx context.Context, uuid string, lat, long float64) (entity.RideLocationEntity, error) {
+	panic("deprecated")
 	schema, err := s.repository.UpdateLocation(ctx, uuid, lat, long)
 
 	if err != nil {
@@ -44,4 +47,10 @@ func (s *RideService) FindById(ctx context.Context, uuid string) (entity.RideLoc
 	}
 
 	return loc.ToEntity(), nil
+}
+
+func (s *RideService) FindNearByRides(ctx context.Context, area location.Area) ([]entity.RideEntity, error) {
+	fmt.Println("[ride service] GOT AREA", area)
+
+	return []entity.RideEntity{}, nil
 }

@@ -18,8 +18,8 @@ ps:
 
 simulate:
 	@echo "[+] Running outside of container. Spawning 1000 riders."
-	@for i in {1..20}; do go run cmd/rider/main.go 1000 ${RIDER_API_KEY} ${CORE_URL}; done;
-	@#go run cmd/rider/main.go 1000 ${RIDER_API_KEY} ${CORE_URL}
+	#@for i in {1..20}; do go run cmd/rider/main.go 1000 ${RIDER_API_KEY} ${CORE_URL}; done;
+	@go run cmd/rider/main.go 1000 ${RIDER_API_KEY} ${CORE_URL}
 # core
 ssh-core:
 	@docker-compose exec $(CORE_CONTAINER) bash

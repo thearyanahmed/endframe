@@ -4,6 +4,8 @@ import (
 	"github.com/google/uuid"
 )
 
+// @todo BIG REFACTOR
+
 type RideEventSchema struct {
 	Uuid          uuid.UUID `json:"uuid"`
 	RideUuid      string    `json:"ride_uuid"`

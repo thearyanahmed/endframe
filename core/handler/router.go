@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 
 	log "github.com/sirupsen/logrus"
@@ -31,9 +30,7 @@ func NewRouter(conf *config.Specification, svcAggregator *service.ServiceAggrega
 			// This endpoint should return all available vehicles within an area
 			// also should support filter by query params
 			// optional: perhaps we can also filter by the radius
-			r.Get("/rides-near-by/{lat}/{long}/", func(w http.ResponseWriter, r *http.Request) { // client user's app
-				_, _ = w.Write([]byte(fmt.Sprintf("lat: %s,long: %s", chi.URLParam(r, "lat"), chi.URLParam(r, "long"))))
-			})
+			r.Get("/rides-near-by", NewNearByRidesHandler(svcAggregator.RideService, svcAggregator.LocationSvc).ServeHTTP)
 
 			// This endpoint spawns a ride from taking lat long and some other values from
 			// the rider app.

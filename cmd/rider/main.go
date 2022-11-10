@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -24,6 +25,36 @@ type Coord struct {
 }
 
 func main() {
+	//spawnRiders()
+	testSort()
+}
+
+type TestCode struct {
+	V int
+}
+
+func testSort() {
+	var x []TestCode
+
+	for i := 0; i < 10; i++ {
+		x = append(x, TestCode{V: gofakeit.IntRange(1, 1000)})
+	}
+
+	for _, v := range x {
+		fmt.Println(v.V)
+	}
+
+	sort.Slice(x, func(i, j int) bool {
+		return x[i].V < x[j].V
+	})
+
+	fmt.Println("AFTER SPRT")
+	for _, v := range x {
+		fmt.Println(v.V)
+	}
+}
+
+func poc() {
 	twoPair := getTwoPair()
 	fmt.Println(twoPair)
 
@@ -165,7 +196,7 @@ func makeRequest(i int, ch chan<- string, apiKey, endpoint string, wg *sync.Wait
 
 	form := url.Values{}
 
-	form.Set("uuid", uuid.New().String())
+	form.Set("ride_uuid", uuid.New().String())
 	lat, err := gofakeit.LatitudeInRange(latitudeRange())
 	if err != nil {
 		ch <- err.Error()

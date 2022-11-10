@@ -1,13 +1,13 @@
 package entity
 
 type RideLocationEntity struct {
-	UUID      string
+	RideUuid  string
 	Latitude  float64
 	Longitude float64
 }
 
 type RideEntity struct {
-	UUID      string
+	RideUuid  string
 	Latitude  float64
 	Longitude float64
 	State     string // in route, available, cooldown

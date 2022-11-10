@@ -24,6 +24,11 @@ Length	Tile Size
 ```
 
 
+## NEXT TODOS
+
+1. 
+
+
 ## Task
 A company called Scootin' Aboot will deploy electric scooters in Ottawa and
 Montreal. Design and implement a backend service that exposes a REST-like
@@ -58,4 +63,10 @@ ZADD s4 3 "{\"state\":\"in_route\",\"timestamp\":\"3\", \"pos\":\"2\", \"ride_id
 ZADD s4 4 "{\"state\":\"in_route\",\"timestamp\":\"4\", \"pos\":\"3\", \"ride_id\":\"ride-01\"}"
 ZADD s4 5 "{\"state\":\"cool_down\",\"timestamp\":\"5\", \"pos\":\"3\", \"ride_id\":\"ride-01\"}"
 ZADD s4 6 "{\"state\":\"roaming\",\"timestamp\":\"6\", \"pos\":\"4\", \"ride_id\":\"ride-01\"}"
+
+
+ZADD u339gf 1668087835 "\{\"uuid\":\"321261f8-22cb-49ed-abdf-093de5657f4f\",\"ride_uuid\":\"35ac7da9-577b-4f29-860e-ab176894d693\",\"lat\":\"52.351873\",\"lon\":\"13.533073\",\"passenger_uuid\":\"\",\"timestamp\":\"1668087835\",\"state\":\"available\"}"
+ZADD u339gf 1668087855 "\{\"uuid\":\"321261f8-22cb-49ed-abdf-093de5657f4f\",\"ride_uuid\":\"35ac7da9-577b-4f29-860e-ab176894d693\",\"lat\":\"52.351873\",\"lon\":\"13.533073\",\"passenger_uuid\":\"\",\"timestamp\":\"1668087855\",\"state\":\"available\"}"
+ZADD u339gf 1668087999 "\{\"uuid\":\"321261f8-22cb-49ed-abdf-093de5657f4g\",\"ride_uuid\":\"35ac7da9-577b-4f29-860e-ab176894d693\",\"lat\":\"52.351873\",\"lon\":\"13.533073\",\"passenger_uuid\":\"\",\"timestamp\":\"1668087999\",\"state\":\"available\"}"
+ZADD u339gf 1668088001 "\{\"uuid\":\"321261f8-22cb-49ed-abdf-093de5657f4g\",\"ride_uuid\":\"35ac7da9-577b-4f29-860e-ab176894d693\",\"lat\":\"52.351873\",\"lon\":\"13.533073\",\"passenger_uuid\":\"\",\"timestamp\":\"1668088001\",\"state\":\"available\"}"
 ```

@@ -14,13 +14,13 @@ type Service struct {
 
 type rideRepository interface {
 	UpdateLocation(ctx context.Context, ghash string, trip RideEventSchema) error
-	GetRideEventsFromMultiGeohash(ctx context.Context, geohashKeys []string) ([]RideEventSchema, error)
+	GetRideEventsFromMultiGeohash(ctx context.Context, geohashKeys []string) (interface{}, error)
 }
 
 // NewLocationService
 // @todo use a builder pattern to build out the service?
 func NewLocationService(ds *redis.Client) *Service {
-	repo := NewRideRepository(ds, "trips")
+	repo := NewRideRepository(ds, "trips_test_01")
 
 	return &Service{
 		geohashLength: uint(6),
@@ -44,6 +44,7 @@ func (s *Service) RecordRideEvent(ctx context.Context, event RideEvent) (RideEve
 
 	loc := fromRideEventEntity(event).WithNewUuid()
 
+	fmt.Println("EVENT", event, "Ghash", ghash)
 	err = s.repo.UpdateLocation(ctx, ghash, *loc)
 
 	if err != nil {
@@ -53,7 +54,7 @@ func (s *Service) RecordRideEvent(ctx context.Context, event RideEvent) (RideEve
 	return loc.ToEntity(), nil
 }
 
-func (s *Service) GetRidesInArea(ctx context.Context, area Area) ([]RideEvent, error) {
+func (s *Service) GetRidesInArea(ctx context.Context, area Area) (interface{}, error) {
 	// first get the data in area
 	// then apply the filters if any
 	neighbours := area.GetNeighbourGeohashFromCenter(s.geohashLength)
@@ -65,10 +66,9 @@ func (s *Service) GetRidesInArea(ctx context.Context, area Area) ([]RideEvent, e
 
 	if err != nil {
 		fmt.Println("ERROR ->", err)
-		return []RideEvent{}, err
+		return map[string]RideEventSchema{}, err
 	}
 
-	fmt.Println(rides, err)
-
-	return fromRideEventCollection(rides), nil
+	return rides, nil
+	//return fromRideEventCollection(rides), nil
 }

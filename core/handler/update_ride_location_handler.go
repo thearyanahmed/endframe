@@ -17,7 +17,8 @@ type activateRideUsecase interface {
 }
 
 type activateRideHandler struct {
-	usecase     activateRideUsecase
+	usecase activateRideUsecase
+	// @todo extract interface
 	locationSvc *location.Service
 }
 
@@ -41,7 +42,7 @@ func (h *activateRideHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 
 	rideEvent := location.RideEvent{
 		RideUuid:      eventRequest.RideUuid,
-		Lat:           eventRequest.Longitude,
+		Lat:           eventRequest.Latitude,
 		Lon:           eventRequest.Longitude,
 		PassengerUuid: "",
 		State:         "available",
