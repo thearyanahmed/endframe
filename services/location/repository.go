@@ -3,10 +3,9 @@ package location
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
-
 	"github.com/go-redis/redis/v8"
+	"sync"
 )
 
 type RideRepository struct {
@@ -27,7 +26,6 @@ func (r *RideRepository) UpdateLocation(ctx context.Context, ghash string, trip 
 	if err != nil {
 		return err
 	}
-	fmt.Println(ghash)
 
 	_, err = r.datastore.ZAdd(ctx, ghash, &redis.Z{
 		Score:  float64(trip.Timestamp),
@@ -39,9 +37,86 @@ func (r *RideRepository) UpdateLocation(ctx context.Context, ghash string, trip 
 
 func (r *RideRepository) getIds(ctx context.Context, ids []string) {
 	data := r.datastore.MGet(ctx, ids...).Val()
-	fmt.Println("MGET DATA", data)
+	fmt.Println("MGET() DATA", data)
 }
 
 func (r *RideRepository) GetRideEventsFromMultiGeohash(ctx context.Context, geohashKeys []string) ([]RideEventSchema, error) {
-	return []RideEventSchema{}, errors.New("yet to be implemented")
+	// get all rides from redis
+	// use concurrency with waitGroups
+
+	// @todo remove these
+	geohashKeys = []string{}
+	geohashKeys = append(geohashKeys, "u339gf")
+
+	glen := len(geohashKeys)
+
+	if glen == 0 {
+		return []RideEventSchema{}, nil
+	}
+
+	ch := make(chan []string)
+
+	var wg sync.WaitGroup
+
+	wg.Add(glen)
+	go func() {
+		wg.Wait()
+		close(ch)
+	}()
+
+	//u339gf
+	for _, hashKey := range geohashKeys {
+		go r.getRidesFromGeohash(ctx, ch, &wg, hashKey, 0, -1)
+	}
+
+	var events []RideEventSchema
+
+	for v := range ch {
+		event := mapZRangeValueToRideEventSchemaCollection(v)
+		events = append(events, event...)
+	}
+
+	return events, nil
+}
+
+func getZrange() {
+	//result, err := r.datastore.ZRange(ctx, "u339gf", 0, -1).Result()
+	//
+	//if err != nil {
+	//	return []RideEventSchema{}, err
+	//}
+	//
+	//fmt.Println("RESULT->", result)
+	//
+	//events := mapZRangeValueToRideEventSchemaCollection(result)
+}
+
+func (r *RideRepository) getRidesFromGeohash(ctx context.Context, ch chan []string, wg *sync.WaitGroup, geohashKey string, from, till int64) {
+	defer wg.Done()
+
+	result, err := r.datastore.ZRange(ctx, geohashKey, from, till).Result()
+
+	if err != nil {
+		return
+	}
+
+	fmt.Println("RESULT->", result)
+	ch <- result
+}
+
+func mapZRangeValueToRideEventSchemaCollection(result []string) []RideEventSchema {
+	var events []RideEventSchema
+
+	for _, v := range result {
+		var x RideEventSchema
+		err := json.Unmarshal([]byte(v), &x)
+
+		if err != nil {
+			continue
+		}
+
+		events = append(events, x)
+	}
+
+	return events
 }
