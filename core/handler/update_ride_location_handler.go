@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"github.com/thearyanahmed/nordsec/services/location"
 	"net/http"
 
 	"github.com/thearyanahmed/nordsec/core/entity"
@@ -15,12 +16,14 @@ type activateRideUsecase interface {
 }
 
 type activateRideHandler struct {
-	usecase activateRideUsecase
+	usecase     activateRideUsecase
+	locationSvc *location.Service
 }
 
-func NewActivateRideHandler(usecase activateRideUsecase) *activateRideHandler {
+func NewActivateRideHandler(usecase activateRideUsecase, locSvc *location.Service) *activateRideHandler {
 	return &activateRideHandler{
-		usecase: usecase,
+		usecase:     usecase,
+		locationSvc: locSvc,
 	}
 }
 
@@ -34,27 +37,26 @@ func (h *activateRideHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	// rideLocation, err := h.usecase.FindById(r.Context(), formRequest.UUID)
+	//loc, err := h.usecase.UpdateRideLocation(r.Context(), formRequest.UUID, formRequest.Latitude, formRequest.Longitude)
+	//
+	//// also need to trigger event
+	//if err != nil {
+	//	presenter.ErrorResponse(w, r, presenter.FromErr(err))
+	//	return
+	//}
 
-	// if err != nil {
-	// 	if err == mongo.ErrNoDocuments {
-	// 		// create new
-	// 		presenter.ErrorResponse(w, r, presenter.FromErr(err))
-	// 		return
-	// 	}
+	cord := location.Coordinate{
+		Lat: formRequest.Latitude,
+		Lon: formRequest.Longitude,
+	}
+	loc, err := h.locationSvc.UpdateRideLocation(r.Context(), formRequest.UUID, "", "available", cord)
 
-	// }
-	// fmt.Print(rideLocation, err)
-	// w.Write([]byte("end"))
-	// return
-	loc, err := h.usecase.UpdateRideLocation(r.Context(), formRequest.UUID, formRequest.Latitude, formRequest.Longitude)
-
-	// also need to trigger event
 	if err != nil {
 		presenter.ErrorResponse(w, r, presenter.FromErr(err))
 		return
 	}
 
-	res := presenter.FromRideLocationEntity(loc)
-	presenter.RenderJsonResponse(w, r, http.StatusOK, res)
+	//@todo update
+	//res := presenter.FromRideLocationEntity(loc)
+	presenter.RenderJsonResponse(w, r, http.StatusOK, loc)
 }
