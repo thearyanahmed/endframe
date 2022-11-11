@@ -40,14 +40,14 @@ func getGeoHash(lat, lon float64, precision uint) string {
 	return geohash.EncodeWithPrecision(lat, lon, precision)
 }
 
-func (s *Service) RecordRideEvent(ctx context.Context, event entity.RideEvent) (entity.RideEvent, error) {
+func (s *Service) RecordRideEvent(ctx context.Context, event entity.Event) (entity.Event, error) {
 	// get the location geohash
 	ghash := getGeoHash(event.Lat, event.Lon, s.geohashLength)
 
 	err := geohash.Validate(ghash)
 
 	if err != nil {
-		return entity.RideEvent{}, err
+		return entity.Event{}, err
 	}
 
 	loc := schema.FromRideEventEntity(event).WithNewUuid()
@@ -56,7 +56,7 @@ func (s *Service) RecordRideEvent(ctx context.Context, event entity.RideEvent) (
 	err = s.repo.UpdateLocation(ctx, ghash, *loc)
 
 	if err != nil {
-		return entity.RideEvent{}, err
+		return entity.Event{}, err
 	}
 
 	return loc.ToEntity(), nil

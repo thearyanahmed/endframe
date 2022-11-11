@@ -9,7 +9,7 @@ import (
 type TripStarted struct {
 	Message string              `json:"message"`
 	Route   []entity.Coordinate `json:"route"`
-	Event   entity.RideEvent    `json:"event"`
+	Event   entity.Event        `json:"event"`
 }
 
 type TripEnded struct {
@@ -31,7 +31,7 @@ func ErrRideUnavailableResponse() *Response {
 	}
 }
 
-func TripStartedResponse(event entity.RideEvent, route []entity.Coordinate) TripStarted {
+func TripStartedResponse(event entity.Event, route []entity.Coordinate) TripStarted {
 	return TripStarted{
 		Message: "trip started",
 		Route:   route,

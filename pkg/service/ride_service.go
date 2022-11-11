@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
-	entity2 "github.com/thearyanahmed/nordsec/services/location/entity"
+	locationEntity "github.com/thearyanahmed/nordsec/services/location/entity"
 
 	"github.com/thearyanahmed/nordsec/pkg/entity"
 	"github.com/thearyanahmed/nordsec/pkg/repository"
@@ -15,31 +15,40 @@ type rideRepository interface {
 	FindById(ctx context.Context, uuid string) (repository.RideLocationSchema, error)
 }
 
-type RideService struct {
-	repository rideRepository
-	logger     shared.LoggerInterface
+type locationService interface {
+	RecordRideEvent(ctx context.Context, event locationEntity.Event) (locationEntity.Event, error)
 }
 
-func NewRideService(repo rideRepository, logger shared.LoggerInterface) *RideService {
+type RideService struct {
+	repository      rideRepository
+	logger          shared.LoggerInterface
+	locationService locationService
+}
+
+func NewRideService(repo rideRepository, locationSvc locationService, logger shared.LoggerInterface) *RideService {
 	return &RideService{
-		repository: repo,
-		logger:     logger,
+		repository:      repo,
+		logger:          logger,
+		locationService: locationSvc,
 	}
 }
 
-func (s *RideService) UpdateRideLocation(ctx context.Context, uuid string, lat, long float64) (entity.RideLocationEntity, error) {
-	panic("deprecated")
-	schema, err := s.repository.UpdateLocation(ctx, uuid, lat, long)
+func (s *RideService) UpdateRideLocation(ctx context.Context, event locationEntity.Event) (locationEntity.Event, error) {
+	rideEvent, err := s.locationService.RecordRideEvent(ctx, event)
 
 	if err != nil {
-		return entity.RideLocationEntity{}, err
+		go func() {
+			s.logger.Error(err)
+		}()
+
+		return locationEntity.Event{}, err
 	}
 
-	// @todo add logging
-	return schema.ToEntity(), nil
+	return rideEvent, nil
 }
 
 func (s *RideService) FindById(ctx context.Context, uuid string) (entity.RideLocationEntity, error) {
+	panic("deprecated")
 	loc, err := s.repository.FindById(ctx, uuid)
 
 	if err != nil {
@@ -49,7 +58,8 @@ func (s *RideService) FindById(ctx context.Context, uuid string) (entity.RideLoc
 	return loc.ToEntity(), nil
 }
 
-func (s *RideService) FindNearByRides(ctx context.Context, area entity2.Area) ([]entity.RideEntity, error) {
+func (s *RideService) FindNearByRides(ctx context.Context, area locationEntity.Area) ([]entity.RideEntity, error) {
+	panic("deprecated")
 	fmt.Println("[ride service] GOT AREA", area)
 
 	return []entity.RideEntity{}, nil

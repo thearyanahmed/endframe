@@ -1,1 +1,0 @@
-hellowrold compose exec redis redis-cli -a

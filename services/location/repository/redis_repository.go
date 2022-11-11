@@ -9,8 +9,6 @@ import (
 	"sync"
 )
 
-// @todo move to dedicated repository directory
-
 type RideRepository struct {
 	datastore *redis.Client
 	ridesKey  string
@@ -41,7 +39,6 @@ func (r *RideRepository) UpdateLocation(ctx context.Context, ghash string, trip 
 func (r *RideRepository) SetToCooldown(ctx context.Context, details schema.RideCooldownEvent) error {
 	key := r.getCooldownKey(details.RideUuid)
 
-	fmt.Println("CHECK KEY", key)
 	_, err := r.datastore.Set(ctx, key, details.Timestamp, details.Duration).Result()
 
 	return err
@@ -66,13 +63,13 @@ func (r *RideRepository) GetRideEvents(ctx context.Context, geohashKeys []string
 	}()
 
 	for _, hashKey := range geohashKeys {
-		go r.getRidesFromGeohash(ctx, ch, &wg, hashKey, 0, -1)
+		go r.getRideEventsByGeohashKey(ctx, ch, &wg, hashKey, 0, -1)
 	}
 
 	var collection []schema.RideEventSchema
 
 	for v := range ch {
-		events := mapZRangeValueToRideEventSchemaCollection(v)
+		events := mapZRangeValToRideEventCollection(v)
 		collection = append(collection, events...)
 	}
 
@@ -134,6 +131,8 @@ func (r *RideRepository) GetRideEventsFromMultiGeohash(ctx context.Context, geoh
 	return m, nil
 }
 
+// applyUniqueFilter filters out all duplicate records (RideEventSchema) based on time.
+// Keeps the latest time's data as that is considered the latest value.
 func (r *RideRepository) applyUniqueFilter(collection []schema.RideEventSchema) map[string]schema.RideEventSchema {
 	m := make(map[string]schema.RideEventSchema)
 
@@ -149,19 +148,18 @@ func (r *RideRepository) applyUniqueFilter(collection []schema.RideEventSchema) 
 	return m
 }
 
-// @todo find a better name
-func (r *RideRepository) getRidesFromGeohash(ctx context.Context, ch chan []string, wg *sync.WaitGroup, geohashKey string, from, till int64) {
+// getRideEventsByGeohashKey retrieves ride
+func (r *RideRepository) getRideEventsByGeohashKey(ctx context.Context, ch chan []string, wg *sync.WaitGroup, geohashKey string, from, till int64) {
 	defer wg.Done()
 
 	// @NOTE we are ignoring the error case for this demonstration.
-	// Get the data in reverse order
 	if result, err := r.datastore.ZRange(ctx, geohashKey, from, till).Result(); err == nil {
 		ch <- result
 	}
 }
 
-// @todo find a better name
-func mapZRangeValueToRideEventSchemaCollection(result []string) []schema.RideEventSchema {
+// mapZRangeValToRideEventCollection takes the value from ZRange and maps it to RideEventSchema
+func mapZRangeValToRideEventCollection(result []string) []schema.RideEventSchema {
 	var events []schema.RideEventSchema
 
 	for _, v := range result {

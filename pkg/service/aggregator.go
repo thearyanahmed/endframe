@@ -20,10 +20,10 @@ func NewServiceAggregator(config *config.Specification, logger *log.Logger) (*Se
 		return &ServiceAggregator{}, err
 	}
 
-	rideRepo := repository.NewRideRepository(redis)
-	rideSvc := NewRideService(rideRepo, logger)
-
 	locSvc := location.NewLocationService(redis)
+	rideRepo := repository.NewRideRepository(redis)
+
+	rideSvc := NewRideService(rideRepo, locSvc, logger)
 
 	aggregator := &ServiceAggregator{
 		RideService: rideSvc,

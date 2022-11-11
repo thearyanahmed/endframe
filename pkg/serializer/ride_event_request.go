@@ -25,3 +25,11 @@ func (r *RecordRideEventRequest) ToLocationCoordinate() entity.Coordinate {
 		Lon: r.Longitude,
 	}
 }
+
+func (r *RecordRideEventRequest) ToRideEvent() *entity.Event {
+	return &entity.Event{
+		RideUuid: r.RideUuid,
+		Lat:      r.Latitude,
+		Lon:      r.Longitude,
+	}
+}

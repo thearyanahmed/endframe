@@ -25,8 +25,8 @@ func (r *EndTripRequest) Rules() govalidator.MapData {
 	}
 }
 
-func (r *EndTripRequest) ToRideEvent() entity.RideEvent {
-	return entity.RideEvent{
+func (r *EndTripRequest) ToRideEvent() entity.Event {
+	return entity.Event{
 		RideUuid:      r.RideUuid,
 		Lat:           r.Latitude,
 		Lon:           r.Longitude,

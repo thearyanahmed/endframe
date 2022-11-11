@@ -18,8 +18,8 @@ type RideEventSchema struct {
 	State         string    `json:"state"` // in route, roaming
 }
 
-func (s *RideEventSchema) ToEntity() entity.RideEvent {
-	return entity.RideEvent{
+func (s *RideEventSchema) ToEntity() entity.Event {
+	return entity.Event{
 		Uuid:          s.Uuid.String(),
 		RideUuid:      s.RideUuid,
 		Lat:           s.Lat,
@@ -39,7 +39,7 @@ func (s *RideEventSchema) ToRideEntity() entity.Ride {
 		State:    s.State,
 	}
 }
-func FromRideEventEntity(e entity.RideEvent) *RideEventSchema {
+func FromRideEventEntity(e entity.Event) *RideEventSchema {
 	s := &RideEventSchema{
 		RideUuid:      e.RideUuid,
 		Lat:           e.Lat,
@@ -57,8 +57,8 @@ func FromRideEventEntity(e entity.RideEvent) *RideEventSchema {
 	return s
 }
 
-func FromRideEventCollection(collection []RideEventSchema) []entity.RideEvent {
-	var eventSchema []entity.RideEvent
+func FromRideEventCollection(collection []RideEventSchema) []entity.Event {
+	var eventSchema []entity.Event
 
 	for _, e := range collection {
 		eventSchema = append(eventSchema, e.ToEntity())

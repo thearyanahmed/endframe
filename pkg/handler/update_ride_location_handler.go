@@ -2,18 +2,16 @@ package handler
 
 import (
 	"context"
-	"github.com/thearyanahmed/nordsec/services/location"
-	entity2 "github.com/thearyanahmed/nordsec/services/location/entity"
-	"net/http"
-	"time"
-
 	"github.com/thearyanahmed/nordsec/pkg/entity"
 	"github.com/thearyanahmed/nordsec/pkg/presenter"
 	"github.com/thearyanahmed/nordsec/pkg/serializer"
+	"github.com/thearyanahmed/nordsec/services/location"
+	locationEntity "github.com/thearyanahmed/nordsec/services/location/entity"
+	"net/http"
 )
 
 type activateRideUsecase interface {
-	UpdateRideLocation(ctx context.Context, rideUuid string, lat, long float64) (entity.RideLocationEntity, error)
+	UpdateRideLocation(ctx context.Context, event locationEntity.Event) (locationEntity.Event, error)
 	FindById(ctx context.Context, uuid string) (entity.RideLocationEntity, error)
 }
 
@@ -31,9 +29,6 @@ func NewUpdateRideLocationHandler(usecase activateRideUsecase, locSvc *location.
 }
 
 func (h *updateRideLocationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// validate the request
-	// check if lat long is valid
-	// @todo find a better name
 	eventRequest := &serializer.RecordRideEventRequest{}
 
 	if formErrors := serializer.ValidatePostForm(r, eventRequest); len(formErrors) > 0 {
@@ -41,24 +36,17 @@ func (h *updateRideLocationHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	// @todo get ride, check if it's in route or in cooldown
-	rideEvent := entity2.RideEvent{
-		RideUuid:      eventRequest.RideUuid,
-		Lat:           eventRequest.Latitude,
-		Lon:           eventRequest.Longitude,
-		PassengerUuid: "",
-		State:         "available", // @todo handle this
-		Timestamp:     time.Now().Unix(),
-	}
+	// @Todo | TASK get ride, check if it's in route or in cooldown
 
-	loc, err := h.locationSvc.RecordRideEvent(r.Context(), rideEvent)
+	rideEvent := eventRequest.ToRideEvent().SetStateAsRoaming().SetCurrentTimestamp()
+
+	loc, err := h.usecase.UpdateRideLocation(r.Context(), *rideEvent)
 
 	if err != nil {
 		presenter.ErrorResponse(w, r, presenter.FromErr(err))
 		return
 	}
 
-	//@todo update
-	//res := presenter.FromRideLocationEntity(loc)
-	presenter.RenderJsonResponse(w, r, http.StatusOK, loc)
+	res := presenter.FromRideLocationEntity(loc)
+	presenter.RenderJsonResponse(w, r, http.StatusOK, res)
 }
