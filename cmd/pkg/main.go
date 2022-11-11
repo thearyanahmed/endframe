@@ -10,10 +10,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/thearyanahmed/nordsec/core/config"
-	"github.com/thearyanahmed/nordsec/core/handler"
-	"github.com/thearyanahmed/nordsec/core/logger"
-	"github.com/thearyanahmed/nordsec/core/service"
+	"github.com/thearyanahmed/nordsec/pkg/config"
+	"github.com/thearyanahmed/nordsec/pkg/handler"
+	"github.com/thearyanahmed/nordsec/pkg/logger"
+	"github.com/thearyanahmed/nordsec/pkg/service"
 )
 
 func main() {

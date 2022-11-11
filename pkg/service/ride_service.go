@@ -5,9 +5,9 @@ import (
 	"fmt"
 	entity2 "github.com/thearyanahmed/nordsec/services/location/entity"
 
-	"github.com/thearyanahmed/nordsec/core/entity"
-	"github.com/thearyanahmed/nordsec/core/repository"
-	"github.com/thearyanahmed/nordsec/core/shared"
+	"github.com/thearyanahmed/nordsec/pkg/entity"
+	"github.com/thearyanahmed/nordsec/pkg/repository"
+	"github.com/thearyanahmed/nordsec/pkg/shared"
 )
 
 type rideRepository interface {

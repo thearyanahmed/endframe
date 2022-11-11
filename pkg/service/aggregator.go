@@ -2,8 +2,8 @@ package service
 
 import (
 	log "github.com/sirupsen/logrus"
-	"github.com/thearyanahmed/nordsec/core/config"
-	"github.com/thearyanahmed/nordsec/core/repository"
+	"github.com/thearyanahmed/nordsec/pkg/config"
+	"github.com/thearyanahmed/nordsec/pkg/repository"
 	"github.com/thearyanahmed/nordsec/services/location"
 )
 

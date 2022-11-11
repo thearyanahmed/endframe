@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/thearyanahmed/nordsec/core/entity"
-	"github.com/thearyanahmed/nordsec/core/presenter"
-	"github.com/thearyanahmed/nordsec/core/serializer"
+	"github.com/thearyanahmed/nordsec/pkg/entity"
+	"github.com/thearyanahmed/nordsec/pkg/presenter"
+	"github.com/thearyanahmed/nordsec/pkg/serializer"
 )
 
 type activateRideUsecase interface {

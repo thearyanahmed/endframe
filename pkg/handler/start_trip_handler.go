@@ -2,8 +2,8 @@ package handler
 
 import (
 	"github.com/google/uuid"
-	"github.com/thearyanahmed/nordsec/core/presenter"
-	"github.com/thearyanahmed/nordsec/core/serializer"
+	"github.com/thearyanahmed/nordsec/pkg/presenter"
+	"github.com/thearyanahmed/nordsec/pkg/serializer"
 	"github.com/thearyanahmed/nordsec/services/location"
 	"github.com/thearyanahmed/nordsec/services/location/entity"
 	"net/http"

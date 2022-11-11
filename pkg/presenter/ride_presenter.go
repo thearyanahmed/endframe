@@ -3,7 +3,7 @@ package presenter
 import (
 	"fmt"
 
-	"github.com/thearyanahmed/nordsec/core/entity"
+	"github.com/thearyanahmed/nordsec/pkg/entity"
 )
 
 type RideLocationUpdateResponse struct {

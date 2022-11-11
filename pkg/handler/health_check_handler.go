@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/thearyanahmed/nordsec/core/presenter"
+	"github.com/thearyanahmed/nordsec/pkg/presenter"
 )
 
 // @todo add dependend modules, eg: redis, kafka, db

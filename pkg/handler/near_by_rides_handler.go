@@ -6,8 +6,8 @@ import (
 	entity2 "github.com/thearyanahmed/nordsec/services/location/entity"
 	"net/http"
 
-	"github.com/thearyanahmed/nordsec/core/entity"
-	"github.com/thearyanahmed/nordsec/core/presenter"
+	"github.com/thearyanahmed/nordsec/pkg/entity"
+	"github.com/thearyanahmed/nordsec/pkg/presenter"
 )
 
 type nearByRidesUsecase interface {

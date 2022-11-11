@@ -2,7 +2,7 @@ package repository
 
 import (
 	"github.com/go-redis/redis/v8"
-	"github.com/thearyanahmed/nordsec/core/entity"
+	"github.com/thearyanahmed/nordsec/pkg/entity"
 )
 
 type RideLocationSchema struct {

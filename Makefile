@@ -28,7 +28,7 @@ run-core:
 	@CompileDaemon -build='make build-core' -graceful-kill -command='./build/core'
 
 build-core:
-	@CGO_ENABLED=0 go build -o build/core -v cmd/core/main.go
+	@CGO_ENABLED=0 go build -o build/core -v cmd/pkg/main.go
 
 deps-core:
 	${call core, mod vendor}
