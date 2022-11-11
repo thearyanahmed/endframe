@@ -31,6 +31,12 @@ func (s *RideEventSchema) ToEntity() entity.Event {
 	}
 }
 
+func (s *RideEventSchema) WithNewUuid() *RideEventSchema {
+	s.Uuid = uuid.New()
+
+	return s
+}
+
 func (s *RideEventSchema) ToRideEntity() entity.Ride {
 	return entity.Ride{
 		RideUuid: s.RideUuid,
@@ -57,18 +63,12 @@ func FromRideEventEntity(e entity.Event) *RideEventSchema {
 	return s
 }
 
-func FromRideEventCollection(collection []RideEventSchema) []entity.Event {
-	var eventSchema []entity.Event
+func FromRideEventCollectionToEntity(list map[string]RideEventSchema) []entity.Ride {
+	var rides []entity.Ride
 
-	for _, e := range collection {
-		eventSchema = append(eventSchema, e.ToEntity())
+	for _, e := range list {
+		rides = append(rides, e.ToRideEntity())
 	}
 
-	return eventSchema
-}
-
-func (s *RideEventSchema) WithNewUuid() *RideEventSchema {
-	s.Uuid = uuid.New()
-
-	return s
+	return rides
 }

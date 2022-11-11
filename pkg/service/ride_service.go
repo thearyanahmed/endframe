@@ -17,6 +17,7 @@ type rideRepository interface {
 
 type locationService interface {
 	RecordRideEvent(ctx context.Context, event locationEntity.Event) (locationEntity.Event, error)
+	FindRideInLocation(ctx context.Context, rideUuid string, origin locationEntity.Coordinate) (locationEntity.Ride, error)
 }
 
 type RideService struct {
@@ -45,6 +46,20 @@ func (s *RideService) UpdateRideLocation(ctx context.Context, event locationEnti
 	}
 
 	return rideEvent, nil
+}
+
+func (s *RideService) CanBeUpdatedViaRiderApp(ctx context.Context, rideUuid string, loc locationEntity.Coordinate) (bool, error) {
+	ride, err := s.locationService.FindRideInLocation(ctx, rideUuid, loc)
+
+	if err != nil {
+		return false, err
+	}
+
+	return s.RideIsAvailable(ride), nil
+}
+
+func (s *RideService) RideIsAvailable(ride locationEntity.Ride) bool {
+	return ride.State != locationEntity.StateInCooldown && ride.State != locationEntity.StateInRoute
 }
 
 func (s *RideService) FindById(ctx context.Context, uuid string) (entity.RideLocationEntity, error) {

@@ -11,7 +11,7 @@ import (
 )
 
 type nearByRidesUsecase interface {
-	// FindRides @todo use options api instead of map[string]string
+	// FindNearByRides FindRides @todo use options api instead of map[string]string
 	FindNearByRides(ctx context.Context, area entity2.Area) ([]entity.RideEntity, error)
 }
 
@@ -30,6 +30,7 @@ func NewNearByRidesHandler(usecase nearByRidesUsecase, loc *location.Service) *n
 }
 
 func (h *nearByRidesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// @todo take from form request
 	area := entity2.Area{
 		X1Y1: entity2.Coordinate{
 			Lat: 52.3251,

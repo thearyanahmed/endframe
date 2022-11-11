@@ -3,7 +3,6 @@ package location
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/go-redis/redis/v8"
 	"github.com/mmcloughlin/geohash"
 	"github.com/thearyanahmed/nordsec/services/location/entity"
@@ -12,6 +11,8 @@ import (
 	"github.com/umahmood/haversine"
 	"time"
 )
+
+var RideNotInLocation = errors.New("ride not in nearby location")
 
 type Service struct {
 	geohashLength uint
@@ -28,8 +29,7 @@ type rideRepository interface {
 // NewLocationService
 // @todo use a builder pattern to build out the service?
 func NewLocationService(ds *redis.Client) *Service {
-	repo := repository.NewRideRepository(ds, "trips_test_01")
-
+	repo := repository.NewRideRepository(ds, "trips_test_01") // @todo take from config
 	return &Service{
 		geohashLength: uint(6),
 		repo:          repo,
@@ -52,7 +52,6 @@ func (s *Service) RecordRideEvent(ctx context.Context, event entity.Event) (enti
 
 	loc := schema.FromRideEventEntity(event).WithNewUuid()
 
-	fmt.Println("EVENT", event, "Ghash", ghash)
 	err = s.repo.UpdateLocation(ctx, ghash, *loc)
 
 	if err != nil {
@@ -62,7 +61,7 @@ func (s *Service) RecordRideEvent(ctx context.Context, event entity.Event) (enti
 	return loc.ToEntity(), nil
 }
 
-func (s *Service) GetRidesInArea(ctx context.Context, area entity.Area) (interface{}, error) {
+func (s *Service) GetRidesInArea(ctx context.Context, area entity.Area) ([]entity.Ride, error) {
 	// first get the data in area
 	// then apply the filters if any
 	neighbours := area.GetNeighbourGeohashFromCenter(s.geohashLength)
@@ -70,26 +69,15 @@ func (s *Service) GetRidesInArea(ctx context.Context, area entity.Area) (interfa
 	rides, err := s.repo.GetRideEventsFromMultiGeohash(ctx, neighbours)
 
 	if err != nil {
-		return map[string]schema.RideEventSchema{}, err
+		return []entity.Ride{}, err
 	}
 
 	rides = s.repo.ApplyStateFilter(ctx, rides)
 
-	return rides, nil
-	//return FromRideEventCollection(rides), nil
+	return schema.FromRideEventCollectionToEntity(rides), nil
 }
 
-func (s *Service) DistanceInMeters(a, b entity.Coordinate) float64 {
-	origin := haversine.Coord{Lat: a.Lat, Lon: a.Lon}
-	dest := haversine.Coord{Lat: b.Lat, Lon: b.Lon}
-
-	_, km := haversine.Distance(origin, dest)
-
-	return km * 1000 // convert to meters
-}
-
-// @change ride event schema to entity
-func (s *Service) FindRideInLocations(ctx context.Context, rideUuid string, origin entity.Coordinate) (entity.Ride, error) {
+func (s *Service) FindRideInLocation(ctx context.Context, rideUuid string, origin entity.Coordinate) (entity.Ride, error) {
 	// get origin
 	// get neighbours
 	ghash := geohash.EncodeWithPrecision(origin.Lat, origin.Lon, s.geohashLength)
@@ -107,7 +95,7 @@ func (s *Service) FindRideInLocations(ctx context.Context, rideUuid string, orig
 
 	// if it doesn't exist, return error
 	if !ok {
-		return entity.Ride{}, errors.New("ride not in nearby location")
+		return entity.Ride{}, RideNotInLocation
 	}
 
 	// but if it exists, apply the state filter, so if any vehicle is in cool down mode, we can validate it correctly
@@ -120,6 +108,17 @@ func (s *Service) FindRideInLocations(ctx context.Context, rideUuid string, orig
 	return rideEventSchema.ToRideEntity(), nil
 }
 
+func (s *Service) StartCooldownForRide(ctx context.Context, rideUuid string, timestamp int64, duration time.Duration) error {
+	ev := schema.RideCooldownEvent{
+		RideUuid:  rideUuid,
+		Timestamp: timestamp,
+		Duration:  duration,
+	}
+
+	return s.repo.SetToCooldown(ctx, ev)
+}
+
+// GetRoute returns an array of points, step by step coordinates from origin to destination.
 func (s *Service) GetRoute(origin, destination entity.Coordinate, intervalPoints int) []entity.Coordinate {
 	x1, x2 := origin.Lat, destination.Lat
 	y1, y2 := origin.Lon, destination.Lon
@@ -144,12 +143,11 @@ func (s *Service) GetRoute(origin, destination entity.Coordinate, intervalPoints
 	return route
 }
 
-func (s *Service) StartCooldownForRide(ctx context.Context, rideUuid string, timestamp int64, duration time.Duration) error {
-	ev := schema.RideCooldownEvent{
-		RideUuid:  rideUuid,
-		Timestamp: timestamp,
-		Duration:  duration,
-	}
+func (s *Service) DistanceInMeters(a, b entity.Coordinate) float64 {
+	origin := haversine.Coord{Lat: a.Lat, Lon: a.Lon}
+	dest := haversine.Coord{Lat: b.Lat, Lon: b.Lon}
 
-	return s.repo.SetToCooldown(ctx, ev)
+	_, km := haversine.Distance(origin, dest)
+
+	return km * 1000 // convert to meters
 }

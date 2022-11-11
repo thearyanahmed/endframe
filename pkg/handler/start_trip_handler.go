@@ -24,9 +24,6 @@ func NewStartTripHandler(service *location.Service) *startTripHandler {
 }
 
 func (h *startTripHandler) ServeHttp(w http.ResponseWriter, r *http.Request) {
-	// validation: validate form request, validate the distance.
-	// check client is in the same geohash as ride'h
-	// check if two distance are with in the same range
 	tripRequest := &serializer.StartTripRequest{}
 
 	if formErrors := serializer.ValidatePostForm(r, tripRequest); len(formErrors) > 0 {
@@ -44,7 +41,7 @@ func (h *startTripHandler) ServeHttp(w http.ResponseWriter, r *http.Request) {
 
 	// @TODO enable the following
 	// check if rideId is in nearby location of the origin
-	ride, err := h.locationSvc.FindRideInLocations(r.Context(), tripRequest.RideUuid, origin)
+	ride, err := h.locationSvc.FindRideInLocation(r.Context(), tripRequest.RideUuid, origin)
 
 	if err != nil {
 		presenter.ErrorResponse(w, r, presenter.FromErr(err))
@@ -52,7 +49,7 @@ func (h *startTripHandler) ServeHttp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// @todo refactor
-	if ride.State != "available" {
+	if ride.State != "roaming" {
 		presenter.ErrorResponse(w, r, presenter.ErrRideUnavailableResponse())
 		return
 	}

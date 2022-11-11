@@ -9,8 +9,8 @@ import (
 )
 
 type activateRideUsecase interface {
-	// Updated
 	UpdateRideLocation(ctx context.Context, event locationEntity.Event) (locationEntity.Event, error)
+	CanBeUpdatedViaRiderApp(ctx context.Context, rideUuid string, loc locationEntity.Coordinate) (bool, error)
 
 	// @TODO Old
 	//FindById(ctx context.Context, uuid string) (entity.RideLocationEntity, error)
@@ -34,7 +34,25 @@ func (h *updateRideLocationHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	// @todo | TASK get ride, check if it's in route or in cooldown
+	// @NOTE:
+	// The following section has been commented out. Because, as of now, there is no persistent storage.
+	// In a real life scenario there will be a persistent storage where we can make a query and see the ride's
+	// current stations.
+	
+	// @TODO implement update ride's status in REDIS ride:status:uuid roaming, in-route
+
+	//can, err := h.usecase.CanBeUpdatedViaRiderApp(r.Context(), eventRequest.RideUuid, eventRequest.ToLocationCoordinate())
+	//
+	//if err != nil {
+	//	presenter.ErrorResponse(w, r, presenter.FromErr(err))
+	//	return
+	//}
+	//
+	//if !can {
+	//	presenter.ErrorResponse(w, r, presenter.CanNotUpdateLocationViaRiderAppResponse())
+	//	return
+	//}
+
 	rideEvent := eventRequest.ToRideEvent().SetStateAsRoaming().SetCurrentTimestamp()
 
 	loc, err := h.usecase.UpdateRideLocation(r.Context(), *rideEvent)

@@ -3,11 +3,12 @@ package presenter
 import (
 	"fmt"
 	"github.com/thearyanahmed/nordsec/services/location/entity"
+	"net/http"
 )
 
 type RideLocationUpdateResponse struct {
 	Message string          `json:"message"`
-	Event   LocationDetails `json:"event"`
+	Event   LocationDetails `json:"event,omitempty"`
 }
 
 type LocationDetails struct {
@@ -24,5 +25,12 @@ func FromRideLocationEntity(e entity.Event) RideLocationUpdateResponse {
 			Latitude:  fmt.Sprintf("%.6f", e.Lat),
 			Longitude: fmt.Sprintf("%.6f", e.Lon),
 		},
+	}
+}
+
+func CanNotUpdateLocationViaRiderAppResponse() *Response {
+	return &Response{
+		HttpStatusCode: http.StatusBadRequest,
+		Message:        "can not update ride location via rider app while in route or in cooldown state.",
 	}
 }
