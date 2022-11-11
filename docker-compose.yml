@@ -15,20 +15,12 @@ services:
       REDIS_PORT: '${REDIS_PORT}'
       REDIS_PASSWORD: '${REDIS_PASSWORD}'
       LOG_LEVEL: '${LOG_LEVEL}'
-      RIDER_API_KEY: '${RIDER_API_KEY}'
+      RIDER_API_KEY: '${RIDER_API_KEY}' # @todo remove these
       CLIENT_API_KEY: '${CLIENT_API_KEY}'
     ports:
       - "${CORE_PORT:-8080}:8080"
     volumes:
       - ./:/app
-
-#  db:
-#    image: mongo:latest
-#    container_name: db
-#    ports:
-#      - "${DB_PORT:-27017}:27017"
-#    volumes:
-#      - db_volume:/data/db
 
   redis:
     image: redis:6.2-alpine
