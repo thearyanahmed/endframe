@@ -41,6 +41,7 @@ func (h *updateRideLocationHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 		return
 	}
 
+	// @todo get ride, check if it's in route or in cooldown
 	rideEvent := entity2.RideEvent{
 		RideUuid:      eventRequest.RideUuid,
 		Lat:           eventRequest.Latitude,

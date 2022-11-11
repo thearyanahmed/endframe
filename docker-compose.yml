@@ -4,9 +4,9 @@ services:
   core:
     container_name: core
     build:
-      dockerfile: .docker/core.Dockerfile
+      dockerfile: Dockerfile
       context: .
-    command: make run-core
+    command: make run
     depends_on:
       - redis
     environment:
@@ -15,7 +15,7 @@ services:
       REDIS_PORT: '${REDIS_PORT}'
       REDIS_PASSWORD: '${REDIS_PASSWORD}'
       LOG_LEVEL: '${LOG_LEVEL}'
-      RIDER_API_KEY: '${RIDER_API_KEY}' # @todo remove these
+      RIDER_API_KEY: '${RIDER_API_KEY}'
       CLIENT_API_KEY: '${CLIENT_API_KEY}'
     ports:
       - "${CORE_PORT:-8080}:8080"

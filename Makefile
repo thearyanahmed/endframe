@@ -3,7 +3,7 @@ include .env
 CONTAINER = core
 DOCKER_COMPOSE_EXISTS := $(shell command -v docker-compose 2> /dev/null)
 
-.PHONY: start stop ps simulate ssh-core run-core build-core deps-core test-core ssh-rider run-rider build-rider deps-rider test-rider ssh-client run-client build-client deps-client test-client
+.PHONY: start stop ps simulate ssh run build deps test
 
 start:
 	@docker-compose up # -d # @todo enable -d
@@ -16,28 +16,28 @@ ps:
 
 simulate:
 	@echo "[+] Running outside of container. Spawning 1000 riders."
-	#@for i in {1..20}; do go run cmd/rider/main.go 1000 ${RIDER_API_KEY} ${CORE_URL}; done;
-	@go run cmd/rider/main.go 1000 ${RIDER_API_KEY} ${CORE_URL}
+	#@for i in {1..20}; do go run cmd/simulation.go 1000 ${RIDER_API_KEY} ${CORE_URL}; done;
+	@go run cmd/simulation.go 1000 ${RIDER_API_KEY} ${CORE_URL}
 # core
-ssh-core:
+ssh:
 	@docker-compose exec $(CONTAINER) bash
 
-run-core:
-	@CompileDaemon -build='make build-core' -graceful-kill -command='./build/core'
+run:
+	@CompileDaemon -build='make build' -graceful-kill -command='./build/app'
 
-build-core:
-	@CGO_ENABLED=0 go build -o build/core -v cmd/pkg/main.go
+build:
+	@CGO_ENABLED=0 go build -o build/app -v cmd/pkg/main.go
 
-deps-core:
-	${call core, mod vendor}
+deps:
+	${call app_container, mod vendor}
 
-test-core:
-	${call core, test -v ./...}
+test:
+	${call app_container, test -v ./...}
 
 
 #---- docker enviroment ----
 ifdef DOCKER_COMPOSE_EXISTS
-define core
+define app_container
 	@docker-compose exec ${CONTAINER} go ${1}
 endef
 endif
