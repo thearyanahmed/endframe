@@ -30,20 +30,20 @@ func NewRouter(conf *config.Specification, svcAggregator *service.ServiceAggrega
 			// This endpoint should return all available vehicles within an area
 			// also should support filter by query params
 			// optional: perhaps we can also filter by the radius
-			r.Get("/rides-near-by", NewNearByRidesHandler(svcAggregator.RideService, svcAggregator.LocationSvc).ServeHTTP)
+			r.With(coreMiddleware.NewAuthorizeClientMiddleware(conf.ClientApiKey, logger).Handle).
+				Get("/rides/near-by", NewNearByRidesHandler(svcAggregator.RideService, svcAggregator.LocationSvc).ServeHTTP)
 
 			// This endpoint spawns a ride from taking lat long and some other values from
 			// the rider app.
 			// This simulates the idea of a rider, who just came online
 			r.With(coreMiddleware.ValidateContentTypeMiddleware).
 				With(coreMiddleware.NewAuthorizeRiderMiddleware(conf.RiderApiKey, logger).Handle).
-				Post("/ride/activate", NewActivateRideHandler(svcAggregator.RideService, svcAggregator.LocationSvc).ServeHTTP)
+				Post("/ride/activate", NewUpdateRideLocationHandler(svcAggregator.RideService, svcAggregator.LocationSvc).ServeHTTP)
 
 			// This endpoint takes input from the input, validates it.
-			// Upon successful validation, it creates 1 database entry, updates redis & go kafka().
-			r.Post("/ride/start", func(w http.ResponseWriter, r *http.Request) {
-
-			})
+			r.With(coreMiddleware.ValidateContentTypeMiddleware).
+				With(coreMiddleware.NewAuthorizeClientMiddleware(conf.ClientApiKey, logger).Handle).
+				Post("/trip/start", NewStartTripHandler(svcAggregator.LocationSvc).ServeHttp)
 
 			// Update ride position takes a ride uuid, updates ride details on kafka.
 			// But also need to push to redis because users can query rides-near-by.
@@ -53,13 +53,8 @@ func NewRouter(conf *config.Specification, svcAggregator *service.ServiceAggrega
 			})
 
 			// Validate the request, update to redis, kafka and database.
-			r.Post("/ride/end", func(w http.ResponseWriter, r *http.Request) {
-
-			})
-
-			// Takes uuid, finds the details of the ride
-			r.Get("/ride/{uuid}/view", func(w http.ResponseWriter, r *http.Request) {
-				w.Write([]byte("get ride details"))
+			r.Post("/trip/end", func(w http.ResponseWriter, r *http.Request) {
+				// update the
 			})
 		})
 	})

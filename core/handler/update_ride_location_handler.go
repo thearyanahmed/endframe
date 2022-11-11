@@ -16,20 +16,20 @@ type activateRideUsecase interface {
 	FindById(ctx context.Context, uuid string) (entity.RideLocationEntity, error)
 }
 
-type activateRideHandler struct {
+type updateRideLocationHandler struct {
 	usecase activateRideUsecase
 	// @todo extract interface
 	locationSvc *location.Service
 }
 
-func NewActivateRideHandler(usecase activateRideUsecase, locSvc *location.Service) *activateRideHandler {
-	return &activateRideHandler{
+func NewUpdateRideLocationHandler(usecase activateRideUsecase, locSvc *location.Service) *updateRideLocationHandler {
+	return &updateRideLocationHandler{
 		usecase:     usecase,
 		locationSvc: locSvc,
 	}
 }
 
-func (h *activateRideHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *updateRideLocationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// validate the request
 	// check if lat long is valid
 	// @todo find a better name
@@ -45,7 +45,7 @@ func (h *activateRideHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		Lat:           eventRequest.Latitude,
 		Lon:           eventRequest.Longitude,
 		PassengerUuid: "",
-		State:         "available",
+		State:         "available", // @todo handle this
 		Timestamp:     time.Now().Unix(),
 	}
 
