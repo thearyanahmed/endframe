@@ -1,11 +1,12 @@
 package handler
 
 import (
-	"fmt"
+	"github.com/google/uuid"
 	"github.com/thearyanahmed/nordsec/core/presenter"
 	"github.com/thearyanahmed/nordsec/core/serializer"
 	"github.com/thearyanahmed/nordsec/services/location"
 	"net/http"
+	"time"
 )
 
 type startTripHandler struct {
@@ -21,9 +22,9 @@ func NewStartTripHandler(service *location.Service) *startTripHandler {
 	}
 }
 
-func (s *startTripHandler) ServeHttp(w http.ResponseWriter, r *http.Request) {
+func (h *startTripHandler) ServeHttp(w http.ResponseWriter, r *http.Request) {
 	// validation: validate form request, validate the distance.
-	// check client is in the same geohash as ride's
+	// check client is in the same geohash as ride'h
 	// check if two distance are with in the same range
 	tripRequest := &serializer.StartTripRequest{}
 
@@ -35,36 +36,47 @@ func (s *startTripHandler) ServeHttp(w http.ResponseWriter, r *http.Request) {
 	origin, dest := tripRequest.Origin(), tripRequest.Destination()
 
 	// check the destination first
-	if s.locationSvc.DistanceInMeters(origin, dest) <= s.minTripDistance {
-		presenter.ErrorResponse(w, r, presenter.ErrDistanceTooLowResponse(s.minTripDistance))
+	if h.locationSvc.DistanceInMeters(origin, dest) <= h.minTripDistance {
+		presenter.ErrorResponse(w, r, presenter.ErrDistanceTooLowResponse(h.minTripDistance))
 		return
 	}
 
+	// @TODO enable the following
 	// check if rideId is in nearby location of the origin
-	//ride, err := s.locationSvc.FindRideInLocations(r.Context(), tripRequest.RideUuid, origin)
-	//
-	//if err != nil {
-	//	presenter.ErrorResponse(w, r, presenter.FromErr(err))
-	//	return
-	//}
-	//
-	//// @todo refactor
-	//if ride.State != "available" {
-	//	presenter.ErrorResponse(w, r, presenter.ErrRideUnavailableResponse())
-	//	return
-	//}
+	ride, err := h.locationSvc.FindRideInLocations(r.Context(), tripRequest.RideUuid, origin)
+
+	if err != nil {
+		presenter.ErrorResponse(w, r, presenter.FromErr(err))
+		return
+	}
+
+	// @todo refactor
+	if ride.State != "available" {
+		presenter.ErrorResponse(w, r, presenter.ErrRideUnavailableResponse())
+		return
+	}
 
 	// @TODO WORK FROM HERE
 	// get route
-	routes := s.locationSvc.GetRoute(origin, dest, 50)
+	routes := h.locationSvc.GetRoute(origin, dest, 50)
 
-	fmt.Println("LEN", len(routes))
-	presenter.RenderJsonResponse(w, r, http.StatusOK, routes)
-	// ride goes to origin
+	rideEvent := location.RideEvent{
+		RideUuid:      tripRequest.RideUuid,
+		Lat:           origin.Lat,
+		Lon:           origin.Lon,
+		PassengerUuid: tripRequest.ClientUuid,
+		State:         "in_route", // @todo handle this
+		Timestamp:     time.Now().Unix(),
+		TripUuid:      uuid.New().String(),
+	}
+
+	event, err := h.locationSvc.RecordRideEvent(r.Context(), rideEvent)
+
+	if err != nil {
+		presenter.ErrorResponse(w, r, presenter.FromErr(err))
+		return
+	}
+
 	// start notify event with current passenger id
-	//
-
-	// response: {
-	//	message: 'trip started',
-	//  route: [{lat1,lon1}, {lat2,lon2}...{latN,lonN}]
+	presenter.RenderJsonResponse(w, r, http.StatusCreated, presenter.TripStartedResponse(event, routes))
 }

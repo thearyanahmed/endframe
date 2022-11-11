@@ -14,7 +14,8 @@ type Area struct {
 }
 
 type Coordinate struct {
-	Lat, Lon float64
+	Lat float64 `json:"lat"`
+	Lon float64 `json:"lon"`
 }
 
 func NewCoordinate(lat, lon float64) *Coordinate {
@@ -47,6 +48,7 @@ type RideEvent struct {
 	Lat           float64 `json:"lat"`
 	Lon           float64 `json:"lon"`
 	PassengerUuid string  `json:"passenger_uuid"`
+	TripUuid      string  `json:"trip_uuid"`
 	Timestamp     int64   `json:"timestamp"`
 	State         string  `json:"state"` // in route, roaming
 }

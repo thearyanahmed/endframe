@@ -12,6 +12,7 @@ type RideEventSchema struct {
 	Lat           float64   `json:"lat"`
 	Lon           float64   `json:"lon"`
 	PassengerUuid string    `json:"passenger_uuid"`
+	TripUuid      string    `json:"trip_uuid"`
 	Timestamp     int64     `json:"timestamp"`
 	State         string    `json:"state"` // in route, roaming
 }
@@ -22,6 +23,7 @@ func (s *RideEventSchema) ToEntity() RideEvent {
 		RideUuid:      s.RideUuid,
 		Lat:           s.Lat,
 		Lon:           s.Lon,
+		TripUuid:      s.TripUuid,
 		PassengerUuid: s.PassengerUuid,
 		Timestamp:     s.Timestamp,
 		State:         s.State,
@@ -34,6 +36,7 @@ func fromRideEventEntity(e RideEvent) *RideEventSchema {
 		Lat:           e.Lat,
 		Lon:           e.Lon,
 		PassengerUuid: e.PassengerUuid,
+		TripUuid:      e.TripUuid,
 		Timestamp:     e.Timestamp,
 		State:         e.State,
 	}
