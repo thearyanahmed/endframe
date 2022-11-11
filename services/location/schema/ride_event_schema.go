@@ -1,18 +1,11 @@
-package repository
+package schema
 
 import (
 	"github.com/google/uuid"
 	"github.com/thearyanahmed/nordsec/services/location/entity"
-	"time"
 )
 
 // @todo BIG REFACTOR
-
-type RideCooldownEvent struct {
-	RideUuid  string        `json:"ride_uuid"`
-	Timestamp int64         `json:"timestamp"`
-	Duration  time.Duration `json:"-"`
-}
 
 type RideEventSchema struct {
 	Uuid          uuid.UUID `json:"uuid"`
@@ -38,6 +31,14 @@ func (s *RideEventSchema) ToEntity() entity.RideEvent {
 	}
 }
 
+func (s *RideEventSchema) ToRideEntity() entity.Ride {
+	return entity.Ride{
+		RideUuid: s.RideUuid,
+		Lat:      s.Lat,
+		Lon:      s.Lon,
+		State:    s.State,
+	}
+}
 func FromRideEventEntity(e entity.RideEvent) *RideEventSchema {
 	s := &RideEventSchema{
 		RideUuid:      e.RideUuid,
@@ -56,7 +57,7 @@ func FromRideEventEntity(e entity.RideEvent) *RideEventSchema {
 	return s
 }
 
-func fromRideEventCollection(collection []RideEventSchema) []entity.RideEvent {
+func FromRideEventCollection(collection []RideEventSchema) []entity.RideEvent {
 	var eventSchema []entity.RideEvent
 
 	for _, e := range collection {
@@ -70,13 +71,4 @@ func (s *RideEventSchema) WithNewUuid() *RideEventSchema {
 	s.Uuid = uuid.New()
 
 	return s
-}
-
-func (s *RideEventSchema) ToRideEntity() entity.Ride {
-	return entity.Ride{
-		RideUuid: s.RideUuid,
-		Lat:      s.Lat,
-		Lon:      s.Lon,
-		State:    s.State,
-	}
 }

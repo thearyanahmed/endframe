@@ -8,6 +8,7 @@ import (
 	"github.com/mmcloughlin/geohash"
 	"github.com/thearyanahmed/nordsec/services/location/entity"
 	"github.com/thearyanahmed/nordsec/services/location/repository"
+	"github.com/thearyanahmed/nordsec/services/location/schema"
 	"github.com/umahmood/haversine"
 	"time"
 )
@@ -18,10 +19,10 @@ type Service struct {
 }
 
 type rideRepository interface {
-	UpdateLocation(ctx context.Context, ghash string, trip repository.RideEventSchema) error
-	GetRideEventsFromMultiGeohash(ctx context.Context, geohashKeys []string) (map[string]repository.RideEventSchema, error)
-	ApplyStateFilter(ctx context.Context, m map[string]repository.RideEventSchema) map[string]repository.RideEventSchema
-	SetToCooldown(ctx context.Context, details repository.RideCooldownEvent) error
+	UpdateLocation(ctx context.Context, ghash string, trip schema.RideEventSchema) error
+	GetRideEventsFromMultiGeohash(ctx context.Context, geohashKeys []string) (map[string]schema.RideEventSchema, error)
+	ApplyStateFilter(ctx context.Context, m map[string]schema.RideEventSchema) map[string]schema.RideEventSchema
+	SetToCooldown(ctx context.Context, details schema.RideCooldownEvent) error
 }
 
 // NewLocationService
@@ -49,7 +50,7 @@ func (s *Service) RecordRideEvent(ctx context.Context, event entity.RideEvent) (
 		return entity.RideEvent{}, err
 	}
 
-	loc := repository.FromRideEventEntity(event).WithNewUuid()
+	loc := schema.FromRideEventEntity(event).WithNewUuid()
 
 	fmt.Println("EVENT", event, "Ghash", ghash)
 	err = s.repo.UpdateLocation(ctx, ghash, *loc)
@@ -69,13 +70,13 @@ func (s *Service) GetRidesInArea(ctx context.Context, area entity.Area) (interfa
 	rides, err := s.repo.GetRideEventsFromMultiGeohash(ctx, neighbours)
 
 	if err != nil {
-		return map[string]repository.RideEventSchema{}, err
+		return map[string]schema.RideEventSchema{}, err
 	}
 
 	rides = s.repo.ApplyStateFilter(ctx, rides)
 
 	return rides, nil
-	//return fromRideEventCollection(rides), nil
+	//return FromRideEventCollection(rides), nil
 }
 
 func (s *Service) DistanceInMeters(a, b entity.Coordinate) float64 {
@@ -110,7 +111,7 @@ func (s *Service) FindRideInLocations(ctx context.Context, rideUuid string, orig
 	}
 
 	// but if it exists, apply the state filter, so if any vehicle is in cool down mode, we can validate it correctly
-	m := map[string]repository.RideEventSchema{rideUuid: rideEvent}
+	m := map[string]schema.RideEventSchema{rideUuid: rideEvent}
 
 	rides = s.repo.ApplyStateFilter(ctx, m)
 
@@ -144,7 +145,7 @@ func (s *Service) GetRoute(origin, destination entity.Coordinate, intervalPoints
 }
 
 func (s *Service) StartCooldownForRide(ctx context.Context, rideUuid string, timestamp int64, duration time.Duration) error {
-	ev := repository.RideCooldownEvent{
+	ev := schema.RideCooldownEvent{
 		RideUuid:  rideUuid,
 		Timestamp: timestamp,
 		Duration:  duration,

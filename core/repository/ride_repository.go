@@ -16,6 +16,7 @@ func NewRideRepository(ds *redis.Client) *RideRepository {
 }
 
 func (r *RideRepository) FindById(ctx context.Context, uuid string) (RideLocationSchema, error) {
+	panic("deprecated")
 	//var rideLocation RideLocationSchema
 
 	//if err := r.datastore.FindOne(ctx, bson.M{"_id": uuid}).Decode(&rideLocation); err != nil {
@@ -26,6 +27,8 @@ func (r *RideRepository) FindById(ctx context.Context, uuid string) (RideLocatio
 }
 
 func (r *RideRepository) UpdateLocation(ctx context.Context, uuid string, lat, lon float64) (RideLocationSchema, error) {
+	panic("deprecated")
+
 	loc := redis.GeoLocation{
 		Name:      uuid,
 		Latitude:  lat,

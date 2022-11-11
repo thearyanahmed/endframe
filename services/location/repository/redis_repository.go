@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis/v8"
+	"github.com/thearyanahmed/nordsec/services/location/schema"
 	"sync"
 )
 
@@ -22,7 +23,7 @@ func NewRideRepository(ds *redis.Client, ridesKey string) *RideRepository {
 	}
 }
 
-func (r *RideRepository) UpdateLocation(ctx context.Context, ghash string, trip RideEventSchema) error {
+func (r *RideRepository) UpdateLocation(ctx context.Context, ghash string, trip schema.RideEventSchema) error {
 	jsonStr, err := json.Marshal(trip)
 
 	if err != nil {
@@ -37,7 +38,7 @@ func (r *RideRepository) UpdateLocation(ctx context.Context, ghash string, trip 
 	return err
 }
 
-func (r *RideRepository) SetToCooldown(ctx context.Context, details RideCooldownEvent) error {
+func (r *RideRepository) SetToCooldown(ctx context.Context, details schema.RideCooldownEvent) error {
 	key := r.getCooldownKey(details.RideUuid)
 
 	fmt.Println("CHECK KEY", key)
@@ -54,7 +55,7 @@ func (r *RideRepository) getIds(ctx context.Context, ids []string) ([]interface{
 	return r.datastore.MGet(ctx, ids...).Result()
 }
 
-func (r *RideRepository) GetRideEvents(ctx context.Context, geohashKeys []string, keyLen int) ([]RideEventSchema, error) {
+func (r *RideRepository) GetRideEvents(ctx context.Context, geohashKeys []string, keyLen int) ([]schema.RideEventSchema, error) {
 	var wg sync.WaitGroup
 	wg.Add(keyLen)
 
@@ -68,7 +69,7 @@ func (r *RideRepository) GetRideEvents(ctx context.Context, geohashKeys []string
 		go r.getRidesFromGeohash(ctx, ch, &wg, hashKey, 0, -1)
 	}
 
-	var collection []RideEventSchema
+	var collection []schema.RideEventSchema
 
 	for v := range ch {
 		events := mapZRangeValueToRideEventSchemaCollection(v)
@@ -78,7 +79,7 @@ func (r *RideRepository) GetRideEvents(ctx context.Context, geohashKeys []string
 	return collection, nil
 }
 
-func (r *RideRepository) ApplyStateFilter(ctx context.Context, m map[string]RideEventSchema) map[string]RideEventSchema {
+func (r *RideRepository) ApplyStateFilter(ctx context.Context, m map[string]schema.RideEventSchema) map[string]schema.RideEventSchema {
 	var keys []string
 
 	for k, _ := range m {
@@ -107,20 +108,20 @@ func (r *RideRepository) ApplyStateFilter(ctx context.Context, m map[string]Ride
 	return m
 }
 
-func (r *RideRepository) GetRideEventsFromMultiGeohash(ctx context.Context, geohashKeys []string) (map[string]RideEventSchema, error) {
+func (r *RideRepository) GetRideEventsFromMultiGeohash(ctx context.Context, geohashKeys []string) (map[string]schema.RideEventSchema, error) {
 	// sanity check
 	// if the geohashKeys are empty, then return empty struct
 	glen := len(geohashKeys)
 
 	if glen == 0 {
-		return map[string]RideEventSchema{}, nil
+		return map[string]schema.RideEventSchema{}, nil
 	}
 
 	// flat array, includes duplicate elements of the same event(ride event schema)
 	collection, err := r.GetRideEvents(ctx, geohashKeys, glen)
 
 	if err != nil {
-		return map[string]RideEventSchema{}, err
+		return map[string]schema.RideEventSchema{}, err
 	}
 
 	// from the duplicate ones, filter out
@@ -133,8 +134,8 @@ func (r *RideRepository) GetRideEventsFromMultiGeohash(ctx context.Context, geoh
 	return m, nil
 }
 
-func (r *RideRepository) applyUniqueFilter(collection []RideEventSchema) map[string]RideEventSchema {
-	m := make(map[string]RideEventSchema)
+func (r *RideRepository) applyUniqueFilter(collection []schema.RideEventSchema) map[string]schema.RideEventSchema {
+	m := make(map[string]schema.RideEventSchema)
 
 	for _, c := range collection {
 		if mv, ok := m[c.RideUuid]; !ok {
@@ -160,11 +161,11 @@ func (r *RideRepository) getRidesFromGeohash(ctx context.Context, ch chan []stri
 }
 
 // @todo find a better name
-func mapZRangeValueToRideEventSchemaCollection(result []string) []RideEventSchema {
-	var events []RideEventSchema
+func mapZRangeValueToRideEventSchemaCollection(result []string) []schema.RideEventSchema {
+	var events []schema.RideEventSchema
 
 	for _, v := range result {
-		var ev RideEventSchema
+		var ev schema.RideEventSchema
 
 		// @NOTE we are ignoring the error case for this demonstration.
 		if err := json.Unmarshal([]byte(v), &ev); err == nil {
