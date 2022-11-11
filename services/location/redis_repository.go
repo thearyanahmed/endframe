@@ -65,7 +65,7 @@ func (r *RideRepository) GetRideEvents(ctx context.Context, geohashKeys []string
 	return collection, nil
 }
 
-func (r *RideRepository) applyStateFilter(ctx context.Context, m map[string]RideEventSchema) map[string]RideEventSchema {
+func (r *RideRepository) ApplyStateFilter(ctx context.Context, m map[string]RideEventSchema) map[string]RideEventSchema {
 	var keys []string
 
 	for k, _ := range m {
@@ -94,14 +94,7 @@ func (r *RideRepository) applyStateFilter(ctx context.Context, m map[string]Ride
 	return m
 }
 
-func (r *RideRepository) GetRideEventsFromMultiGeohash(ctx context.Context, geohashKeys []string) (interface{}, error) {
-	// get all rides from redis
-	// use concurrency with waitGroups
-
-	// @todo remove these
-	//geohashKeys = []string{}
-	//geohashKeys = append(geohashKeys, "y70fs9")
-
+func (r *RideRepository) GetRideEventsFromMultiGeohash(ctx context.Context, geohashKeys []string) (map[string]RideEventSchema, error) {
 	// sanity check
 	// if the geohashKeys are empty, then return empty struct
 	glen := len(geohashKeys)
@@ -121,8 +114,8 @@ func (r *RideRepository) GetRideEventsFromMultiGeohash(ctx context.Context, geoh
 	// @improvement: maybe we can have something like r.applyFilter(function, data)
 	m := r.applyUniqueFilter(collection)
 
-	// @todo apply PostFilters
-	m = r.applyStateFilter(ctx, m)
+	// @todo apply PostFilters // extract to different method
+	m = r.ApplyStateFilter(ctx, m)
 
 	return m, nil
 }

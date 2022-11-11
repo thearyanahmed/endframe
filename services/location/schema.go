@@ -60,3 +60,12 @@ func (s *RideEventSchema) WithNewUuid() *RideEventSchema {
 
 	return s
 }
+
+func (s *RideEventSchema) ToRideEntity() Ride {
+	return Ride{
+		RideUuid: s.RideUuid,
+		Lat:      s.Lat,
+		Lon:      s.Lon,
+		State:    s.State,
+	}
+}
