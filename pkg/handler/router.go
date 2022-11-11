@@ -33,7 +33,7 @@ func NewRouter(conf *config.Specification, svcAggregator *service.ServiceAggrega
 			// This simulates the idea of a rider, who just came online
 			r.With(apiMiddleware.ValidateContentTypeMiddleware).
 				With(apiMiddleware.NewAuthorizeRiderMiddleware(conf.RiderApiKey, logger).Handle).
-				Post("/ride/activate", NewUpdateRideLocationHandler(svcAggregator.RideService, svcAggregator.LocationSvc).ServeHTTP)
+				Post("/ride/activate", NewUpdateRideLocationHandler(svcAggregator.RideService).ServeHTTP)
 
 			// Start a trip.
 			r.With(apiMiddleware.ValidateContentTypeMiddleware).
