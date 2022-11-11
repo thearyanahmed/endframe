@@ -114,3 +114,27 @@ func (s *Service) FindRideInLocations(ctx context.Context, rideUuid string, orig
 
 	return rideEventSchema.ToRideEntity(), nil
 }
+
+func (s *Service) GetRoute(origin, destination Coordinate, intervalPoints int) []Coordinate {
+	x1, x2 := origin.Lat, destination.Lat
+	y1, y2 := origin.Lon, destination.Lon
+
+	dx := (x2 - x1) / float64(intervalPoints)
+	dy := (y2 - y1) / float64(intervalPoints)
+
+	var route []Coordinate
+
+	route = append(route, origin)
+
+	for i := 1; i < intervalPoints-1; i++ {
+		point := Coordinate{
+			Lat: x1 + float64(i)*dx,
+			Lon: y1 + float64(i)*dy,
+		}
+		route = append(route, point)
+	}
+
+	route = append(route, destination)
+
+	return route
+}

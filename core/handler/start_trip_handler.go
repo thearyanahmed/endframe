@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/thearyanahmed/nordsec/core/presenter"
 	"github.com/thearyanahmed/nordsec/core/serializer"
 	"github.com/thearyanahmed/nordsec/services/location"
@@ -40,18 +41,28 @@ func (s *startTripHandler) ServeHttp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check if rideId is in nearby location of the origin
-	ride, err := s.locationSvc.FindRideInLocations(r.Context(), tripRequest.RideUuid, origin)
+	//ride, err := s.locationSvc.FindRideInLocations(r.Context(), tripRequest.RideUuid, origin)
+	//
+	//if err != nil {
+	//	presenter.ErrorResponse(w, r, presenter.FromErr(err))
+	//	return
+	//}
+	//
+	//// @todo refactor
+	//if ride.State != "available" {
+	//	presenter.ErrorResponse(w, r, presenter.ErrRideUnavailableResponse())
+	//	return
+	//}
 
-	if err != nil {
-		presenter.ErrorResponse(w, r, presenter.FromErr(err))
-		return
-	}
+	// @TODO WORK FROM HERE
+	// get route
+	routes := s.locationSvc.GetRoute(origin, dest, 50)
 
-	// @todo refactor
-	if ride.State != "available" {
-		presenter.ErrorResponse(w, r, presenter.ErrRideUnavailableResponse())
-		return
-	}
+	fmt.Println("LEN", len(routes))
+	presenter.RenderJsonResponse(w, r, http.StatusOK, routes)
+	// ride goes to origin
+	// start notify event with current passenger id
+	//
 
 	// response: {
 	//	message: 'trip started',
