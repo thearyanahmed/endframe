@@ -26,9 +26,6 @@ Length	Tile Size
 
 ## NEXT TODOS
 
-1. 
-
-
 ## Task
 A company called Scootin' Aboot will deploy electric scooters in Ottawa and
 Montreal. Design and implement a backend service that exposes a REST-like

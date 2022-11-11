@@ -10,10 +10,10 @@ import (
 
 type authorizeClientMiddleware struct {
 	authToken string
-	logger    log.Logger
+	logger    *log.Logger
 }
 
-func NewAuthorizeClientMiddleware(token string, logger log.Logger) *authorizeClientMiddleware {
+func NewAuthorizeClientMiddleware(token string, logger *log.Logger) *authorizeClientMiddleware {
 	return &authorizeClientMiddleware{
 		authToken: token,
 		logger:    logger,
