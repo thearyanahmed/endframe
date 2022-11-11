@@ -1,7 +1,8 @@
-package location
+package repository
 
 import (
 	"github.com/google/uuid"
+	"github.com/thearyanahmed/nordsec/services/location/entity"
 	"time"
 )
 
@@ -24,8 +25,8 @@ type RideEventSchema struct {
 	State         string    `json:"state"` // in route, roaming
 }
 
-func (s *RideEventSchema) ToEntity() RideEvent {
-	return RideEvent{
+func (s *RideEventSchema) ToEntity() entity.RideEvent {
+	return entity.RideEvent{
 		Uuid:          s.Uuid.String(),
 		RideUuid:      s.RideUuid,
 		Lat:           s.Lat,
@@ -37,7 +38,7 @@ func (s *RideEventSchema) ToEntity() RideEvent {
 	}
 }
 
-func fromRideEventEntity(e RideEvent) *RideEventSchema {
+func FromRideEventEntity(e entity.RideEvent) *RideEventSchema {
 	s := &RideEventSchema{
 		RideUuid:      e.RideUuid,
 		Lat:           e.Lat,
@@ -55,8 +56,8 @@ func fromRideEventEntity(e RideEvent) *RideEventSchema {
 	return s
 }
 
-func fromRideEventCollection(collection []RideEventSchema) []RideEvent {
-	var eventSchema []RideEvent
+func fromRideEventCollection(collection []RideEventSchema) []entity.RideEvent {
+	var eventSchema []entity.RideEvent
 
 	for _, e := range collection {
 		eventSchema = append(eventSchema, e.ToEntity())
@@ -71,8 +72,8 @@ func (s *RideEventSchema) WithNewUuid() *RideEventSchema {
 	return s
 }
 
-func (s *RideEventSchema) ToRideEntity() Ride {
-	return Ride{
+func (s *RideEventSchema) ToRideEntity() entity.Ride {
+	return entity.Ride{
 		RideUuid: s.RideUuid,
 		Lat:      s.Lat,
 		Lon:      s.Lon,

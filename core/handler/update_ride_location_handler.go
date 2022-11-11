@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"github.com/thearyanahmed/nordsec/services/location"
+	entity2 "github.com/thearyanahmed/nordsec/services/location/entity"
 	"net/http"
 	"time"
 
@@ -40,7 +41,7 @@ func (h *updateRideLocationHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	rideEvent := location.RideEvent{
+	rideEvent := entity2.RideEvent{
 		RideUuid:      eventRequest.RideUuid,
 		Lat:           eventRequest.Latitude,
 		Lon:           eventRequest.Longitude,

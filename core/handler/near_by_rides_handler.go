@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"github.com/thearyanahmed/nordsec/services/location"
+	entity2 "github.com/thearyanahmed/nordsec/services/location/entity"
 	"net/http"
 
 	"github.com/thearyanahmed/nordsec/core/entity"
@@ -11,7 +12,7 @@ import (
 
 type nearByRidesUsecase interface {
 	// FindRides @todo use options api instead of map[string]string
-	FindNearByRides(ctx context.Context, area location.Area) ([]entity.RideEntity, error)
+	FindNearByRides(ctx context.Context, area entity2.Area) ([]entity.RideEntity, error)
 }
 
 type nearByRidesHandler struct {
@@ -29,20 +30,20 @@ func NewNearByRidesHandler(usecase nearByRidesUsecase, loc *location.Service) *n
 }
 
 func (h *nearByRidesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	area := location.Area{
-		X1Y1: location.Coordinate{
+	area := entity2.Area{
+		X1Y1: entity2.Coordinate{
 			Lat: 52.3251,
 			Lon: 13.453,
 		},
-		X2Y2: location.Coordinate{
+		X2Y2: entity2.Coordinate{
 			Lat: 0,
 			Lon: 0,
 		},
-		X3Y3: location.Coordinate{
+		X3Y3: entity2.Coordinate{
 			Lat: 52.3361,
 			Lon: 13.475,
 		},
-		X4Y4: location.Coordinate{
+		X4Y4: entity2.Coordinate{
 			Lat: 0,
 			Lon: 0,
 		},

@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/thearyanahmed/nordsec/services/location"
+	entity2 "github.com/thearyanahmed/nordsec/services/location/entity"
 
 	"github.com/thearyanahmed/nordsec/core/entity"
 	"github.com/thearyanahmed/nordsec/core/repository"
@@ -49,7 +49,7 @@ func (s *RideService) FindById(ctx context.Context, uuid string) (entity.RideLoc
 	return loc.ToEntity(), nil
 }
 
-func (s *RideService) FindNearByRides(ctx context.Context, area location.Area) ([]entity.RideEntity, error) {
+func (s *RideService) FindNearByRides(ctx context.Context, area entity2.Area) ([]entity.RideEntity, error) {
 	fmt.Println("[ride service] GOT AREA", area)
 
 	return []entity.RideEntity{}, nil
