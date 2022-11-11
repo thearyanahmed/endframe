@@ -35,7 +35,6 @@ func (h *updateRideLocationHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 	}
 
 	// @todo | TASK get ride, check if it's in route or in cooldown
-
 	rideEvent := eventRequest.ToRideEvent().SetStateAsRoaming().SetCurrentTimestamp()
 
 	loc, err := h.usecase.UpdateRideLocation(r.Context(), *rideEvent)
