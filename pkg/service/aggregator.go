@@ -20,7 +20,7 @@ func NewServiceAggregator(config *config.Specification, logger *log.Logger) (*Se
 		return &ServiceAggregator{}, err
 	}
 
-	locSvc := location.NewLocationService(redis)
+	locSvc := location.NewLocationService(redis, config.GetRedisLocationsKey())
 	rideRepo := repository.NewRideRepository(redis)
 
 	rideSvc := NewRideService(rideRepo, locSvc, logger)

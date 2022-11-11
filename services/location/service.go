@@ -26,12 +26,10 @@ type rideRepository interface {
 	SetToCooldown(ctx context.Context, details schema.RideCooldownEvent) error
 }
 
-// NewLocationService
-// @todo use a builder pattern to build out the service?
-func NewLocationService(ds *redis.Client) *Service {
-	repo := repository.NewRideRepository(ds, "trips_test_01") // @todo take from config
+func NewLocationService(ds *redis.Client, redisKey string) *Service {
+	repo := repository.NewRideRepository(ds, redisKey)
 	return &Service{
-		geohashLength: uint(6),
+		geohashLength: uint(6), // could have taken from config as well
 		repo:          repo,
 	}
 }
@@ -41,7 +39,6 @@ func getGeoHash(lat, lon float64, precision uint) string {
 }
 
 func (s *Service) RecordRideEvent(ctx context.Context, event entity.Event) (entity.Event, error) {
-	// get the location geohash
 	ghash := getGeoHash(event.Lat, event.Lon, s.geohashLength)
 
 	err := geohash.Validate(ghash)
@@ -62,8 +59,6 @@ func (s *Service) RecordRideEvent(ctx context.Context, event entity.Event) (enti
 }
 
 func (s *Service) GetRidesInArea(ctx context.Context, area entity.Area) ([]entity.Ride, error) {
-	// first get the data in area
-	// then apply the filters if any
 	neighbours := area.GetNeighbourGeohashFromCenter(s.geohashLength)
 
 	rides, err := s.repo.GetRideEventsFromMultiGeohash(ctx, neighbours)
@@ -78,14 +73,10 @@ func (s *Service) GetRidesInArea(ctx context.Context, area entity.Area) ([]entit
 }
 
 func (s *Service) FindRideInLocation(ctx context.Context, rideUuid string, origin entity.Coordinate) (entity.Ride, error) {
-	// get origin
-	// get neighbours
 	ghash := geohash.EncodeWithPrecision(origin.Lat, origin.Lon, s.geohashLength)
 
-	// get all rides in neighbours
 	neighbours := geohash.Neighbors(ghash)
 
-	// check if rides there
 	rides, err := s.repo.GetRideEventsFromMultiGeohash(ctx, neighbours)
 	if err != nil {
 		return entity.Ride{}, err
@@ -93,12 +84,10 @@ func (s *Service) FindRideInLocation(ctx context.Context, rideUuid string, origi
 
 	rideEvent, ok := rides[rideUuid]
 
-	// if it doesn't exist, return error
 	if !ok {
 		return entity.Ride{}, RideNotInLocation
 	}
 
-	// but if it exists, apply the state filter, so if any vehicle is in cool down mode, we can validate it correctly
 	m := map[string]schema.RideEventSchema{rideUuid: rideEvent}
 
 	rides = s.repo.ApplyStateFilter(ctx, m)

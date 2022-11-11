@@ -4,19 +4,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/suite"
 	"github.com/thearyanahmed/nordsec/pkg/presenter"
+	"github.com/thearyanahmed/nordsec/pkg/service"
+	"github.com/thearyanahmed/nordsec/pkg/testutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
-
-	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
-	"github.com/thearyanahmed/nordsec/pkg/service"
-	"github.com/thearyanahmed/nordsec/pkg/testutil"
 )
 
-type UpdateRideLocationHandlerTestSuite struct {
+type updateRideLocationHandlerTestSuite struct {
 	suite.Suite
 	usecase *service.RideServiceMock
 }
@@ -31,16 +30,16 @@ type updateRideLocationFailedValidationResponse struct {
 }
 
 func TestUpdateRideLocationHandlerTestSuite(t *testing.T) {
-	suite.Run(t, new(UpdateRideLocationHandlerTestSuite))
+	suite.Run(t, new(updateRideLocationHandlerTestSuite))
 }
 
-func (s *UpdateRideLocationHandlerTestSuite) SetupTest() {
+func (s *updateRideLocationHandlerTestSuite) SetupTest() {
 	s.usecase = &service.RideServiceMock{}
 
 	defer mock.AssertExpectationsForObjects(s.T(), s.usecase)
 }
 
-func (s *UpdateRideLocationHandlerTestSuite) TestFormRequestHandlesLatLonValidation() {
+func (s *updateRideLocationHandlerTestSuite) TestFormRequestHandlesLatLonValidation() {
 	data := testutil.FakeRecordRideEventRequestWithInvalidLatLon()
 	res := s.response(testutil.RecordRideEventToUrlValues(data))
 
@@ -52,7 +51,7 @@ func (s *UpdateRideLocationHandlerTestSuite) TestFormRequestHandlesLatLonValidat
 	assert.Equal(s.T(), http.StatusBadRequest, res.Code)
 }
 
-func (s *UpdateRideLocationHandlerTestSuite) TestFormRequestHandlesRideUuidValidation() {
+func (s *updateRideLocationHandlerTestSuite) TestFormRequestHandlesRideUuidValidation() {
 	data := testutil.FakeRecordRideEventRequestWithInvalidRideUuid()
 	res := s.response(testutil.RecordRideEventToUrlValues(data))
 
@@ -64,7 +63,7 @@ func (s *UpdateRideLocationHandlerTestSuite) TestFormRequestHandlesRideUuidValid
 	assert.Equal(s.T(), http.StatusBadRequest, res.Code)
 }
 
-func (s *UpdateRideLocationHandlerTestSuite) TestRequestFailsWithoutFormData() {
+func (s *updateRideLocationHandlerTestSuite) TestRequestFailsWithoutFormData() {
 	res := s.response(nil)
 
 	assert.Equal(s.T(), http.StatusBadRequest, res.Code)
@@ -80,7 +79,7 @@ func (s *UpdateRideLocationHandlerTestSuite) TestRequestFailsWithoutFormData() {
 	assert.Contains(s.T(), result.Details.RideUuid, "The ride_uuid field is required")
 }
 
-func (s *UpdateRideLocationHandlerTestSuite) TestRideLocationUpdatesSuccessfully() {
+func (s *updateRideLocationHandlerTestSuite) TestRideLocationUpdatesSuccessfully() {
 	data := testutil.FakeRecordRideEventRequest()
 
 	s.usecase.On("UpdateRideLocation").Return(*(data.ToRideEvent()), nil).Once()
@@ -100,7 +99,7 @@ func (s *UpdateRideLocationHandlerTestSuite) TestRideLocationUpdatesSuccessfully
 	assert.Equal(s.T(), result.Event.Longitude, fmt.Sprintf("%.6f", data.Longitude))
 }
 
-func (s *UpdateRideLocationHandlerTestSuite) response(data url.Values) *httptest.ResponseRecorder {
+func (s *updateRideLocationHandlerTestSuite) response(data url.Values) *httptest.ResponseRecorder {
 	rr := testutil.NewAPIResponseBuilder().
 		Method(http.MethodPost).
 		URL("/api/v1/ride/activate").

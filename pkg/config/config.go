@@ -13,9 +13,10 @@ type (
 			Port string `envconfig:"APP_PORT" required:"true"`
 		}
 
-		RedisHost string `envconfig:"REDIS_HOST" required:"true"`
-		RedisPort string `envconfig:"REDIS_PORT" required:"true"`
-		RedisPass string `envconfig:"REDIS_PASSWORD" required:"true"`
+		RedisHost        string `envconfig:"REDIS_HOST" required:"true"`
+		RedisPort        string `envconfig:"REDIS_PORT" required:"true"`
+		RedisPass        string `envconfig:"REDIS_PASSWORD" required:"true"`
+		RedisLocationKey string `envconfig:"REDIS_LOCATION_KEY" required:"true"`
 
 		LogLevel string `envconfig:"LOG_LEVEL" required:"false"`
 
@@ -49,4 +50,8 @@ func (c *Specification) GetRedisPassword() string {
 
 func (c *Specification) GetLogLevel() string {
 	return c.LogLevel
+}
+
+func (c *Specification) GetRedisLocationsKey() string {
+	return c.RedisLocationKey
 }
