@@ -2,9 +2,16 @@ package location
 
 import (
 	"github.com/google/uuid"
+	"time"
 )
 
 // @todo BIG REFACTOR
+
+type RideCooldownEvent struct {
+	RideUuid  string        `json:"ride_uuid"`
+	Timestamp int64         `json:"timestamp"`
+	Duration  time.Duration `json:"-"`
+}
 
 type RideEventSchema struct {
 	Uuid          uuid.UUID `json:"uuid"`

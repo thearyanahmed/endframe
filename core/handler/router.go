@@ -48,14 +48,14 @@ func NewRouter(conf *config.Specification, svcAggregator *service.ServiceAggrega
 			// Update ride position takes a ride uuid, updates ride details on kafka.
 			// But also need to push to redis because users can query rides-near-by.
 			// That query will be done from redis.
-			r.Post("/notify/position", func(w http.ResponseWriter, r *http.Request) {
-				w.Write([]byte("update ride position"))
-			})
+			r.With(coreMiddleware.ValidateContentTypeMiddleware).
+				With(coreMiddleware.NewAuthorizeClientMiddleware(conf.ClientApiKey, logger).Handle).
+				Post("/trip/notify/location", NewNotifyPositionHandler(svcAggregator.LocationSvc).ServeHTTP)
 
 			// Validate the request, update to redis, kafka and database.
-			r.Post("/trip/end", func(w http.ResponseWriter, r *http.Request) {
-				// update the
-			})
+			r.With(coreMiddleware.ValidateContentTypeMiddleware).
+				With(coreMiddleware.NewAuthorizeClientMiddleware(conf.ClientApiKey, logger).Handle).
+				Post("/trip/end", NewEndTripHandler(svcAggregator.LocationSvc).ServeHTTP)
 		})
 	})
 

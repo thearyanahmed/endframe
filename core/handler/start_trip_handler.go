@@ -60,6 +60,7 @@ func (h *startTripHandler) ServeHttp(w http.ResponseWriter, r *http.Request) {
 	// get route
 	routes := h.locationSvc.GetRoute(origin, dest, 50)
 
+	// @Todo add to database
 	rideEvent := location.RideEvent{
 		RideUuid:      tripRequest.RideUuid,
 		Lat:           origin.Lat,

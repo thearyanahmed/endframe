@@ -7,6 +7,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/mmcloughlin/geohash"
 	"github.com/umahmood/haversine"
+	"time"
 )
 
 type Service struct {
@@ -18,6 +19,7 @@ type rideRepository interface {
 	UpdateLocation(ctx context.Context, ghash string, trip RideEventSchema) error
 	GetRideEventsFromMultiGeohash(ctx context.Context, geohashKeys []string) (map[string]RideEventSchema, error)
 	ApplyStateFilter(ctx context.Context, m map[string]RideEventSchema) map[string]RideEventSchema
+	SetToCooldown(ctx context.Context, details RideCooldownEvent) error
 }
 
 // NewLocationService
@@ -137,4 +139,14 @@ func (s *Service) GetRoute(origin, destination Coordinate, intervalPoints int) [
 	route = append(route, destination)
 
 	return route
+}
+
+func (s *Service) StartCooldownForRide(ctx context.Context, rideUuid string, timestamp int64, duration time.Duration) error {
+	ev := RideCooldownEvent{
+		RideUuid:  rideUuid,
+		Timestamp: timestamp,
+		Duration:  duration,
+	}
+
+	return s.repo.SetToCooldown(ctx, ev)
 }

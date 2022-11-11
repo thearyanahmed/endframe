@@ -37,6 +37,19 @@ func (r *RideRepository) UpdateLocation(ctx context.Context, ghash string, trip 
 	return err
 }
 
+func (r *RideRepository) SetToCooldown(ctx context.Context, details RideCooldownEvent) error {
+	key := r.getCooldownKey(details.RideUuid)
+
+	fmt.Println("CHECK KEY", key)
+	_, err := r.datastore.Set(ctx, key, details.Timestamp, details.Duration).Result()
+
+	return err
+}
+
+func (r *RideRepository) getCooldownKey(key string) string {
+	return fmt.Sprintf("cooldown:%s", key)
+}
+
 func (r *RideRepository) getIds(ctx context.Context, ids []string) ([]interface{}, error) {
 	return r.datastore.MGet(ctx, ids...).Result()
 }
@@ -69,7 +82,7 @@ func (r *RideRepository) ApplyStateFilter(ctx context.Context, m map[string]Ride
 	var keys []string
 
 	for k, _ := range m {
-		keys = append(keys, k)
+		keys = append(keys, r.getCooldownKey(k))
 	}
 
 	keyLen := len(keys)

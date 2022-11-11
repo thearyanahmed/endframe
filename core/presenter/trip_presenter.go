@@ -12,6 +12,11 @@ type TripStarted struct {
 	Event   location.RideEvent    `json:"event"`
 }
 
+type TripEnded struct {
+	Message  string `json:"message"`
+	TripUuid string `json:"trip_uuid"`
+}
+
 func ErrDistanceTooLowResponse(minDistance float64) *Response {
 	return &Response{
 		HttpStatusCode: http.StatusBadRequest,
@@ -31,5 +36,12 @@ func TripStartedResponse(event location.RideEvent, route []location.Coordinate) 
 		Message: "trip started",
 		Route:   route,
 		Event:   event,
+	}
+}
+
+func TripEndedResponse(tripUuid string) TripEnded {
+	return TripEnded{
+		Message:  "trip has ended",
+		TripUuid: tripUuid,
 	}
 }
