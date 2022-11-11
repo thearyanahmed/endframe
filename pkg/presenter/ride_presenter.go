@@ -2,8 +2,7 @@ package presenter
 
 import (
 	"fmt"
-
-	locationEntity "github.com/thearyanahmed/nordsec/services/location/entity"
+	"github.com/thearyanahmed/nordsec/services/location/entity"
 )
 
 type RideLocationUpdateResponse struct {
@@ -12,18 +11,18 @@ type RideLocationUpdateResponse struct {
 }
 
 type LocationDetails struct {
-	UUID      string `json:"uuid"`
+	Uuid      string `json:"uuid"`
 	Latitude  string `json:"latitude"`
 	Longitude string `json:"longitude"`
 }
 
-func FromRideLocationEntity(e locationEntity.Event) RideLocationUpdateResponse {
+func FromRideLocationEntity(e entity.Event) RideLocationUpdateResponse {
 	return RideLocationUpdateResponse{
 		Message: "ride location updated",
 		Event: LocationDetails{
-			UUID:      e.RideUuid,
-			Latitude:  fmt.Sprintf("%.5f", e.Lat),
-			Longitude: fmt.Sprintf("%.5f", e.Lon),
+			Uuid:      e.RideUuid,
+			Latitude:  fmt.Sprintf("%.6f", e.Lat),
+			Longitude: fmt.Sprintf("%.6f", e.Lon),
 		},
 	}
 }
