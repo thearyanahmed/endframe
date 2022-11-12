@@ -10,6 +10,36 @@ type RideServiceMock struct {
 	mock.Mock
 }
 
+func (s *RideServiceMock) GetMinimumTripDistance() float64 {
+	args := s.Called()
+	return args.Get(0).(float64)
+}
+
+func (s *RideServiceMock) RideIsAvailable(ride locationEntity.Ride) bool {
+	args := s.Called()
+	return args.Get(0).(bool)
+}
+
+func (s *RideServiceMock) GetRoute(origin, dest locationEntity.Coordinate) []locationEntity.Coordinate {
+	args := s.Called()
+	return args.Get(0).([]locationEntity.Coordinate)
+}
+
+func (s *RideServiceMock) RecordRideEvent(ctx context.Context, event locationEntity.Event) (locationEntity.Event, error) {
+	args := s.Called()
+	return args.Get(0).(locationEntity.Event), args.Error(1)
+}
+
+func (s *RideServiceMock) DistanceIsGreaterThanMinimumDistance(origin, destination locationEntity.Coordinate) bool {
+	args := s.Called()
+	return args.Get(0).(bool)
+}
+
+func (s *RideServiceMock) FindRideInLocation(ctx context.Context, rideUuid string, rideLocation locationEntity.Coordinate) (locationEntity.Ride, error) {
+	args := s.Called()
+	return args.Get(0).(locationEntity.Ride), args.Error(1)
+}
+
 func (s *RideServiceMock) UpdateRideLocation(ctx context.Context, event locationEntity.Event) (locationEntity.Event, error) {
 	args := s.Called()
 	return args.Get(0).(locationEntity.Event), args.Error(1)

@@ -78,6 +78,16 @@ func FakeStartTripRequestWithInvalidUuid() serializer.StartTripRequest {
 	return r
 }
 
+func FakeStartTripRequestWithInvalidDistance() serializer.StartTripRequest {
+	r := FakeStartTripRequest()
+
+	// set a very minimum distance
+	r.DestinationLatitude = r.OriginLatitude + 0.0006
+	r.DestinationLongitude = r.OriginLongitude + 0.0006
+
+	return r
+}
+
 func StartTripRequestToUrlValues(rre serializer.StartTripRequest) url.Values {
 	req := url.Values{}
 
@@ -90,4 +100,3 @@ func StartTripRequestToUrlValues(rre serializer.StartTripRequest) url.Values {
 
 	return req
 }
-

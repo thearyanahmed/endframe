@@ -1,29 +1,33 @@
 package handler
 
 import (
-	"github.com/google/uuid"
+	"context"
 	"github.com/thearyanahmed/nordsec/pkg/presenter"
 	"github.com/thearyanahmed/nordsec/pkg/serializer"
-	"github.com/thearyanahmed/nordsec/services/location"
 	"github.com/thearyanahmed/nordsec/services/location/entity"
 	"net/http"
-	"time"
 )
 
 type startTripHandler struct {
-	// @todo extract interface
-	minTripDistance float64 // minimum distance between origin and destination, in meters
-	locationSvc     *location.Service
+	rideService rideService
 }
 
-func NewStartTripHandler(service *location.Service) *startTripHandler {
+type rideService interface {
+	GetMinimumTripDistance() float64
+	RideIsAvailable(ride entity.Ride) bool
+	GetRoute(origin, dest entity.Coordinate) []entity.Coordinate
+	RecordRideEvent(ctx context.Context, event entity.Event) (entity.Event, error)
+	DistanceIsGreaterThanMinimumDistance(origin, destination entity.Coordinate) bool
+	FindRideInLocation(ctx context.Context, rideUuid string, rideLocation entity.Coordinate) (entity.Ride, error)
+}
+
+func NewStartTripHandler(rideService rideService) *startTripHandler {
 	return &startTripHandler{
-		locationSvc:     service,
-		minTripDistance: 500, // in meters
+		rideService: rideService,
 	}
 }
 
-func (h *startTripHandler) ServeHttp(w http.ResponseWriter, r *http.Request) {
+func (h *startTripHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	tripRequest := &serializer.StartTripRequest{}
 
 	if formErrors := serializer.ValidatePostForm(r, tripRequest); len(formErrors) > 0 {
@@ -33,43 +37,27 @@ func (h *startTripHandler) ServeHttp(w http.ResponseWriter, r *http.Request) {
 
 	origin, dest := tripRequest.Origin(), tripRequest.Destination()
 
-	// check the destination first
-	if h.locationSvc.DistanceInMeters(origin, dest) <= h.minTripDistance {
-		presenter.ErrorResponse(w, r, presenter.ErrDistanceTooLowResponse(h.minTripDistance))
+	if !h.rideService.DistanceIsGreaterThanMinimumDistance(origin, dest) {
+		presenter.ErrorResponse(w, r, presenter.ErrDistanceTooLowResponse(h.rideService.GetMinimumTripDistance()))
 		return
 	}
 
-	// @TODO enable the following
-	// check if rideId is in nearby location of the origin
-	ride, err := h.locationSvc.FindRideInLocation(r.Context(), tripRequest.RideUuid, origin)
-
+	// @TODO | check if rideId is in nearby location of the origin
+	ride, err := h.rideService.FindRideInLocation(r.Context(), tripRequest.RideUuid, origin)
 	if err != nil {
 		presenter.ErrorResponse(w, r, presenter.FromErr(err))
 		return
 	}
 
-	// @todo refactor
-	if ride.State != "roaming" {
+	if !h.rideService.RideIsAvailable(ride) {
 		presenter.ErrorResponse(w, r, presenter.ErrRideUnavailableResponse())
 		return
 	}
 
-	// @TODO WORK FROM HERE
-	// get route
-	routes := h.locationSvc.GetRoute(origin, dest, 50)
+	routes := h.rideService.GetRoute(origin, dest)
+	rideEvent := tripRequest.ToRideEventFromOrigin()
 
-	// @Todo add to database
-	rideEvent := entity.Event{
-		RideUuid:      tripRequest.RideUuid,
-		Lat:           origin.Lat,
-		Lon:           origin.Lon,
-		PassengerUuid: tripRequest.ClientUuid,
-		State:         "in_route", // @todo handle this
-		Timestamp:     time.Now().Unix(),
-		TripUuid:      uuid.New().String(),
-	}
-
-	event, err := h.locationSvc.RecordRideEvent(r.Context(), rideEvent)
+	event, err := h.rideService.RecordRideEvent(r.Context(), rideEvent)
 
 	if err != nil {
 		presenter.ErrorResponse(w, r, presenter.FromErr(err))

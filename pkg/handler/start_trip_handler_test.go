@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/thearyanahmed/nordsec/pkg/serializer"
 	"net/http"
 	"net/http/httptest"
@@ -18,10 +19,10 @@ import (
 type startTripHandlerTestSuite struct {
 	suite.Suite
 	minTripDistance float64 // minimum distance between origin and destination, in meters
-	usecase         *service.RideServiceMock
+	rideService     *service.RideServiceMock
 }
 
-type startTripRequestResponse struct {
+type startTripRequestValidationResponse struct {
 	Message string `json:"message"`
 	Details struct {
 		DecoderError []string `json:"decoder_error"`
@@ -29,10 +30,10 @@ type startTripRequestResponse struct {
 }
 
 func (s *startTripHandlerTestSuite) SetupTest() {
-	s.usecase = &service.RideServiceMock{}
+	s.rideService = &service.RideServiceMock{}
 	s.minTripDistance = 5000
 
-	defer mock.AssertExpectationsForObjects(s.T(), s.usecase)
+	defer mock.AssertExpectationsForObjects(s.T(), s.rideService)
 }
 
 func TestStartTripHandlerTestSuite(t *testing.T) {
@@ -51,7 +52,7 @@ func (s *startTripHandlerTestSuite) TestEndpointValidatesFormDataCorrectly() {
 		assert.Equal(s.T(), http.StatusBadRequest, res.Code)
 
 		// Make sure the response is valid as well
-		var result startTripRequestResponse
+		var result startTripRequestValidationResponse
 		if err := json.NewDecoder(res.Body).Decode(&result); err != nil {
 			s.T().Errorf("failed to decode response body: %v", err)
 		}
@@ -62,24 +63,40 @@ func (s *startTripHandlerTestSuite) TestEndpointValidatesFormDataCorrectly() {
 }
 
 // test if distance is less than minTripDistance, it should return false (and check response)
-func (s *startTripHandlerTestSuite) TestMinimumTripDistanceIsMoreOrEqualToGivenMinDistance() {
-	assert.False(s.T(), true)
+func (s *startTripHandlerTestSuite) TestTripDistanceIsMoreOrEqualToGivenMinDistance() {
+	fakeReq := testutil.FakeStartTripRequest()
+
+	minDist := 5000.00
+
+	s.rideService.On("GetMinimumTripDistance").Return(minDist).Once()
+	s.rideService.On("DistanceIsGreaterThanMinimumDistance").Return(false).Once()
+
+	res := s.response(testutil.StartTripRequestToUrlValues(fakeReq))
+
+	assert.Equal(s.T(), http.StatusBadRequest, res.Code)
+
+	// Make sure the response is valid as well
+	var result testutil.Response
+	if err := json.NewDecoder(res.Body).Decode(&result); err != nil {
+		s.T().Errorf("failed to decode response body: %v", err)
+	}
+
+	// Make sure the response is for validation failed and not something else
+	msg := fmt.Sprintf("distance too low. minimum distance required %.2f meters or greater", minDist)
+	assert.Equal(s.T(), msg, result.Message)
 }
 
 // test if ride is in location
 func (s *startTripHandlerTestSuite) TestRideIsInLocation() {
-	assert.False(s.T(), true)
 }
 
 // test if ride.state is available or not
 func (s *startTripHandlerTestSuite) TestRideIsAvailableBeforeStartingTrip() {
-	assert.False(s.T(), true)
 }
 
 // test response
 // 1. should have a specific format, should contain routes array
 func (s *startTripHandlerTestSuite) TestTripStartsSuccessfullyGivenValidData() {
-	assert.False(s.T(), true)
 }
 
 func (s *startTripHandlerTestSuite) response(data url.Values) *httptest.ResponseRecorder {
@@ -87,7 +104,7 @@ func (s *startTripHandlerTestSuite) response(data url.Values) *httptest.Response
 		Method(http.MethodPost).
 		URL("/api/v1/trip/start").
 		Body(data).
-		Handler(NewUpdateRideLocationHandler(s.usecase).ServeHTTP).
+		Handler(NewStartTripHandler(s.rideService).ServeHTTP).
 		IsFormUrlEncoded().
 		Build()
 

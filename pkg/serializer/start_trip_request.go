@@ -38,3 +38,12 @@ func (r *StartTripRequest) Destination() entity.Coordinate {
 		Lon: r.DestinationLongitude,
 	}
 }
+
+func (r *StartTripRequest) ToRideEventFromOrigin() entity.Event {
+	return entity.Event{
+		RideUuid:      r.RideUuid,
+		Lat:           r.OriginLatitude,
+		Lon:           r.OriginLongitude,
+		PassengerUuid: r.ClientUuid,
+	}
+}

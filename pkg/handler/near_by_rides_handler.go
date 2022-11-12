@@ -3,16 +3,15 @@ package handler
 import (
 	"context"
 	"github.com/thearyanahmed/nordsec/services/location"
-	entity2 "github.com/thearyanahmed/nordsec/services/location/entity"
+	locationEntity "github.com/thearyanahmed/nordsec/services/location/entity"
 	"net/http"
 
-	"github.com/thearyanahmed/nordsec/pkg/entity"
 	"github.com/thearyanahmed/nordsec/pkg/presenter"
 )
 
 type nearByRidesUsecase interface {
 	// FindNearByRides FindRides @todo use options api instead of map[string]string
-	FindNearByRides(ctx context.Context, area entity2.Area) ([]entity.RideEntity, error)
+	FindNearByRides(ctx context.Context, area locationEntity.Area) ([]locationEntity.Ride, error)
 }
 
 type nearByRidesHandler struct {
@@ -31,27 +30,26 @@ func NewNearByRidesHandler(usecase nearByRidesUsecase, loc *location.Service) *n
 
 func (h *nearByRidesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// @todo take from form request
-	area := entity2.Area{
-		X1Y1: entity2.Coordinate{
+	area := locationEntity.Area{
+		X1Y1: locationEntity.Coordinate{
 			Lat: 52.3251,
 			Lon: 13.453,
 		},
-		X2Y2: entity2.Coordinate{
+		X2Y2: locationEntity.Coordinate{
 			Lat: 0,
 			Lon: 0,
 		},
-		X3Y3: entity2.Coordinate{
+		X3Y3: locationEntity.Coordinate{
 			Lat: 52.3361,
 			Lon: 13.475,
 		},
-		X4Y4: entity2.Coordinate{
+		X4Y4: locationEntity.Coordinate{
 			Lat: 0,
 			Lon: 0,
 		},
 	}
 
-	//rides, err := h.usecase.FindNearByRides(r.Context(), area)
-	rides, err := h.locationSvc.GetRidesInArea(r.Context(), area)
+	rides, err := h.usecase.FindNearByRides(r.Context(), area)
 
 	if err != nil {
 		presenter.ErrorResponse(w, r, presenter.FromErr(err))

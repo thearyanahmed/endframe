@@ -38,7 +38,7 @@ func NewRouter(conf *config.Specification, svcAggregator *service.ServiceAggrega
 			// Start a trip.
 			r.With(apiMiddleware.ValidateContentTypeMiddleware).
 				With(apiMiddleware.NewAuthorizeClientMiddleware(conf.ClientApiKey, logger).Handle).
-				Post("/trip/start", NewStartTripHandler(svcAggregator.LocationSvc).ServeHttp)
+				Post("/trip/start", NewStartTripHandler(svcAggregator.RideService).ServeHTTP)
 
 			// Update location while on trip
 			r.With(apiMiddleware.ValidateContentTypeMiddleware).
