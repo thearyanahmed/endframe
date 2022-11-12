@@ -30,6 +30,11 @@ func (s *RideServiceMock) RecordNewRideEvent(ctx context.Context, event location
 	return args.Get(0).(locationEntity.Event), args.Error(1)
 }
 
+func (s *RideServiceMock) RecordLocationUpdate(ctx context.Context, event locationEntity.Event) (locationEntity.Event, error) {
+	args := s.Called()
+	return args.Get(0).(locationEntity.Event), args.Error(1)
+}
+
 func (s *RideServiceMock) DistanceIsGreaterThanMinimumDistance(origin, destination locationEntity.Coordinate) bool {
 	args := s.Called()
 	return args.Get(0).(bool)

@@ -13,7 +13,7 @@ type notifyPositionHandler struct {
 }
 
 type notifyRideService interface {
-	UpdateRideLocation(ctx context.Context, event locationEntity.Event) (locationEntity.Event, error)
+	RecordLocationUpdate(ctx context.Context, event locationEntity.Event) (locationEntity.Event, error)
 }
 
 func NewNotifyPositionHandler(rideService notifyRideService) *notifyPositionHandler {
@@ -31,8 +31,7 @@ func (h *notifyPositionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 	// @TODO check in database if trip exists or not.
 
 	rideEvent := eventRequest.ToRideEvent()
-
-	event, err := h.rideService.UpdateRideLocation(r.Context(), rideEvent)
+	event, err := h.rideService.RecordLocationUpdate(r.Context(), rideEvent)
 
 	if err != nil {
 		presenter.ErrorResponse(w, r, presenter.FromErr(err))

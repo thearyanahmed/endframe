@@ -37,6 +37,12 @@ func (s *RideService) RecordNewRideEvent(ctx context.Context, event locationEnti
 	return s.UpdateRideLocation(ctx, event)
 }
 
+func (s *RideService) RecordLocationUpdate(ctx context.Context, event locationEntity.Event) (locationEntity.Event, error) {
+	event.SetStateAsInRoute().SetCurrentTimestamp()
+
+	return s.UpdateRideLocation(ctx, event)
+}
+
 func (s *RideService) UpdateRideLocation(ctx context.Context, event locationEntity.Event) (locationEntity.Event, error) {
 	rideEvent, err := s.locationService.RecordRideEvent(ctx, event)
 

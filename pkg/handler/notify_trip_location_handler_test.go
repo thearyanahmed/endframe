@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -12,6 +13,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
+	"time"
 )
 
 type notifyPositionHandlerTestSuite struct {
@@ -74,7 +76,9 @@ func (s *notifyPositionHandlerTestSuite) TestRideLocationUpdatesSuccessfullyWith
 	formData := testutil.NotifyTripLocationRequestToUrlValues(fakeReq)
 	rideEvent := fakeReq.ToRideEvent()
 
-	s.rideService.On("UpdateRideLocation").Return(rideEvent, nil).Once()
+	rideEvent.Uuid = uuid.New().String()
+	rideEvent.Timestamp = time.Now().Unix()
+	s.rideService.On("RecordLocationUpdate").Return(rideEvent, nil).Once()
 	res := s.response(formData)
 	assert.Equal(s.T(), http.StatusOK, res.Code)
 
@@ -90,6 +94,7 @@ func (s *notifyPositionHandlerTestSuite) TestRideLocationUpdatesSuccessfullyWith
 	assert.Equal(s.T(), rideEvent.PassengerUuid, result.PassengerUuid)
 	assert.Equal(s.T(), rideEvent.RideUuid, result.RideUuid)
 	assert.NotEmpty(s.T(), result.Timestamp)
+	assert.NotEmpty(s.T(), result.Uuid)
 }
 
 func (s *notifyPositionHandlerTestSuite) response(data url.Values) *httptest.ResponseRecorder {
