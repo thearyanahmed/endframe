@@ -5,6 +5,7 @@ import (
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/google/uuid"
 	"github.com/thearyanahmed/nordsec/pkg/serializer"
+	locationEntity "github.com/thearyanahmed/nordsec/services/location/entity"
 	"net/url"
 )
 
@@ -78,16 +79,6 @@ func FakeStartTripRequestWithInvalidUuid() serializer.StartTripRequest {
 	return r
 }
 
-func FakeStartTripRequestWithInvalidDistance() serializer.StartTripRequest {
-	r := FakeStartTripRequest()
-
-	// set a very minimum distance
-	r.DestinationLatitude = r.OriginLatitude + 0.0006
-	r.DestinationLongitude = r.OriginLongitude + 0.0006
-
-	return r
-}
-
 func StartTripRequestToUrlValues(rre serializer.StartTripRequest) url.Values {
 	req := url.Values{}
 
@@ -99,4 +90,13 @@ func StartTripRequestToUrlValues(rre serializer.StartTripRequest) url.Values {
 	req.Set("destination_longitude", fmt.Sprintf("%.6f", rre.DestinationLongitude))
 
 	return req
+}
+
+func FakeRoamingRideEntity() locationEntity.Ride {
+	return locationEntity.Ride{
+		RideUuid: uuid.New().String(),
+		Lat:      gofakeit.Latitude(),
+		Lon:      gofakeit.Longitude(),
+		State:    locationEntity.StateRoaming,
+	}
 }

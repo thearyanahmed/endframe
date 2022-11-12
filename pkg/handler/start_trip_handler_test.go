@@ -2,8 +2,10 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/thearyanahmed/nordsec/pkg/serializer"
+	"github.com/thearyanahmed/nordsec/services/location/entity"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -66,7 +68,7 @@ func (s *startTripHandlerTestSuite) TestEndpointValidatesFormDataCorrectly() {
 func (s *startTripHandlerTestSuite) TestTripDistanceIsMoreOrEqualToGivenMinDistance() {
 	fakeReq := testutil.FakeStartTripRequest()
 
-	minDist := 5000.00
+	minDist := 50000.00
 
 	s.rideService.On("GetMinimumTripDistance").Return(minDist).Once()
 	s.rideService.On("DistanceIsGreaterThanMinimumDistance").Return(false).Once()
@@ -87,7 +89,24 @@ func (s *startTripHandlerTestSuite) TestTripDistanceIsMoreOrEqualToGivenMinDista
 }
 
 // test if ride is in location
-func (s *startTripHandlerTestSuite) TestRideIsInLocation() {
+func (s *startTripHandlerTestSuite) TestItReturnsErrorIfRideIsNotInLocation() {
+	fakeReq := testutil.FakeStartTripRequest()
+
+	riderErr := errors.New("ride not in nearby location")
+
+	s.rideService.On("GetMinimumTripDistance").Return(1).Once() // a very low distance
+	s.rideService.On("DistanceIsGreaterThanMinimumDistance").Return(true).Once()
+	s.rideService.On("FindRideInLocation").Return(entity.Ride{}, riderErr).Once()
+
+	res := s.response(testutil.StartTripRequestToUrlValues(fakeReq))
+	assert.Equal(s.T(), http.StatusUnprocessableEntity, res.Code)
+
+	var result testutil.Response
+	if err := json.NewDecoder(res.Body).Decode(&result); err != nil {
+		s.T().Errorf("failed to decode response body: %v", err)
+	}
+
+	assert.Equal(s.T(), riderErr.Error(), result.Message)
 }
 
 // test if ride.state is available or not
