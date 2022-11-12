@@ -12,7 +12,7 @@ type ServiceAggregator struct {
 	LocationSvc *location.Service
 }
 
-func NewServiceAggregator(config *config.Specification, logger *log.Logger) (*ServiceAggregator, error) {
+func NewServiceAggregator(config *config.Specification, _ *log.Logger) (*ServiceAggregator, error) {
 	// @todo extract to different layer
 	redis, err := repository.NewRedisClient(config.GetRedisAddr(), config.GetRedisPassword())
 
@@ -21,9 +21,9 @@ func NewServiceAggregator(config *config.Specification, logger *log.Logger) (*Se
 	}
 
 	locSvc := location.NewLocationService(redis, config.GetRedisLocationsKey())
-	rideRepo := repository.NewRideRepository(redis)
+	//rideRepo := repository.NewRideRepository(redis)
 
-	rideSvc := NewRideService(rideRepo, locSvc, logger)
+	rideSvc := NewRideService(locSvc)
 
 	aggregator := &ServiceAggregator{
 		RideService: rideSvc,

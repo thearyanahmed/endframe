@@ -2,50 +2,53 @@ package service
 
 import (
 	"context"
-	"fmt"
 	locationEntity "github.com/thearyanahmed/nordsec/services/location/entity"
-
-	"github.com/thearyanahmed/nordsec/pkg/entity"
-	"github.com/thearyanahmed/nordsec/pkg/repository"
-	"github.com/thearyanahmed/nordsec/pkg/shared"
 )
 
-type rideRepository interface {
-	UpdateLocation(ctx context.Context, uuid string, lat, long float64) (repository.RideLocationSchema, error)
-	FindById(ctx context.Context, uuid string) (repository.RideLocationSchema, error)
-}
-
 type locationService interface {
+	DistanceInMeters(origin, dest locationEntity.Coordinate) float64
+	GetRidesInArea(ctx context.Context, area locationEntity.Area) ([]locationEntity.Ride, error)
 	RecordRideEvent(ctx context.Context, event locationEntity.Event) (locationEntity.Event, error)
+	GetRoute(origin, destination locationEntity.Coordinate, intervalPoints int) []locationEntity.Coordinate
 	FindRideInLocation(ctx context.Context, rideUuid string, origin locationEntity.Coordinate) (locationEntity.Ride, error)
 }
 
 type RideService struct {
-	repository      rideRepository
-	logger          shared.LoggerInterface
-	locationService locationService
+	locationService       locationService
+	minTripDistance       float64 // minimum distance between origin and destination, in meters
+	inRouteIntervalPoints int
 }
 
-func NewRideService(repo rideRepository, locationSvc locationService, logger shared.LoggerInterface) *RideService {
+func NewRideService(locationSvc locationService) *RideService {
 	return &RideService{
-		repository:      repo,
-		logger:          logger,
-		locationService: locationSvc,
+		locationService:       locationSvc,
+		minTripDistance:       500,
+		inRouteIntervalPoints: 15,
 	}
+}
+
+func (s *RideService) RecordRideEvent(ctx context.Context, event locationEntity.Event) (locationEntity.Event, error) {
+	event.SetStateAsInRoute().SetCurrentTimestamp().SetNewTripUuid()
+
+	return s.UpdateRideLocation(ctx, event)
+}
+
+func (s *RideService) GetMinimumTripDistance() float64 {
+	return s.minTripDistance
 }
 
 func (s *RideService) UpdateRideLocation(ctx context.Context, event locationEntity.Event) (locationEntity.Event, error) {
 	rideEvent, err := s.locationService.RecordRideEvent(ctx, event)
 
 	if err != nil {
-		go func() {
-			s.logger.Error(err)
-		}()
-
 		return locationEntity.Event{}, err
 	}
 
 	return rideEvent, nil
+}
+
+func (s *RideService) GetRoute(origin, dest locationEntity.Coordinate) []locationEntity.Coordinate {
+	return s.locationService.GetRoute(origin, dest, s.inRouteIntervalPoints)
 }
 
 func (s *RideService) CanBeUpdatedViaRiderApp(ctx context.Context, rideUuid string, loc locationEntity.Coordinate) (bool, error) {
@@ -62,20 +65,14 @@ func (s *RideService) RideIsAvailable(ride locationEntity.Ride) bool {
 	return ride.State != locationEntity.StateInCooldown && ride.State != locationEntity.StateInRoute
 }
 
-func (s *RideService) FindById(ctx context.Context, uuid string) (entity.RideLocationEntity, error) {
-	panic("deprecated")
-	loc, err := s.repository.FindById(ctx, uuid)
-
-	if err != nil {
-		return entity.RideLocationEntity{}, err
-	}
-
-	return loc.ToEntity(), nil
+func (s *RideService) DistanceIsGreaterThanMinimumDistance(origin, dest locationEntity.Coordinate) bool {
+	return s.locationService.DistanceInMeters(origin, dest) < s.minTripDistance
 }
 
-func (s *RideService) FindNearByRides(ctx context.Context, area locationEntity.Area) ([]entity.RideEntity, error) {
-	panic("deprecated")
-	fmt.Println("[ride service] GOT AREA", area)
+func (s *RideService) FindRideInLocation(ctx context.Context, rideUuid string, rideLocation locationEntity.Coordinate) (locationEntity.Ride, error) {
+	return s.locationService.FindRideInLocation(ctx, rideUuid, rideLocation)
+}
 
-	return []entity.RideEntity{}, nil
+func (s *RideService) FindNearByRides(ctx context.Context, area locationEntity.Area) ([]locationEntity.Ride, error) {
+	return s.locationService.GetRidesInArea(ctx, area)
 }
