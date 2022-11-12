@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"github.com/thearyanahmed/nordsec/pkg/serializer"
-	entity2 "github.com/thearyanahmed/nordsec/pkg/service/location/entity"
+	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 	"github.com/thearyanahmed/nordsec/pkg/service/ride"
 	"github.com/thearyanahmed/nordsec/pkg/testutil"
 	"net/http"
@@ -97,7 +97,7 @@ func (s *startTripHandlerTestSuite) TestItReturnsErrorIfRideIsNotInLocation() {
 
 	s.rideService.On("GetMinimumTripDistance").Return(1).Once() // a very low distance
 	s.rideService.On("DistanceIsGreaterThanMinimumDistance").Return(true).Once()
-	s.rideService.On("FindRideInLocation").Return(entity2.Ride{}, riderErr).Once()
+	s.rideService.On("FindRideInLocation").Return(entity.Ride{}, riderErr).Once()
 
 	defer s.rideService.ResetMock()
 
@@ -115,11 +115,11 @@ func (s *startTripHandlerTestSuite) TestItReturnsErrorIfRideIsNotInLocation() {
 // test if ride.state is available or not
 func (s *startTripHandlerTestSuite) TestIsRideAvailableBeforeStartingTrip() {
 	fakeReq := testutil.FakeStartTripRequest()
-	ride := testutil.FakeInRouteRideEntity()
+	fakeRide := testutil.FakeInRouteRideEntity()
 
 	s.rideService.On("GetMinimumTripDistance").Return(1).Once() // a very low distance
 	s.rideService.On("DistanceIsGreaterThanMinimumDistance").Return(true).Once()
-	s.rideService.On("FindRideInLocation").Return(ride, nil).Once()
+	s.rideService.On("FindRideInLocation").Return(fakeRide, nil).Once()
 	s.rideService.On("IsRideAvailable").Return(false).Once()
 
 	defer s.rideService.ResetMock()
@@ -140,23 +140,23 @@ func (s *startTripHandlerTestSuite) TestIsRideAvailableBeforeStartingTrip() {
 // 1. should have a specific format, should contain routes array
 func (s *startTripHandlerTestSuite) TestTripStartsSuccessfullyGivenValidData() {
 	fakeReq := testutil.FakeStartTripRequest()
-	ride := testutil.FakeRoamingRideEntity()
+	fakeRide := testutil.FakeRoamingRideEntity()
 
-	origin := entity2.Coordinate{
+	origin := entity.Coordinate{
 		Lat: fakeReq.OriginLatitude,
 		Lon: fakeReq.OriginLongitude,
 	}
-	dest := entity2.Coordinate{
+	dest := entity.Coordinate{
 		Lat: fakeReq.OriginLatitude,
 		Lon: fakeReq.OriginLongitude,
 	}
 
 	route := testutil.FakeRoute(origin, dest)
-	event := testutil.FakeEventInRoute(ride.RideUuid, route[1])
+	event := testutil.FakeEventInRoute(fakeRide.RideUuid, route[1])
 
 	s.rideService.On("GetMinimumTripDistance").Return(1).Once() // a very low distance
 	s.rideService.On("DistanceIsGreaterThanMinimumDistance").Return(true).Once()
-	s.rideService.On("FindRideInLocation").Return(ride, nil).Once()
+	s.rideService.On("FindRideInLocation").Return(fakeRide, nil).Once()
 	s.rideService.On("IsRideAvailable").Return(true).Once()
 	s.rideService.On("GetRoute").Return(route).Once()
 	s.rideService.On("RecordNewRideEvent").Return(event, nil).Once()

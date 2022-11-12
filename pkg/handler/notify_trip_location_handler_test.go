@@ -78,7 +78,10 @@ func (s *notifyPositionHandlerTestSuite) TestRideLocationUpdatesSuccessfullyWith
 
 	rideEvent.Uuid = uuid.New().String()
 	rideEvent.Timestamp = time.Now().Unix()
+
 	s.rideService.On("RecordLocationUpdate").Return(rideEvent, nil).Once()
+	defer s.rideService.ResetMock()
+
 	res := s.response(formData)
 	assert.Equal(s.T(), http.StatusOK, res.Code)
 

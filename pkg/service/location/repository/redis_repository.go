@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis/v8"
-	schema2 "github.com/thearyanahmed/nordsec/pkg/service/location/schema"
+	"github.com/thearyanahmed/nordsec/pkg/service/location/schema"
 	"sync"
 )
 
@@ -21,7 +21,7 @@ func NewRideRepository(ds *redis.Client, ridesKey string) *RideRepository {
 	}
 }
 
-func (r *RideRepository) UpdateLocation(ctx context.Context, ghash string, trip schema2.RideEventSchema) error {
+func (r *RideRepository) UpdateLocation(ctx context.Context, ghash string, trip schema.RideEventSchema) error {
 	jsonStr, err := json.Marshal(trip)
 
 	if err != nil {
@@ -36,7 +36,7 @@ func (r *RideRepository) UpdateLocation(ctx context.Context, ghash string, trip 
 	return err
 }
 
-func (r *RideRepository) SetToCooldown(ctx context.Context, details schema2.RideCooldownEvent) error {
+func (r *RideRepository) SetToCooldown(ctx context.Context, details schema.RideCooldownEvent) error {
 	key := r.getCooldownKey(details.RideUuid)
 
 	_, err := r.datastore.Set(ctx, key, details.Timestamp, details.Duration).Result()
@@ -52,7 +52,7 @@ func (r *RideRepository) getIds(ctx context.Context, ids []string) ([]interface{
 	return r.datastore.MGet(ctx, ids...).Result()
 }
 
-func (r *RideRepository) GetRideEvents(ctx context.Context, geohashKeys []string, keyLen int) ([]schema2.RideEventSchema, error) {
+func (r *RideRepository) GetRideEvents(ctx context.Context, geohashKeys []string, keyLen int) ([]schema.RideEventSchema, error) {
 	var wg sync.WaitGroup
 	wg.Add(keyLen)
 
@@ -66,7 +66,7 @@ func (r *RideRepository) GetRideEvents(ctx context.Context, geohashKeys []string
 		go r.getRideEventsByGeohashKey(ctx, ch, &wg, hashKey, 0, -1)
 	}
 
-	var collection []schema2.RideEventSchema
+	var collection []schema.RideEventSchema
 
 	for v := range ch {
 		events := mapZRangeValToRideEventCollection(v)
@@ -76,7 +76,7 @@ func (r *RideRepository) GetRideEvents(ctx context.Context, geohashKeys []string
 	return collection, nil
 }
 
-func (r *RideRepository) ApplyCooldownStateFilter(ctx context.Context, m map[string]schema2.RideEventSchema) map[string]schema2.RideEventSchema {
+func (r *RideRepository) ApplyCooldownStateFilter(ctx context.Context, m map[string]schema.RideEventSchema) map[string]schema.RideEventSchema {
 	var keys []string
 
 	for k := range m {
@@ -105,20 +105,20 @@ func (r *RideRepository) ApplyCooldownStateFilter(ctx context.Context, m map[str
 	return m
 }
 
-func (r *RideRepository) GetRideEventsFromMultiGeohash(ctx context.Context, geohashKeys []string) (map[string]schema2.RideEventSchema, error) {
+func (r *RideRepository) GetRideEventsFromMultiGeohash(ctx context.Context, geohashKeys []string) (map[string]schema.RideEventSchema, error) {
 	// sanity check
 	// if the geohashKeys are empty, then return empty struct
 	glen := len(geohashKeys)
 
 	if glen == 0 {
-		return map[string]schema2.RideEventSchema{}, nil
+		return map[string]schema.RideEventSchema{}, nil
 	}
 
 	// flat array, includes duplicate elements of the same event(ride event schema)
 	collection, err := r.GetRideEvents(ctx, geohashKeys, glen)
 
 	if err != nil {
-		return map[string]schema2.RideEventSchema{}, err
+		return map[string]schema.RideEventSchema{}, err
 	}
 
 	// from the duplicate ones, filter out
@@ -133,8 +133,8 @@ func (r *RideRepository) GetRideEventsFromMultiGeohash(ctx context.Context, geoh
 
 // applyUniqueFilter filters out all duplicate records (RideEventSchema) based on time.
 // Keeps the latest time's data as that is considered the latest value.
-func (r *RideRepository) applyUniqueFilter(collection []schema2.RideEventSchema) map[string]schema2.RideEventSchema {
-	m := make(map[string]schema2.RideEventSchema)
+func (r *RideRepository) applyUniqueFilter(collection []schema.RideEventSchema) map[string]schema.RideEventSchema {
+	m := make(map[string]schema.RideEventSchema)
 
 	for _, c := range collection {
 		if mv, ok := m[c.RideUuid]; !ok {
@@ -159,11 +159,11 @@ func (r *RideRepository) getRideEventsByGeohashKey(ctx context.Context, ch chan 
 }
 
 // mapZRangeValToRideEventCollection takes the value from ZRange and maps it to RideEventSchema
-func mapZRangeValToRideEventCollection(result []string) []schema2.RideEventSchema {
-	var events []schema2.RideEventSchema
+func mapZRangeValToRideEventCollection(result []string) []schema.RideEventSchema {
+	var events []schema.RideEventSchema
 
 	for _, v := range result {
-		var ev schema2.RideEventSchema
+		var ev schema.RideEventSchema
 
 		// @NOTE we are ignoring the error case for this demonstration.
 		if err := json.Unmarshal([]byte(v), &ev); err == nil {

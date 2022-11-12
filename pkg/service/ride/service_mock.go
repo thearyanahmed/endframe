@@ -10,6 +10,11 @@ type RideServiceMock struct {
 	mock.Mock
 }
 
+func (s *RideServiceMock) FindNearByRides(_ context.Context, _ entity.Area, _ string) ([]entity.Ride, error) {
+	args := s.Called()
+	return args.Get(0).([]entity.Ride), args.Error(1)
+}
+
 func (s *RideServiceMock) GetMinimumTripDistance() float64 {
 	args := s.Called()
 	return args.Get(0).(float64)

@@ -186,3 +186,44 @@ func NotifyTripLocationRequestToUrlValues(request serializer.NotifyTripLocationR
 
 	return req
 }
+
+func Lat() float64 {
+	return gofakeit.Latitude()
+}
+
+func Lon() float64 {
+	return gofakeit.Longitude()
+}
+
+func FakeRideEntity(n int, targetState string) []entity.Ride {
+	var rides []entity.Ride
+
+	for i := 0; i < n; i++ {
+		state := targetState
+		if targetState == "" {
+			state = FakeRandomState()
+		}
+
+		rides = append(rides, entity.Ride{
+			RideUuid: uuid.New().String(),
+			Lat:      Lat(),
+			Lon:      Lon(),
+			State:    state,
+		})
+	}
+
+	return rides
+}
+
+func FakeRandomState() string {
+	switch gofakeit.IntRange(0, 2) {
+	case 0:
+		return entity.StateRoaming
+	case 1:
+		return entity.StateInRoute
+	case 2:
+		return entity.StateInCooldown
+	}
+
+	return entity.StateRoaming
+}
