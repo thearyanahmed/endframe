@@ -2,24 +2,23 @@ package handler
 
 import (
 	"context"
+	"github.com/thearyanahmed/nordsec/pkg/presenter"
 	"github.com/thearyanahmed/nordsec/pkg/serializer"
 	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 	"net/http"
-
-	"github.com/thearyanahmed/nordsec/pkg/presenter"
 )
 
 type nearByRidesUsecase interface {
-	FindNearByRides(ctx context.Context, area entity.Area) ([]entity.Ride, error)
+	FindNearByRides(ctx context.Context, area entity.Area, stateFilter string) ([]entity.Ride, error)
 }
 
 type nearByRidesHandler struct {
-	usecase nearByRidesUsecase
+	riderService nearByRidesUsecase
 }
 
-func NewNearByRidesHandler(usecase nearByRidesUsecase) *nearByRidesHandler {
+func NewNearByRidesHandler(rideSvc nearByRidesUsecase) *nearByRidesHandler {
 	return &nearByRidesHandler{
-		usecase: usecase,
+		riderService: rideSvc,
 	}
 }
 
@@ -31,7 +30,7 @@ func (h *nearByRidesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rides, err := h.usecase.FindNearByRides(r.Context(), filterRequest.ToArea(r))
+	rides, err := h.riderService.FindNearByRides(r.Context(), filterRequest.ToArea(r), r.URL.Query().Get("state"))
 
 	if err != nil {
 		presenter.ErrorResponse(w, r, presenter.FromErr(err))

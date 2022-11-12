@@ -76,10 +76,10 @@ func (r *RideRepository) GetRideEvents(ctx context.Context, geohashKeys []string
 	return collection, nil
 }
 
-func (r *RideRepository) ApplyStateFilter(ctx context.Context, m map[string]schema2.RideEventSchema) map[string]schema2.RideEventSchema {
+func (r *RideRepository) ApplyCooldownStateFilter(ctx context.Context, m map[string]schema2.RideEventSchema) map[string]schema2.RideEventSchema {
 	var keys []string
 
-	for k, _ := range m {
+	for k := range m {
 		keys = append(keys, r.getCooldownKey(k))
 	}
 
@@ -126,7 +126,7 @@ func (r *RideRepository) GetRideEventsFromMultiGeohash(ctx context.Context, geoh
 	m := r.applyUniqueFilter(collection)
 
 	// @todo apply PostFilters // extract to different method
-	m = r.ApplyStateFilter(ctx, m)
+	m = r.ApplyCooldownStateFilter(ctx, m)
 
 	return m, nil
 }

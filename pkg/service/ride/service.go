@@ -79,6 +79,32 @@ func (s *RideService) FindRideInLocation(ctx context.Context, rideUuid string, r
 	return s.locationService.FindRideInLocation(ctx, rideUuid, rideLocation)
 }
 
-func (s *RideService) FindNearByRides(ctx context.Context, area entity.Area) ([]entity.Ride, error) {
-	return s.locationService.GetRidesInArea(ctx, area)
+func (s *RideService) FindNearByRides(ctx context.Context, area entity.Area, stateFilter string) ([]entity.Ride, error) {
+	rides, err := s.locationService.GetRidesInArea(ctx, area)
+
+	if err != nil {
+		return []entity.Ride{}, err
+	}
+
+	if s.isValidFilter(stateFilter) {
+		return s.filterByState(rides, stateFilter), nil
+	}
+
+	return rides, nil
+}
+
+func (s *RideService) isValidFilter(state string) bool {
+	return state == entity.StateInCooldown || state == entity.StateRoaming || state == entity.StateInRoute
+}
+
+func (s *RideService) filterByState(collection []entity.Ride, state string) []entity.Ride {
+	filtered := make([]entity.Ride, 0)
+
+	for _, col := range collection {
+		if col.State == state {
+			filtered = append(filtered, col)
+		}
+	}
+
+	return filtered
 }
