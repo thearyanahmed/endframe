@@ -16,7 +16,7 @@ type rideService interface {
 	GetMinimumTripDistance() float64
 	IsRideAvailable(ride entity.Ride) bool
 	GetRoute(origin, dest entity.Coordinate) []entity.Coordinate
-	RecordRideEvent(ctx context.Context, event entity.Event) (entity.Event, error)
+	RecordNewRideEvent(ctx context.Context, event entity.Event) (entity.Event, error)
 	DistanceIsGreaterThanMinimumDistance(origin, destination entity.Coordinate) bool
 	FindRideInLocation(ctx context.Context, rideUuid string, rideLocation entity.Coordinate) (entity.Ride, error)
 }
@@ -57,7 +57,7 @@ func (h *startTripHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	routes := h.rideService.GetRoute(origin, dest)
 	rideEvent := tripRequest.ToRideEventFromOrigin()
 
-	event, err := h.rideService.RecordRideEvent(r.Context(), rideEvent)
+	event, err := h.rideService.RecordNewRideEvent(r.Context(), rideEvent)
 
 	if err != nil {
 		presenter.ErrorResponse(w, r, presenter.FromErr(err))

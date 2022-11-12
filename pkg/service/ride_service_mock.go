@@ -25,7 +25,7 @@ func (s *RideServiceMock) GetRoute(origin, dest locationEntity.Coordinate) []loc
 	return args.Get(0).([]locationEntity.Coordinate)
 }
 
-func (s *RideServiceMock) RecordRideEvent(ctx context.Context, event locationEntity.Event) (locationEntity.Event, error) {
+func (s *RideServiceMock) RecordNewRideEvent(ctx context.Context, event locationEntity.Event) (locationEntity.Event, error) {
 	args := s.Called()
 	return args.Get(0).(locationEntity.Event), args.Error(1)
 }

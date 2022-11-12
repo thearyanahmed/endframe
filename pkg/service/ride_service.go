@@ -27,14 +27,14 @@ func NewRideService(locationSvc locationService) *RideService {
 	}
 }
 
-func (s *RideService) RecordRideEvent(ctx context.Context, event locationEntity.Event) (locationEntity.Event, error) {
+func (s *RideService) GetMinimumTripDistance() float64 {
+	return s.minTripDistance
+}
+
+func (s *RideService) RecordNewRideEvent(ctx context.Context, event locationEntity.Event) (locationEntity.Event, error) {
 	event.SetStateAsInRoute().SetCurrentTimestamp().SetNewTripUuid()
 
 	return s.UpdateRideLocation(ctx, event)
-}
-
-func (s *RideService) GetMinimumTripDistance() float64 {
-	return s.minTripDistance
 }
 
 func (s *RideService) UpdateRideLocation(ctx context.Context, event locationEntity.Event) (locationEntity.Event, error) {

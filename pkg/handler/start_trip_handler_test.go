@@ -4,18 +4,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/suite"
 	"github.com/thearyanahmed/nordsec/pkg/serializer"
+	"github.com/thearyanahmed/nordsec/pkg/service"
+	"github.com/thearyanahmed/nordsec/pkg/testutil"
 	"github.com/thearyanahmed/nordsec/services/location/entity"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
-	"github.com/thearyanahmed/nordsec/pkg/service"
-	"github.com/thearyanahmed/nordsec/pkg/testutil"
 )
 
 type startTripHandlerTestSuite struct {
@@ -29,24 +28,6 @@ type startTripRequestValidationResponse struct {
 	Details struct {
 		DecoderError []string `json:"decoder_error"`
 	} `json:"details"`
-}
-
-type startTripResponse struct {
-	Message string `json:"message"`
-	Route   []struct {
-		Lat float64 `json:"lat"`
-		Lon float64 `json:"lon"`
-	} `json:"route"`
-	Event struct {
-		Uuid          string `json:"uuid"`
-		RideUuid      string `json:"ride_uuid"`
-		Lat           int    `json:"lat"`
-		Lon           int    `json:"lon"`
-		PassengerUuid string `json:"passenger_uuid"`
-		TripUuid      string `json:"trip_uuid"`
-		Timestamp     int    `json:"timestamp"`
-		State         string `json:"state"`
-	} `json:"event"`
 }
 
 func (s *startTripHandlerTestSuite) SetupTest() {
@@ -178,7 +159,7 @@ func (s *startTripHandlerTestSuite) TestTripStartsSuccessfullyGivenValidData() {
 	s.rideService.On("FindRideInLocation").Return(ride, nil).Once()
 	s.rideService.On("IsRideAvailable").Return(true).Once()
 	s.rideService.On("GetRoute").Return(route).Once()
-	s.rideService.On("RecordRideEvent").Return(event, nil).Once()
+	s.rideService.On("RecordNewRideEvent").Return(event, nil).Once()
 
 	defer s.rideService.ResetMock()
 

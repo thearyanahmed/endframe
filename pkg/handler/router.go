@@ -43,7 +43,7 @@ func NewRouter(conf *config.Specification, svcAggregator *service.ServiceAggrega
 			// Update location while on trip
 			r.With(apiMiddleware.ValidateContentTypeMiddleware).
 				With(apiMiddleware.NewAuthorizeClientMiddleware(conf.ClientApiKey, logger).Handle).
-				Post("/trip/notify/location", NewNotifyPositionHandler(svcAggregator.LocationSvc).ServeHTTP)
+				Post("/trip/notify/location", NewNotifyPositionHandler(svcAggregator.RideService).ServeHTTP)
 
 			// Notify when trip has ended
 			r.With(apiMiddleware.ValidateContentTypeMiddleware).

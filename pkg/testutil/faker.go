@@ -32,12 +32,12 @@ func FakeRecordRideEventRequestWithInvalidRideUuid() serializer.RecordRideEventR
 	}
 }
 
-func RecordRideEventToUrlValues(rre serializer.RecordRideEventRequest) url.Values {
+func RecordRideEventToUrlValues(request serializer.RecordRideEventRequest) url.Values {
 	req := url.Values{}
 
-	req.Set("ride_uuid", rre.RideUuid)
-	req.Set("latitude", fmt.Sprintf("%.6f", rre.Latitude))
-	req.Set("longitude", fmt.Sprintf("%.6f", rre.Longitude))
+	req.Set("ride_uuid", request.RideUuid)
+	req.Set("latitude", fmt.Sprintf("%.6f", request.Latitude))
+	req.Set("longitude", fmt.Sprintf("%.6f", request.Longitude))
 
 	return req
 }
@@ -79,15 +79,15 @@ func FakeStartTripRequestWithInvalidUuid() serializer.StartTripRequest {
 	return r
 }
 
-func StartTripRequestToUrlValues(rre serializer.StartTripRequest) url.Values {
+func StartTripRequestToUrlValues(request serializer.StartTripRequest) url.Values {
 	req := url.Values{}
 
-	req.Set("ride_uuid", rre.RideUuid)
-	req.Set("client_uuid", rre.ClientUuid)
-	req.Set("origin_latitude", fmt.Sprintf("%.6f", rre.OriginLatitude))
-	req.Set("origin_longitude", fmt.Sprintf("%.6f", rre.OriginLongitude))
-	req.Set("destination_latitude", fmt.Sprintf("%.6f", rre.DestinationLatitude))
-	req.Set("destination_longitude", fmt.Sprintf("%.6f", rre.DestinationLongitude))
+	req.Set("ride_uuid", request.RideUuid)
+	req.Set("client_uuid", request.ClientUuid)
+	req.Set("origin_latitude", fmt.Sprintf("%.6f", request.OriginLatitude))
+	req.Set("origin_longitude", fmt.Sprintf("%.6f", request.OriginLongitude))
+	req.Set("destination_latitude", fmt.Sprintf("%.6f", request.DestinationLatitude))
+	req.Set("destination_longitude", fmt.Sprintf("%.6f", request.DestinationLongitude))
 
 	return req
 }
@@ -139,4 +139,50 @@ func FakeEventInRoute(rideUuid string, loc locationEntity.Coordinate) locationEn
 		Timestamp:     gofakeit.Int64(),
 		State:         locationEntity.StateInRoute,
 	}
+}
+
+func FakeNotifyTripLocationRequest() serializer.NotifyTripLocationRequest {
+	return serializer.NotifyTripLocationRequest{
+		Latitude:      gofakeit.Latitude(),
+		Longitude:     gofakeit.Longitude(),
+		RideUuid:      uuid.New().String(),
+		TripUuid:      uuid.New().String(),
+		ClientUuid:    uuid.New().String(),
+		PassengerUuid: uuid.New().String(),
+	}
+}
+
+func FakeNotifyTripLocationRequestWithInvalidLatLon() serializer.NotifyTripLocationRequest {
+	r := FakeNotifyTripLocationRequest()
+	r.Latitude = 122012.22
+	r.Longitude = 122012.22
+
+	return r
+}
+
+func FakeNotifyTripLocationRequestWithMissingRequiredFields() serializer.NotifyTripLocationRequest {
+	return serializer.NotifyTripLocationRequest{}
+}
+
+func FakeNotifyTripLocationRequestWithInvalidUuid() serializer.NotifyTripLocationRequest {
+	r := FakeNotifyTripLocationRequest()
+
+	r.PassengerUuid = "not-a-valid-uuid"
+	r.ClientUuid = "not-a-valid-uuid"
+	r.TripUuid = "not-a-valid-uuid"
+
+	return r
+}
+
+func NotifyTripLocationRequestToUrlValues(request serializer.NotifyTripLocationRequest) url.Values {
+	req := url.Values{}
+
+	req.Set("ride_uuid", request.RideUuid)
+	req.Set("trip_uuid", request.TripUuid)
+	req.Set("client_uuid", request.ClientUuid)
+	req.Set("passenger_uuid", request.PassengerUuid)
+	req.Set("latitude", fmt.Sprintf("%.6f", request.Latitude))
+	req.Set("longitude", fmt.Sprintf("%.6f", request.Longitude))
+
+	return req
 }

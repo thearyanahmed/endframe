@@ -1,23 +1,26 @@
 package handler
 
 import (
+	"context"
 	"github.com/thearyanahmed/nordsec/pkg/presenter"
 	"github.com/thearyanahmed/nordsec/pkg/serializer"
-	"github.com/thearyanahmed/nordsec/services/location"
+	locationEntity "github.com/thearyanahmed/nordsec/services/location/entity"
 	"net/http"
 )
 
 type notifyPositionHandler struct {
-	locationSvc *location.Service
+	rideService notifyRideService
 }
 
-func NewNotifyPositionHandler(locSvc *location.Service) *notifyPositionHandler {
-	return &notifyPositionHandler{locationSvc: locSvc}
+type notifyRideService interface {
+	UpdateRideLocation(ctx context.Context, event locationEntity.Event) (locationEntity.Event, error)
+}
+
+func NewNotifyPositionHandler(rideService notifyRideService) *notifyPositionHandler {
+	return &notifyPositionHandler{rideService: rideService}
 }
 
 func (h *notifyPositionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// validate request
-	// add event with in_route
 	eventRequest := &serializer.NotifyTripLocationRequest{}
 
 	if formErrors := serializer.ValidatePostForm(r, eventRequest); len(formErrors) > 0 {
@@ -26,15 +29,15 @@ func (h *notifyPositionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 	}
 
 	// @TODO check in database if trip exists or not.
+
 	rideEvent := eventRequest.ToRideEvent()
 
-	loc, err := h.locationSvc.RecordRideEvent(r.Context(), rideEvent)
+	event, err := h.rideService.UpdateRideLocation(r.Context(), rideEvent)
 
 	if err != nil {
 		presenter.ErrorResponse(w, r, presenter.FromErr(err))
 		return
 	}
 
-	// return response
-	presenter.RenderJsonResponse(w, r, http.StatusOK, loc)
+	presenter.RenderJsonResponse(w, r, http.StatusOK, event)
 }

@@ -21,6 +21,7 @@ func (r *NotifyTripLocationRequest) Rules() govalidator.MapData {
 		"longitude":      []string{"required", "lon"},
 		"trip_uuid":      []string{"required", "uuid_v4"},
 		"ride_uuid":      []string{"required", "uuid_v4"},
+		"client_uuid":    []string{"required", "uuid_v4"},
 		"passenger_uuid": []string{"required", "uuid_v4"},
 	}
 }
@@ -32,7 +33,7 @@ func (r *NotifyTripLocationRequest) ToRideEvent() entity.Event {
 		Lon:           r.Longitude,
 		PassengerUuid: r.PassengerUuid,
 		TripUuid:      r.TripUuid,
-		State:         "in_route",
+		State:         "in_route", // @todo extract
 		Timestamp:     time.Now().Unix(),
 	}
 }
