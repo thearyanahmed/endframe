@@ -4,11 +4,12 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/thearyanahmed/nordsec/pkg/config"
 	"github.com/thearyanahmed/nordsec/pkg/repository"
-	"github.com/thearyanahmed/nordsec/services/location"
+	"github.com/thearyanahmed/nordsec/pkg/service/location"
+	"github.com/thearyanahmed/nordsec/pkg/service/ride"
 )
 
 type ServiceAggregator struct {
-	*RideService
+	*ride.RideService
 	LocationSvc *location.Service
 }
 
@@ -23,7 +24,7 @@ func NewServiceAggregator(config *config.Specification, _ *log.Logger) (*Service
 	locSvc := location.NewLocationService(redis, config.GetRedisLocationsKey())
 	//rideRepo := repository.NewRideRepository(redis)
 
-	rideSvc := NewRideService(locSvc)
+	rideSvc := ride.NewRideService(locSvc)
 
 	aggregator := &ServiceAggregator{
 		RideService: rideSvc,

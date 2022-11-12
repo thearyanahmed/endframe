@@ -2,7 +2,7 @@ package presenter
 
 import (
 	"fmt"
-	"github.com/thearyanahmed/nordsec/services/location/entity"
+	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 	"net/http"
 )
 

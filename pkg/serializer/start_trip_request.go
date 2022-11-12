@@ -1,7 +1,7 @@
 package serializer
 
 import (
-	"github.com/thearyanahmed/nordsec/services/location/entity"
+	entity2 "github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 	"github.com/thedevsaddam/govalidator"
 )
 
@@ -25,22 +25,22 @@ func (r *StartTripRequest) Rules() govalidator.MapData {
 	}
 }
 
-func (r *StartTripRequest) Origin() entity.Coordinate {
-	return entity.Coordinate{
+func (r *StartTripRequest) Origin() entity2.Coordinate {
+	return entity2.Coordinate{
 		Lat: r.OriginLatitude,
 		Lon: r.OriginLongitude,
 	}
 }
 
-func (r *StartTripRequest) Destination() entity.Coordinate {
-	return entity.Coordinate{
+func (r *StartTripRequest) Destination() entity2.Coordinate {
+	return entity2.Coordinate{
 		Lat: r.DestinationLatitude,
 		Lon: r.DestinationLongitude,
 	}
 }
 
-func (r *StartTripRequest) ToRideEventFromOrigin() entity.Event {
-	return entity.Event{
+func (r *StartTripRequest) ToRideEventFromOrigin() entity2.Event {
+	return entity2.Event{
 		RideUuid:      r.RideUuid,
 		Lat:           r.OriginLatitude,
 		Lon:           r.OriginLongitude,

@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/thearyanahmed/nordsec/pkg/presenter"
 	"github.com/thearyanahmed/nordsec/pkg/serializer"
-	locationEntity "github.com/thearyanahmed/nordsec/services/location/entity"
+	locationEntity "github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 	"net/http"
 )
 

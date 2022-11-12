@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"github.com/thearyanahmed/nordsec/pkg/serializer"
-	"github.com/thearyanahmed/nordsec/pkg/service"
+	"github.com/thearyanahmed/nordsec/pkg/service/ride"
 	"github.com/thearyanahmed/nordsec/pkg/testutil"
 	"net/http"
 	"net/http/httptest"
@@ -18,7 +18,7 @@ import (
 
 type notifyPositionHandlerTestSuite struct {
 	suite.Suite
-	rideService *service.RideServiceMock
+	rideService *ride.RideServiceMock
 }
 
 type notifyTripLocationSuccessResponse struct {
@@ -40,7 +40,7 @@ type notifyTripLocationFailedValidationResponse struct {
 }
 
 func (s *notifyPositionHandlerTestSuite) SetupTest() {
-	s.rideService = &service.RideServiceMock{}
+	s.rideService = &ride.RideServiceMock{}
 
 	defer mock.AssertExpectationsForObjects(s.T(), s.rideService)
 }

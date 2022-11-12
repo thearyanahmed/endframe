@@ -4,13 +4,13 @@ import (
 	"context"
 	"github.com/thearyanahmed/nordsec/pkg/presenter"
 	"github.com/thearyanahmed/nordsec/pkg/serializer"
-	locationEntity "github.com/thearyanahmed/nordsec/services/location/entity"
+	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 	"net/http"
 )
 
 type activateRideUsecase interface {
-	UpdateRideLocation(ctx context.Context, event locationEntity.Event) (locationEntity.Event, error)
-	CanBeUpdatedViaRiderApp(ctx context.Context, rideUuid string, loc locationEntity.Coordinate) (bool, error)
+	UpdateRideLocation(ctx context.Context, event entity.Event) (entity.Event, error)
+	CanBeUpdatedViaRiderApp(ctx context.Context, rideUuid string, loc entity.Coordinate) (bool, error)
 }
 
 type updateRideLocationHandler struct {

@@ -5,7 +5,7 @@ import (
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/google/uuid"
 	"github.com/thearyanahmed/nordsec/pkg/serializer"
-	locationEntity "github.com/thearyanahmed/nordsec/services/location/entity"
+	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 	"net/url"
 )
 
@@ -92,13 +92,13 @@ func StartTripRequestToUrlValues(request serializer.StartTripRequest) url.Values
 	return req
 }
 
-func FakeRoute(origin, dest locationEntity.Coordinate) []locationEntity.Coordinate {
-	var route []locationEntity.Coordinate
+func FakeRoute(origin, dest entity.Coordinate) []entity.Coordinate {
+	var route []entity.Coordinate
 
 	route = append(route, origin)
 
 	for i := 1; i < 11; i++ {
-		point := locationEntity.Coordinate{
+		point := entity.Coordinate{
 			Lat: gofakeit.Latitude() + 0.005,
 			Lon: gofakeit.Longitude() + 0.005,
 		}
@@ -110,26 +110,26 @@ func FakeRoute(origin, dest locationEntity.Coordinate) []locationEntity.Coordina
 	return route
 }
 
-func FakeRoamingRideEntity() locationEntity.Ride {
-	return locationEntity.Ride{
+func FakeRoamingRideEntity() entity.Ride {
+	return entity.Ride{
 		RideUuid: uuid.New().String(),
 		Lat:      gofakeit.Latitude(),
 		Lon:      gofakeit.Longitude(),
-		State:    locationEntity.StateRoaming,
+		State:    entity.StateRoaming,
 	}
 }
 
-func FakeInRouteRideEntity() locationEntity.Ride {
-	return locationEntity.Ride{
+func FakeInRouteRideEntity() entity.Ride {
+	return entity.Ride{
 		RideUuid: uuid.New().String(),
 		Lat:      gofakeit.Latitude(),
 		Lon:      gofakeit.Longitude(),
-		State:    locationEntity.StateInRoute,
+		State:    entity.StateInRoute,
 	}
 }
 
-func FakeEventInRoute(rideUuid string, loc locationEntity.Coordinate) locationEntity.Event {
-	return locationEntity.Event{
+func FakeEventInRoute(rideUuid string, loc entity.Coordinate) entity.Event {
+	return entity.Event{
 		Uuid:          uuid.New().String(),
 		RideUuid:      rideUuid,
 		Lat:           loc.Lat,
@@ -137,7 +137,7 @@ func FakeEventInRoute(rideUuid string, loc locationEntity.Coordinate) locationEn
 		PassengerUuid: uuid.New().String(),
 		TripUuid:      uuid.New().String(),
 		Timestamp:     gofakeit.Int64(),
-		State:         locationEntity.StateInRoute,
+		State:         entity.StateInRoute,
 	}
 }
 

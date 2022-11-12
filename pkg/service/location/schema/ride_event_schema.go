@@ -2,7 +2,7 @@ package schema
 
 import (
 	"github.com/google/uuid"
-	"github.com/thearyanahmed/nordsec/services/location/entity"
+	entity2 "github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 )
 
 // @todo BIG REFACTOR
@@ -18,8 +18,8 @@ type RideEventSchema struct {
 	State         string    `json:"state"` // in route, roaming
 }
 
-func (s *RideEventSchema) ToEntity() entity.Event {
-	return entity.Event{
+func (s *RideEventSchema) ToEntity() entity2.Event {
+	return entity2.Event{
 		Uuid:          s.Uuid.String(),
 		RideUuid:      s.RideUuid,
 		Lat:           s.Lat,
@@ -37,15 +37,15 @@ func (s *RideEventSchema) WithNewUuid() *RideEventSchema {
 	return s
 }
 
-func (s *RideEventSchema) ToRideEntity() entity.Ride {
-	return entity.Ride{
+func (s *RideEventSchema) ToRideEntity() entity2.Ride {
+	return entity2.Ride{
 		RideUuid: s.RideUuid,
 		Lat:      s.Lat,
 		Lon:      s.Lon,
 		State:    s.State,
 	}
 }
-func FromRideEventEntity(e entity.Event) *RideEventSchema {
+func FromRideEventEntity(e entity2.Event) *RideEventSchema {
 	s := &RideEventSchema{
 		RideUuid:      e.RideUuid,
 		Lat:           e.Lat,
@@ -63,8 +63,8 @@ func FromRideEventEntity(e entity.Event) *RideEventSchema {
 	return s
 }
 
-func FromRideEventCollectionToEntity(list map[string]RideEventSchema) []entity.Ride {
-	var rides []entity.Ride
+func FromRideEventCollectionToEntity(list map[string]RideEventSchema) []entity2.Ride {
+	var rides []entity2.Ride
 
 	for _, e := range list {
 		rides = append(rides, e.ToRideEntity())

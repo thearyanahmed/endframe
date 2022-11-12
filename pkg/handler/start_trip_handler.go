@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/thearyanahmed/nordsec/pkg/presenter"
 	"github.com/thearyanahmed/nordsec/pkg/serializer"
-	"github.com/thearyanahmed/nordsec/services/location/entity"
+	entity2 "github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 	"net/http"
 )
 
@@ -14,11 +14,11 @@ type startTripHandler struct {
 
 type rideService interface {
 	GetMinimumTripDistance() float64
-	IsRideAvailable(ride entity.Ride) bool
-	GetRoute(origin, dest entity.Coordinate) []entity.Coordinate
-	RecordNewRideEvent(ctx context.Context, event entity.Event) (entity.Event, error)
-	DistanceIsGreaterThanMinimumDistance(origin, destination entity.Coordinate) bool
-	FindRideInLocation(ctx context.Context, rideUuid string, rideLocation entity.Coordinate) (entity.Ride, error)
+	IsRideAvailable(ride entity2.Ride) bool
+	GetRoute(origin, dest entity2.Coordinate) []entity2.Coordinate
+	RecordNewRideEvent(ctx context.Context, event entity2.Event) (entity2.Event, error)
+	DistanceIsGreaterThanMinimumDistance(origin, destination entity2.Coordinate) bool
+	FindRideInLocation(ctx context.Context, rideUuid string, rideLocation entity2.Coordinate) (entity2.Ride, error)
 }
 
 func NewStartTripHandler(rideService rideService) *startTripHandler {

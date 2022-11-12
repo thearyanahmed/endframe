@@ -3,7 +3,7 @@ package handler
 import (
 	"github.com/thearyanahmed/nordsec/pkg/presenter"
 	"github.com/thearyanahmed/nordsec/pkg/serializer"
-	"github.com/thearyanahmed/nordsec/services/location"
+	"github.com/thearyanahmed/nordsec/pkg/service/location"
 	"net/http"
 	"time"
 )

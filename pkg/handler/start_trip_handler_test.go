@@ -8,9 +8,9 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"github.com/thearyanahmed/nordsec/pkg/serializer"
-	"github.com/thearyanahmed/nordsec/pkg/service"
+	entity2 "github.com/thearyanahmed/nordsec/pkg/service/location/entity"
+	"github.com/thearyanahmed/nordsec/pkg/service/ride"
 	"github.com/thearyanahmed/nordsec/pkg/testutil"
-	"github.com/thearyanahmed/nordsec/services/location/entity"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -20,7 +20,7 @@ import (
 type startTripHandlerTestSuite struct {
 	suite.Suite
 	minTripDistance float64 // minimum distance between origin and destination, in meters
-	rideService     *service.RideServiceMock
+	rideService     *ride.RideServiceMock
 }
 
 type startTripRequestValidationResponse struct {
@@ -31,7 +31,7 @@ type startTripRequestValidationResponse struct {
 }
 
 func (s *startTripHandlerTestSuite) SetupTest() {
-	s.rideService = &service.RideServiceMock{}
+	s.rideService = &ride.RideServiceMock{}
 	s.minTripDistance = 5000
 
 	defer mock.AssertExpectationsForObjects(s.T(), s.rideService)
@@ -97,7 +97,7 @@ func (s *startTripHandlerTestSuite) TestItReturnsErrorIfRideIsNotInLocation() {
 
 	s.rideService.On("GetMinimumTripDistance").Return(1).Once() // a very low distance
 	s.rideService.On("DistanceIsGreaterThanMinimumDistance").Return(true).Once()
-	s.rideService.On("FindRideInLocation").Return(entity.Ride{}, riderErr).Once()
+	s.rideService.On("FindRideInLocation").Return(entity2.Ride{}, riderErr).Once()
 
 	defer s.rideService.ResetMock()
 
@@ -142,11 +142,11 @@ func (s *startTripHandlerTestSuite) TestTripStartsSuccessfullyGivenValidData() {
 	fakeReq := testutil.FakeStartTripRequest()
 	ride := testutil.FakeRoamingRideEntity()
 
-	origin := entity.Coordinate{
+	origin := entity2.Coordinate{
 		Lat: fakeReq.OriginLatitude,
 		Lon: fakeReq.OriginLongitude,
 	}
-	dest := entity.Coordinate{
+	dest := entity2.Coordinate{
 		Lat: fakeReq.OriginLatitude,
 		Lon: fakeReq.OriginLongitude,
 	}

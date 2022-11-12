@@ -28,7 +28,7 @@ func NewRouter(conf *config.Specification, svcAggregator *service.ServiceAggrega
 			// This endpoint should return all available vehicles within an area also
 			// should support filter by query params
 			r.With(apiMiddleware.NewAuthorizeClientMiddleware(conf.ClientApiKey, logger).Handle).
-				Get("/rides/near-by", NewNearByRidesHandler(svcAggregator.RideService, svcAggregator.LocationSvc).ServeHTTP)
+				Get("/rides/near-by", NewNearByRidesHandler(svcAggregator.RideService).ServeHTTP)
 
 			// This simulates the idea of a rider, who just came online
 			r.With(apiMiddleware.ValidateContentTypeMiddleware).

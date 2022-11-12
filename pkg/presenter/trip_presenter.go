@@ -2,14 +2,14 @@ package presenter
 
 import (
 	"fmt"
-	"github.com/thearyanahmed/nordsec/services/location/entity"
+	entity2 "github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 	"net/http"
 )
 
 type TripStarted struct {
-	Message string              `json:"message"`
-	Route   []entity.Coordinate `json:"route"`
-	Event   entity.Event        `json:"event"`
+	Message string               `json:"message"`
+	Route   []entity2.Coordinate `json:"route"`
+	Event   entity2.Event        `json:"event"`
 }
 
 type TripEnded struct {
@@ -31,7 +31,7 @@ func ErrRideUnavailableResponse() *Response {
 	}
 }
 
-func TripStartedResponse(event entity.Event, route []entity.Coordinate) TripStarted {
+func TripStartedResponse(event entity2.Event, route []entity2.Coordinate) TripStarted {
 	return TripStarted{
 		Message: "trip started",
 		Route:   route,

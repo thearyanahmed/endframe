@@ -1,7 +1,7 @@
 package serializer
 
 import (
-	"github.com/thearyanahmed/nordsec/services/location/entity"
+	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 	"github.com/thedevsaddam/govalidator"
 )
 
