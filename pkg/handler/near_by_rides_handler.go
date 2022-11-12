@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"github.com/thearyanahmed/nordsec/pkg/serializer"
 	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 	"net/http"
 
@@ -23,27 +24,14 @@ func NewNearByRidesHandler(usecase nearByRidesUsecase) *nearByRidesHandler {
 }
 
 func (h *nearByRidesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// @todo take from form request
-	area := entity.Area{
-		X1Y1: entity.Coordinate{
-			Lat: 52.3251,
-			Lon: 13.453,
-		},
-		X2Y2: entity.Coordinate{
-			Lat: 0,
-			Lon: 0,
-		},
-		X3Y3: entity.Coordinate{
-			Lat: 52.3361,
-			Lon: 13.475,
-		},
-		X4Y4: entity.Coordinate{
-			Lat: 0,
-			Lon: 0,
-		},
+	filterRequest := &serializer.NearByRidesRequest{}
+
+	if formErrors := serializer.ValidateGetQuery(r, filterRequest); len(formErrors) > 0 {
+		presenter.ErrorResponse(w, r, presenter.ErrorValidationFailed(formErrors))
+		return
 	}
 
-	rides, err := h.usecase.FindNearByRides(r.Context(), area)
+	rides, err := h.usecase.FindNearByRides(r.Context(), filterRequest.ToArea(r))
 
 	if err != nil {
 		presenter.ErrorResponse(w, r, presenter.FromErr(err))
