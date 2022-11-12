@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"github.com/google/uuid"
 	"time"
 )
 
@@ -16,7 +17,13 @@ type Event struct {
 	PassengerUuid string  `json:"passenger_uuid"`
 	TripUuid      string  `json:"trip_uuid"`
 	Timestamp     int64   `json:"timestamp"`
-	State         string  `json:"state"` // in route, roaming
+	State         string  `json:"state"`
+}
+
+func (r *Event) SetNewTripUuid() *Event {
+	r.TripUuid = uuid.New().String()
+
+	return r
 }
 
 func (r *Event) SetCurrentTimestamp() *Event {
