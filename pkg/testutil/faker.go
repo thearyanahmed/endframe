@@ -92,11 +92,51 @@ func StartTripRequestToUrlValues(rre serializer.StartTripRequest) url.Values {
 	return req
 }
 
+func FakeRoute(origin, dest locationEntity.Coordinate) []locationEntity.Coordinate {
+	var route []locationEntity.Coordinate
+
+	route = append(route, origin)
+
+	for i := 1; i < 11; i++ {
+		point := locationEntity.Coordinate{
+			Lat: gofakeit.Latitude() + 0.005,
+			Lon: gofakeit.Longitude() + 0.005,
+		}
+		route = append(route, point)
+	}
+
+	route = append(route, dest)
+
+	return route
+}
+
 func FakeRoamingRideEntity() locationEntity.Ride {
 	return locationEntity.Ride{
 		RideUuid: uuid.New().String(),
 		Lat:      gofakeit.Latitude(),
 		Lon:      gofakeit.Longitude(),
 		State:    locationEntity.StateRoaming,
+	}
+}
+
+func FakeInRouteRideEntity() locationEntity.Ride {
+	return locationEntity.Ride{
+		RideUuid: uuid.New().String(),
+		Lat:      gofakeit.Latitude(),
+		Lon:      gofakeit.Longitude(),
+		State:    locationEntity.StateInRoute,
+	}
+}
+
+func FakeEventInRoute(rideUuid string, loc locationEntity.Coordinate) locationEntity.Event {
+	return locationEntity.Event{
+		Uuid:          uuid.New().String(),
+		RideUuid:      rideUuid,
+		Lat:           loc.Lat,
+		Lon:           loc.Lon,
+		PassengerUuid: uuid.New().String(),
+		TripUuid:      uuid.New().String(),
+		Timestamp:     gofakeit.Int64(),
+		State:         locationEntity.StateInRoute,
 	}
 }

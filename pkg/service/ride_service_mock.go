@@ -15,7 +15,7 @@ func (s *RideServiceMock) GetMinimumTripDistance() float64 {
 	return args.Get(0).(float64)
 }
 
-func (s *RideServiceMock) RideIsAvailable(ride locationEntity.Ride) bool {
+func (s *RideServiceMock) IsRideAvailable(ride locationEntity.Ride) bool {
 	args := s.Called()
 	return args.Get(0).(bool)
 }

@@ -31,6 +31,24 @@ type startTripRequestValidationResponse struct {
 	} `json:"details"`
 }
 
+type startTripResponse struct {
+	Message string `json:"message"`
+	Route   []struct {
+		Lat float64 `json:"lat"`
+		Lon float64 `json:"lon"`
+	} `json:"route"`
+	Event struct {
+		Uuid          string `json:"uuid"`
+		RideUuid      string `json:"ride_uuid"`
+		Lat           int    `json:"lat"`
+		Lon           int    `json:"lon"`
+		PassengerUuid string `json:"passenger_uuid"`
+		TripUuid      string `json:"trip_uuid"`
+		Timestamp     int    `json:"timestamp"`
+		State         string `json:"state"`
+	} `json:"event"`
+}
+
 func (s *startTripHandlerTestSuite) SetupTest() {
 	s.rideService = &service.RideServiceMock{}
 	s.minTripDistance = 5000
@@ -73,6 +91,8 @@ func (s *startTripHandlerTestSuite) TestTripDistanceIsMoreOrEqualToGivenMinDista
 	s.rideService.On("GetMinimumTripDistance").Return(minDist).Once()
 	s.rideService.On("DistanceIsGreaterThanMinimumDistance").Return(false).Once()
 
+	defer s.rideService.ResetMock()
+
 	res := s.response(testutil.StartTripRequestToUrlValues(fakeReq))
 
 	assert.Equal(s.T(), http.StatusBadRequest, res.Code)
@@ -98,6 +118,8 @@ func (s *startTripHandlerTestSuite) TestItReturnsErrorIfRideIsNotInLocation() {
 	s.rideService.On("DistanceIsGreaterThanMinimumDistance").Return(true).Once()
 	s.rideService.On("FindRideInLocation").Return(entity.Ride{}, riderErr).Once()
 
+	defer s.rideService.ResetMock()
+
 	res := s.response(testutil.StartTripRequestToUrlValues(fakeReq))
 	assert.Equal(s.T(), http.StatusUnprocessableEntity, res.Code)
 
@@ -110,12 +132,59 @@ func (s *startTripHandlerTestSuite) TestItReturnsErrorIfRideIsNotInLocation() {
 }
 
 // test if ride.state is available or not
-func (s *startTripHandlerTestSuite) TestRideIsAvailableBeforeStartingTrip() {
+func (s *startTripHandlerTestSuite) TestIsRideAvailableBeforeStartingTrip() {
+	fakeReq := testutil.FakeStartTripRequest()
+	ride := testutil.FakeInRouteRideEntity()
+
+	s.rideService.On("GetMinimumTripDistance").Return(1).Once() // a very low distance
+	s.rideService.On("DistanceIsGreaterThanMinimumDistance").Return(true).Once()
+	s.rideService.On("FindRideInLocation").Return(ride, nil).Once()
+	s.rideService.On("IsRideAvailable").Return(false).Once()
+
+	defer s.rideService.ResetMock()
+
+	res := s.response(testutil.StartTripRequestToUrlValues(fakeReq))
+
+	assert.Equal(s.T(), http.StatusUnprocessableEntity, res.Code)
+
+	var result testutil.Response
+	if err := json.NewDecoder(res.Body).Decode(&result); err != nil {
+		s.T().Errorf("failed to decode response body: %v", err)
+	}
+
+	assert.Equal(s.T(), "ride is unavailable", result.Message)
 }
 
 // test response
 // 1. should have a specific format, should contain routes array
 func (s *startTripHandlerTestSuite) TestTripStartsSuccessfullyGivenValidData() {
+	fakeReq := testutil.FakeStartTripRequest()
+	ride := testutil.FakeRoamingRideEntity()
+
+	origin := entity.Coordinate{
+		Lat: fakeReq.OriginLatitude,
+		Lon: fakeReq.OriginLongitude,
+	}
+	dest := entity.Coordinate{
+		Lat: fakeReq.OriginLatitude,
+		Lon: fakeReq.OriginLongitude,
+	}
+
+	route := testutil.FakeRoute(origin, dest)
+	event := testutil.FakeEventInRoute(ride.RideUuid, route[1])
+
+	s.rideService.On("GetMinimumTripDistance").Return(1).Once() // a very low distance
+	s.rideService.On("DistanceIsGreaterThanMinimumDistance").Return(true).Once()
+	s.rideService.On("FindRideInLocation").Return(ride, nil).Once()
+	s.rideService.On("IsRideAvailable").Return(true).Once()
+	s.rideService.On("GetRoute").Return(route).Once()
+	s.rideService.On("RecordRideEvent").Return(event, nil).Once()
+
+	defer s.rideService.ResetMock()
+
+	res := s.response(testutil.StartTripRequestToUrlValues(fakeReq))
+
+	assert.Equal(s.T(), http.StatusCreated, res.Code)
 }
 
 func (s *startTripHandlerTestSuite) response(data url.Values) *httptest.ResponseRecorder {

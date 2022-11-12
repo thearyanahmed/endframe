@@ -14,7 +14,7 @@ type startTripHandler struct {
 
 type rideService interface {
 	GetMinimumTripDistance() float64
-	RideIsAvailable(ride entity.Ride) bool
+	IsRideAvailable(ride entity.Ride) bool
 	GetRoute(origin, dest entity.Coordinate) []entity.Coordinate
 	RecordRideEvent(ctx context.Context, event entity.Event) (entity.Event, error)
 	DistanceIsGreaterThanMinimumDistance(origin, destination entity.Coordinate) bool
@@ -49,7 +49,7 @@ func (h *startTripHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !h.rideService.RideIsAvailable(ride) {
+	if !h.rideService.IsRideAvailable(ride) {
 		presenter.ErrorResponse(w, r, presenter.ErrRideUnavailableResponse())
 		return
 	}
@@ -64,6 +64,5 @@ func (h *startTripHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// start notify event with current passenger id
 	presenter.RenderJsonResponse(w, r, http.StatusCreated, presenter.TripStartedResponse(event, routes))
 }

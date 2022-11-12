@@ -58,10 +58,10 @@ func (s *RideService) CanBeUpdatedViaRiderApp(ctx context.Context, rideUuid stri
 		return false, err
 	}
 
-	return s.RideIsAvailable(ride), nil
+	return s.IsRideAvailable(ride), nil
 }
 
-func (s *RideService) RideIsAvailable(ride locationEntity.Ride) bool {
+func (s *RideService) IsRideAvailable(ride locationEntity.Ride) bool {
 	return ride.State != locationEntity.StateInCooldown && ride.State != locationEntity.StateInRoute
 }
 
