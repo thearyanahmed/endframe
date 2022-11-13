@@ -42,7 +42,6 @@ func (h *startTripHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// @TODO | check if rideId is in nearby location of the origin
 	ride, err := h.rideService.FindRideInLocation(r.Context(), tripRequest.RideUuid, origin)
 	if err != nil {
 		presenter.ErrorResponse(w, r, presenter.FromErr(err))

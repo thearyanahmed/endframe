@@ -13,6 +13,8 @@ type locationService interface {
 	GetRoute(origin, destination entity.Coordinate, intervalPoints int) []entity.Coordinate
 	FindRideInLocation(ctx context.Context, rideUuid string, origin entity.Coordinate) (entity.Ride, error)
 	StartCooldownForRide(ctx context.Context, rideUuid string, timestamp int64, duration time.Duration) error
+
+	UpdateRideEventCurrentStatus(ctx context.Context, event entity.Event) error
 }
 
 type RideService struct {
@@ -125,4 +127,8 @@ func (s *RideService) filterByState(collection []entity.Ride, state string) []en
 	}
 
 	return filtered
+}
+
+func (s *RideService) SetRideCurrentStatus(ctx context.Context, event entity.Event) error {
+	return s.locationService.UpdateRideEventCurrentStatus(ctx, event)
 }

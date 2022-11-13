@@ -173,3 +173,21 @@ func mapZRangeValToRideEventCollection(result []string) []schema.RideEventSchema
 
 	return events
 }
+
+func (r *RideRepository) UpdateRideCurrentStatus(ctx context.Context, eventSchema schema.RideEventSchema) error {
+	key := r.getRideCurrentStatusKey(eventSchema.RideUuid)
+
+	val, err := eventSchema.EncodeToJson()
+
+	if err != nil {
+		return err
+	}
+
+	_, err = r.datastore.Set(ctx, key, val, 0).Result()
+
+	return err
+}
+
+func (r *RideRepository) getRideCurrentStatusKey(from string) string {
+	return fmt.Sprintf("ride:%s", from)
+}

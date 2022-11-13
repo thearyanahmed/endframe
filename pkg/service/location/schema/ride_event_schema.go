@@ -1,8 +1,9 @@
 package schema
 
 import (
+	"encoding/json"
 	"github.com/google/uuid"
-	entity2 "github.com/thearyanahmed/nordsec/pkg/service/location/entity"
+	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 )
 
 // @todo BIG REFACTOR
@@ -18,8 +19,16 @@ type RideEventSchema struct {
 	State         string    `json:"state"` // in route, roaming
 }
 
-func (s *RideEventSchema) ToEntity() entity2.Event {
-	return entity2.Event{
+func (s *RideEventSchema) EncodeToJson() (string, error) {
+	if marshalled, err := json.Marshal(s); err != nil {
+		return "", err
+	} else {
+		return string(marshalled), nil
+	}
+}
+
+func (s *RideEventSchema) ToEntity() entity.Event {
+	return entity.Event{
 		Uuid:          s.Uuid.String(),
 		RideUuid:      s.RideUuid,
 		Lat:           s.Lat,
@@ -37,15 +46,15 @@ func (s *RideEventSchema) WithNewUuid() *RideEventSchema {
 	return s
 }
 
-func (s *RideEventSchema) ToRideEntity() entity2.Ride {
-	return entity2.Ride{
+func (s *RideEventSchema) ToRideEntity() entity.Ride {
+	return entity.Ride{
 		RideUuid: s.RideUuid,
 		Lat:      s.Lat,
 		Lon:      s.Lon,
 		State:    s.State,
 	}
 }
-func FromRideEventEntity(e entity2.Event) *RideEventSchema {
+func FromRideEventEntity(e entity.Event) *RideEventSchema {
 	s := &RideEventSchema{
 		RideUuid:      e.RideUuid,
 		Lat:           e.Lat,
@@ -63,8 +72,8 @@ func FromRideEventEntity(e entity2.Event) *RideEventSchema {
 	return s
 }
 
-func FromRideEventCollectionToEntity(list map[string]RideEventSchema) []entity2.Ride {
-	var rides []entity2.Ride
+func FromRideEventCollectionToEntity(list map[string]RideEventSchema) []entity.Ride {
+	var rides []entity.Ride
 
 	for _, e := range list {
 		rides = append(rides, e.ToRideEntity())

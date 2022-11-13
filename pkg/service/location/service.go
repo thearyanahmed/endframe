@@ -24,6 +24,8 @@ type rideRepository interface {
 	GetRideEventsFromMultiGeohash(ctx context.Context, geohashKeys []string) (map[string]schema.RideEventSchema, error)
 	ApplyCooldownStateFilter(ctx context.Context, m map[string]schema.RideEventSchema) map[string]schema.RideEventSchema
 	SetToCooldown(ctx context.Context, details schema.RideCooldownEvent) error
+
+	UpdateRideCurrentStatus(ctx context.Context, schema schema.RideEventSchema) error
 }
 
 func NewLocationService(ds *redis.Client, redisKey string) *Service {
@@ -139,4 +141,8 @@ func (s *Service) DistanceInMeters(a, b entity.Coordinate) float64 {
 	_, km := haversine.Distance(origin, dest)
 
 	return km * 1000 // convert to meters
+}
+
+func (s *Service) UpdateRideEventCurrentStatus(ctx context.Context, event entity.Event) error {
+	return s.repo.UpdateRideCurrentStatus(ctx, *schema.FromRideEventEntity(event))
 }
