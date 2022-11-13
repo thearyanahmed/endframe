@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"github.com/thearyanahmed/nordsec/pkg/presenter"
 	"github.com/thearyanahmed/nordsec/pkg/serializer"
 	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
@@ -37,6 +38,12 @@ func (h *endTripHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	tripEvent, err := h.rideService.GetRideEventByUuid(r.Context(), rideEvent.RideUuid)
 	if err != nil {
 		presenter.ErrorResponse(w, r, presenter.ErrNotFound(err))
+		return
+	}
+
+	if tripEvent.TripUuid != eventRequest.TripUuid {
+		err = errors.New("given trip uuid does not match current trip uuid")
+		presenter.ErrorResponse(w, r, presenter.ErrFrom(err))
 		return
 	}
 
