@@ -2,7 +2,6 @@ package ride
 
 import (
 	"context"
-	"fmt"
 	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 	"time"
 )
@@ -58,7 +57,6 @@ func (s *RideService) RecordLocationUpdate(ctx context.Context, event entity.Eve
 func (s *RideService) RecordEndRideEvent(ctx context.Context, event entity.Event) (entity.Event, error) {
 	event.SetStateAsRoaming().SetCurrentTimestamp()
 
-	fmt.Println("EVENT SHOULD BE", event)
 	return s.locationService.RecordRideEvent(ctx, event)
 }
 
