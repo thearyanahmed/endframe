@@ -7,16 +7,17 @@ import (
 )
 
 type (
-	// Specification structured configuration variables.
 	Specification struct {
 		App struct {
 			Port string `envconfig:"APP_PORT" required:"true"`
 		}
 
-		RedisHost        string `envconfig:"REDIS_HOST" required:"true"`
-		RedisPort        string `envconfig:"REDIS_PORT" required:"true"`
-		RedisPass        string `envconfig:"REDIS_PASSWORD" required:"true"`
-		RedisLocationKey string `envconfig:"REDIS_LOCATION_KEY" required:"true"`
+		DataStore struct {
+			Host        string `envconfig:"REDIS_HOST" required:"true"`
+			Port        string `envconfig:"REDIS_PORT" required:"true"`
+			Pass        string `envconfig:"REDIS_PASSWORD" required:"true"`
+			LocationKey string `envconfig:"REDIS_LOCATION_KEY" required:"true"`
+		}
 
 		LogLevel string `envconfig:"LOG_LEVEL" required:"false"`
 
@@ -41,11 +42,11 @@ func (c *Specification) AppAddress() string {
 }
 
 func (c *Specification) GetRedisAddr() string {
-	return fmt.Sprintf("%s:%s", c.RedisHost, c.RedisPort)
+	return fmt.Sprintf("%s:%s", c.DataStore.Host, c.DataStore.Port)
 }
 
 func (c *Specification) GetRedisPassword() string {
-	return c.RedisPass
+	return c.DataStore.Pass
 }
 
 func (c *Specification) GetLogLevel() string {
@@ -53,5 +54,5 @@ func (c *Specification) GetLogLevel() string {
 }
 
 func (c *Specification) GetRedisLocationsKey() string {
-	return c.RedisLocationKey
+	return c.DataStore.LocationKey
 }
