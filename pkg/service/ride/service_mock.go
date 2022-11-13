@@ -27,7 +27,7 @@ func (s *RideServiceMock) RecordEndRideEvent(_ context.Context, _ entity.Event) 
 
 func (s *RideServiceMock) EnterCooldownMode(_ context.Context, _ entity.Event) error {
 	args := s.Called()
-	return args.Get(0).(error)
+	return args.Error(0)
 }
 
 func (s *RideServiceMock) FindNearByRides(_ context.Context, _ entity.Area, _ string) ([]entity.Ride, error) {

@@ -57,6 +57,8 @@ func (s *RideService) RecordLocationUpdate(ctx context.Context, event entity.Eve
 func (s *RideService) RecordEndRideEvent(ctx context.Context, event entity.Event) (entity.Event, error) {
 	event.SetStateAsRoaming().SetCurrentTimestamp()
 
+	// @todo update ride:uuid current status
+
 	return s.locationService.RecordRideEvent(ctx, event)
 }
 

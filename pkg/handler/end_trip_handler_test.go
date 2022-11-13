@@ -72,12 +72,26 @@ func (h *endTripHandlerTestSuite) TestItFailsIfRideEventHasAlreadyEnded() {
 
 	h.rideService.On("GetRideEventByUuid").Return(fakeEvent, nil).Once()
 	h.rideService.On("TripHasEnded").Return(true).Once()
-
 	defer h.rideService.ResetMock()
 
 	res := h.response(testutil.EndTripRequestToUrlValues(scene))
 
 	assert.Equal(h.T(), http.StatusBadRequest, res.Code)
+}
+
+func (h *endTripHandlerTestSuite) TestItEndsATripSuccessfully() {
+	scene := testutil.FakeEndTripRequest()
+	fakeEvent := testutil.FakeRideStatusRoaming()
+
+	h.rideService.On("GetRideEventByUuid").Return(fakeEvent, nil).Once()
+	h.rideService.On("TripHasEnded").Return(false).Once()
+	h.rideService.On("RecordEndRideEvent").Return(fakeEvent, nil).Once()
+	h.rideService.On("EnterCooldownMode").Return(nil).Once()
+	defer h.rideService.ResetMock()
+
+	res := h.response(testutil.EndTripRequestToUrlValues(scene))
+
+	assert.Equal(h.T(), http.StatusOK, res.Code)
 }
 
 func (h *endTripHandlerTestSuite) response(data url.Values) *httptest.ResponseRecorder {
