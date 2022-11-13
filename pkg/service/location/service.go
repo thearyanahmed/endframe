@@ -15,8 +15,8 @@ import (
 var RideNotInLocation = errors.New("ride not in nearby location")
 
 type Service struct {
-	geohashLength uint
-	repo          rideRepository
+	geohashTileLength uint
+	repo              rideRepository
 }
 
 type rideRepository interface {
@@ -31,10 +31,11 @@ type rideRepository interface {
 }
 
 func NewLocationService(ds *redis.Client, redisKey string) *Service {
-	repo := repository.NewRideRepository(ds, redisKey)
+	ghashTileLen := uint(6) // could have taken from config as well
+	repo := repository.NewRideRepository(ds, redisKey, ghashTileLen)
 	return &Service{
-		geohashLength: uint(5), // could have taken from config as well
-		repo:          repo,
+		geohashTileLength: ghashTileLen,
+		repo:              repo,
 	}
 }
 
@@ -43,7 +44,7 @@ func getGeoHash(lat, lon float64, precision uint) string {
 }
 
 func (s *Service) RecordRideEvent(ctx context.Context, event entity.Event) (entity.Event, error) {
-	ghash := getGeoHash(event.Lat, event.Lon, s.geohashLength)
+	ghash := getGeoHash(event.Lat, event.Lon, s.geohashTileLength)
 
 	err := geohash.Validate(ghash)
 
@@ -63,7 +64,7 @@ func (s *Service) RecordRideEvent(ctx context.Context, event entity.Event) (enti
 }
 
 func (s *Service) GetRidesInArea(ctx context.Context, area entity.Area) ([]entity.Ride, error) {
-	neighbours := area.GetNeighbourGeohashFromCenter(s.geohashLength)
+	neighbours := area.GetNeighbourGeohashFromCenter(s.geohashTileLength)
 
 	rides, err := s.repo.GetRideEventsFromMultiGeohash(ctx, neighbours)
 
@@ -79,7 +80,7 @@ func (s *Service) GetRidesInArea(ctx context.Context, area entity.Area) ([]entit
 }
 
 func (s *Service) FindRideInLocation(ctx context.Context, rideUuid string, origin entity.Coordinate) (entity.Ride, error) {
-	ghash := geohash.EncodeWithPrecision(origin.Lat, origin.Lon, s.geohashLength)
+	ghash := geohash.EncodeWithPrecision(origin.Lat, origin.Lon, s.geohashTileLength)
 
 	neighbours := geohash.Neighbors(ghash)
 

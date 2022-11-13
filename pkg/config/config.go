@@ -5,6 +5,9 @@ import (
 	"github.com/kelseyhightower/envconfig"
 )
 
+const DefaultCooldownDuration = int64(300)      // in seconds
+const DefaultMinimumTripDistance = float64(500) // in meters
+
 type (
 	Specification struct {
 		App struct {
@@ -17,6 +20,9 @@ type (
 			Pass        string `envconfig:"REDIS_PASSWORD" required:"true"`
 			LocationKey string `envconfig:"REDIS_LOCATION_KEY" required:"true"`
 		}
+
+		MinTripDistance  float64 `envconfig:"MIN_TRIP_DISTANCE" required:"false"`
+		CooldownDuration int64   `envconfig:"COOLDOWN_DURATION" required:"false"`
 
 		LogLevel string `envconfig:"LOG_LEVEL" required:"false"`
 
@@ -54,4 +60,20 @@ func (c *Specification) GetLogLevel() string {
 
 func (c *Specification) GetRedisLocationsKey() string {
 	return c.DataStore.LocationKey
+}
+
+func (c *Specification) GetCooldownDuration() int64 {
+	if c.CooldownDuration == 0 {
+		return DefaultCooldownDuration
+	}
+
+	return c.CooldownDuration
+}
+
+func (c *Specification) GetMinimumTripDistance() float64 {
+	if c.MinTripDistance == 0 {
+		return DefaultMinimumTripDistance
+	}
+
+	return c.MinTripDistance
 }

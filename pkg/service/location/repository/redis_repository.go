@@ -14,14 +14,16 @@ import (
 )
 
 type RideRepository struct {
-	datastore *redis.Client
-	ridesKey  string
+	datastore         *redis.Client
+	ridesKey          string
+	geohashTileLength uint
 }
 
-func NewRideRepository(ds *redis.Client, ridesKey string) *RideRepository {
+func NewRideRepository(ds *redis.Client, ridesKey string, tileLen uint) *RideRepository {
 	return &RideRepository{
-		datastore: ds,
-		ridesKey:  ridesKey,
+		datastore:         ds,
+		ridesKey:          ridesKey,
+		geohashTileLength: tileLen,
 	}
 }
 
@@ -259,6 +261,7 @@ func (r *RideRepository) ApplyCurrentLocationFilter(ctx context.Context, rides m
 
 			// @NOTE we are ignoring the error case for this demonstration.
 			if err = json.Unmarshal(b, &ev); err == nil {
+
 				evGeohash := geohash.EncodeWithPrecision(ev.Lat, ev.Lon, 5)
 				if _, ok := neighboursMap[evGeohash]; !ok {
 					delete(rides, ev.RideUuid)

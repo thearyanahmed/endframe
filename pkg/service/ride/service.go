@@ -26,12 +26,12 @@ type RideService struct {
 	cooldownMode          int64
 }
 
-func NewRideService(locationSvc locationService) *RideService {
+func NewRideService(locationSvc locationService, minTripDistance float64, cooldownMode int64) *RideService {
 	return &RideService{
 		locationService:       locationSvc,
-		minTripDistance:       500,
-		inRouteIntervalPoints: 15,  // how many points will be plotted between origin and destination (origin and destination are inclusive)
-		cooldownMode:          300, // in second
+		minTripDistance:       minTripDistance,
+		inRouteIntervalPoints: 15,           // how many points will be plotted between origin and destination (origin and destination are inclusive)
+		cooldownMode:          cooldownMode, // in second
 	}
 }
 

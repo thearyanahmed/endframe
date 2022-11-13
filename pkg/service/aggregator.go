@@ -20,14 +20,13 @@ func NewServiceAggregator(config *config.Specification, _ *log.Logger) (*Service
 		return &ServiceAggregator{}, err
 	}
 
-	locSvc := location.NewLocationService(redis, config.GetRedisLocationsKey())
-	//rideRepo := repository.NewRideRepository(redis)
+	locationService := location.NewLocationService(redis, config.GetRedisLocationsKey())
 
-	rideSvc := ride.NewRideService(locSvc)
+	rideSvc := ride.NewRideService(locationService, config.GetMinimumTripDistance(), config.GetCooldownDuration())
 
 	aggregator := &ServiceAggregator{
 		RideService: rideSvc,
-		LocationSvc: locSvc,
+		LocationSvc: locationService,
 	}
 
 	return aggregator, nil
