@@ -100,7 +100,7 @@ func travelToDestination(trip Trip, wg *sync.WaitGroup) {
 	for ; i < routeLen-1; i++ {
 		r := trip.Route[i]
 
-		fmt.Printf("Notifying server about trip: %s location: %v, %v\n", trip.Event.TripUuid, r.Lat, r.Lon)
+		fmt.Printf("Notifying server about trip: %s location: %v, %v\nWill need 3 seconds (time.Sleep) to travel to next destination.", trip.Event.TripUuid, r.Lat, r.Lon)
 		pingLocation(trip, r, endpoint)
 
 		time.Sleep(time.Second * 3)
@@ -110,6 +110,8 @@ func travelToDestination(trip Trip, wg *sync.WaitGroup) {
 }
 
 func reachDestination(trip Trip, routeLen int) {
+	defer fmt.Printf("reached destination:%s\n", trip.Event.TripUuid)
+
 	lastStop := trip.Route[routeLen-1]
 	endTripEndpoint := fmt.Sprintf("%s/trip/end", GetBaseUrl())
 
@@ -257,7 +259,6 @@ func GetNearByRides() {
 
 	for v := range ch {
 		fmt.Println(v)
-		fmt.Println("-----------------")
 	}
 }
 
@@ -306,7 +307,7 @@ func SpawnRiders() {
 	}
 
 	endpoint := fmt.Sprintf("%s/ride/activate", GetBaseUrl())
-	requests := 1500
+	requests := 500
 	apiKey := GetRiderApiKey()
 
 	ch := make(chan string)

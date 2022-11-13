@@ -1,6 +1,6 @@
 include .env
 
-CONTAINER = core
+CONTAINER = app
 DOCKER_COMPOSE_EXISTS := $(shell command -v docker-compose 2> /dev/null)
 
 .PHONY: start stop ps simulate ssh ssh-redis run build deps test
@@ -17,8 +17,8 @@ ps:
 
 simulate:
 	@echo "running outside of container."
-	@source .env; go run cmd/simulation/main.go 5 ${RIDER_API_KEY} ${CLIENT_API_KEY} ${CORE_URL}
-# core
+	@source .env; go run cmd/simulation/main.go 5 ${RIDER_API_KEY} ${CLIENT_API_KEY} ${APP_URL}
+
 ssh:
 	@docker-compose exec $(CONTAINER) bash
 
@@ -37,7 +37,7 @@ deps:
 	${call app_container, mod vendor}
 
 test:
-	${call app_container, test -v ./...}
+	${call app_container, test -v ./pkg/handler/}
 
 #---- docker enviroment ----
 ifdef DOCKER_COMPOSE_EXISTS
