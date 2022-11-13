@@ -9,14 +9,14 @@ import (
 // @todo BIG REFACTOR
 
 type RideEventSchema struct {
-	Uuid          uuid.UUID `json:"uuid"`
-	RideUuid      string    `json:"ride_uuid"`
-	Lat           float64   `json:"lat"`
-	Lon           float64   `json:"lon"`
-	PassengerUuid string    `json:"passenger_uuid"`
-	TripUuid      string    `json:"trip_uuid"`
-	Timestamp     int64     `json:"timestamp"`
-	State         string    `json:"state"` // in route, roaming
+	Uuid          string  `json:"uuid"`
+	RideUuid      string  `json:"ride_uuid"`
+	Lat           float64 `json:"lat"`
+	Lon           float64 `json:"lon"`
+	PassengerUuid string  `json:"passenger_uuid"`
+	TripUuid      string  `json:"trip_uuid"`
+	Timestamp     int64   `json:"timestamp"`
+	State         string  `json:"state"` // in route, roaming
 }
 
 func (s *RideEventSchema) EncodeToJson() (string, error) {
@@ -29,7 +29,7 @@ func (s *RideEventSchema) EncodeToJson() (string, error) {
 
 func (s *RideEventSchema) ToEntity() entity.Event {
 	return entity.Event{
-		Uuid:          s.Uuid.String(),
+		Uuid:          s.Uuid,
 		RideUuid:      s.RideUuid,
 		Lat:           s.Lat,
 		Lon:           s.Lon,
@@ -41,7 +41,7 @@ func (s *RideEventSchema) ToEntity() entity.Event {
 }
 
 func (s *RideEventSchema) WithNewUuid() *RideEventSchema {
-	s.Uuid = uuid.New()
+	s.Uuid = uuid.New().String()
 
 	return s
 }
@@ -58,15 +58,12 @@ func FromRideEventEntity(e entity.Event) *RideEventSchema {
 	s := &RideEventSchema{
 		RideUuid:      e.RideUuid,
 		Lat:           e.Lat,
+		Uuid:          e.Uuid,
 		Lon:           e.Lon,
 		PassengerUuid: e.PassengerUuid,
 		TripUuid:      e.TripUuid,
 		Timestamp:     e.Timestamp,
 		State:         e.State,
-	}
-
-	if e.Uuid != "" {
-		s.Uuid = uuid.Must(uuid.FromBytes([]byte(e.Uuid)))
 	}
 
 	return s

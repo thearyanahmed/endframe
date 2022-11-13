@@ -99,7 +99,7 @@ func (s *RideService) isAvailableByState(state string) bool {
 }
 
 func (s *RideService) DistanceIsGreaterThanMinimumDistance(origin, dest entity.Coordinate) bool {
-	return s.locationService.DistanceInMeters(origin, dest) < s.minTripDistance
+	return s.locationService.DistanceInMeters(origin, dest) > s.minTripDistance
 }
 
 func (s *RideService) FindRideInLocation(ctx context.Context, rideUuid string, rideLocation entity.Coordinate) (entity.Ride, error) {

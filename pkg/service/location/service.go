@@ -80,6 +80,8 @@ func (s *Service) FindRideInLocation(ctx context.Context, rideUuid string, origi
 
 	neighbours := geohash.Neighbors(ghash)
 
+	neighbours = append(neighbours, ghash)
+
 	rides, err := s.repo.GetRideEventsFromMultiGeohash(ctx, neighbours)
 	if err != nil {
 		return entity.Ride{}, err

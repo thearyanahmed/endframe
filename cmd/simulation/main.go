@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -24,33 +23,11 @@ type Coord struct {
 }
 
 func main() {
-	//spawnRiders()
-	testSort()
+	spawnRiders()
 }
 
 type TestCode struct {
 	V int
-}
-
-func testSort() {
-	var x []TestCode
-
-	for i := 0; i < 10; i++ {
-		x = append(x, TestCode{V: gofakeit.IntRange(1, 1000)})
-	}
-
-	for _, v := range x {
-		fmt.Println(v.V)
-	}
-
-	sort.Slice(x, func(i, j int) bool {
-		return x[i].V < x[j].V
-	})
-
-	fmt.Println("AFTER SPRT")
-	for _, v := range x {
-		fmt.Println(v.V)
-	}
 }
 
 func poc() {

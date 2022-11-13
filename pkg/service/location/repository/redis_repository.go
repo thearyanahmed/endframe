@@ -184,7 +184,7 @@ func (r *RideRepository) UpdateRideCurrentStatus(ctx context.Context, eventSchem
 	}
 
 	_, err = r.datastore.Set(ctx, key, val, 0).Result()
-
+	fmt.Println("LOOK FOR KEY", key)
 	return err
 }
 
