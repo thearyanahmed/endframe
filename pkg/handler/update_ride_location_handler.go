@@ -11,15 +11,18 @@ import (
 type activateRideUsecase interface {
 	UpdateRideLocation(ctx context.Context, event entity.Event) (entity.Event, error)
 	CanBeUpdatedViaRiderApp(ctx context.Context, rideUuid string, loc entity.Coordinate) (bool, error)
+	SetRideCurrentStatus(ctx context.Context, event entity.Event) error
+	GetRideEventByUuid(ctx context.Context, rideUuid string) (entity.Event, error)
+	IsInRoute(state string) bool
 }
 
 type updateRideLocationHandler struct {
-	usecase activateRideUsecase
+	rideService activateRideUsecase
 }
 
 func NewUpdateRideLocationHandler(usecase activateRideUsecase) *updateRideLocationHandler {
 	return &updateRideLocationHandler{
-		usecase: usecase,
+		rideService: usecase,
 	}
 }
 
@@ -32,32 +35,27 @@ func (h *updateRideLocationHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 	}
 
 	// @NOTE:
-	// The following section has been commented out. Because, as of now, there is no persistent storage.
+	// As of now, there is no persistent storage.
 	// In a real life scenario there will be a persistent storage where we can make a query and see the ride's
 	// current stations.
-
-	// @TODO implement update ride's status in REDIS ride:status:uuid roaming, in-route
-
-	//can, err := h.rideService.CanBeUpdatedViaRiderApp(r.Context(), eventRequest.RideUuid, eventRequest.ToLocationCoordinate())
-	//
-	//if err != nil {
-	//	presenter.ErrorResponse(w, r, presenter.ErrFrom(err))
-	//	return
-	//}
-	//
-	//if !can {
-	//	presenter.ErrorResponse(w, r, presenter.CanNotUpdateLocationViaRiderAppResponse())
-	//	return
-	//}
+	if tripEvent, err := h.rideService.GetRideEventByUuid(r.Context(), eventRequest.RideUuid); err == nil && h.rideService.IsInRoute(tripEvent.State) {
+		presenter.ErrorResponse(w, r, presenter.ErrNotFound(err))
+		return
+	}
 
 	rideEvent := eventRequest.ToRideEvent().SetStateAsRoaming().SetCurrentTimestamp()
 
-	loc, err := h.usecase.UpdateRideLocation(r.Context(), *rideEvent)
+	recordedEvent, err := h.rideService.UpdateRideLocation(r.Context(), *rideEvent)
 
 	if err != nil {
 		presenter.ErrorResponse(w, r, presenter.ErrFrom(err))
 		return
 	}
 
-	presenter.RenderJsonResponse(w, r, http.StatusOK, presenter.FromRideLocationEntity(loc))
+	if err = h.rideService.SetRideCurrentStatus(r.Context(), recordedEvent); err != nil {
+		presenter.ErrorResponse(w, r, presenter.ErrFrom(err))
+		return
+	}
+
+	presenter.RenderJsonResponse(w, r, http.StatusOK, presenter.FromRideLocationEntity(recordedEvent))
 }

@@ -114,6 +114,7 @@ func (h *endTripHandlerTestSuite) TestItEndsATripSuccessfully() {
 	h.rideService.On("TripHasEnded").Return(false).Once()
 	h.rideService.On("RecordEndRideEvent").Return(fakeEvent, nil).Once()
 	h.rideService.On("EnterCooldownMode").Return(nil).Once()
+	h.rideService.On("SetRideCurrentStatus").Return(nil).Once()
 	defer h.rideService.ResetMock()
 
 	res := h.response(testutil.EndTripRequestToUrlValues(scene))

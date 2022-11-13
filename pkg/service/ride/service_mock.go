@@ -10,6 +10,11 @@ type RideServiceMock struct {
 	mock.Mock
 }
 
+func (s *RideServiceMock) IsInRoute(state string) bool {
+	args := s.Called()
+	return args.Get(0).(bool)
+}
+
 func (s *RideServiceMock) SetRideCurrentStatus(ctx context.Context, event entity.Event) error {
 	args := s.Called()
 	return args.Error(0)

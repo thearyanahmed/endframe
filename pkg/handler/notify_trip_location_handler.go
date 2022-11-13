@@ -14,6 +14,7 @@ type notifyPositionHandler struct {
 
 type notifyRideService interface {
 	RecordLocationUpdate(ctx context.Context, event locationEntity.Event) (locationEntity.Event, error)
+	SetRideCurrentStatus(ctx context.Context, event locationEntity.Event) error
 }
 
 func NewNotifyPositionHandler(rideService notifyRideService) *notifyPositionHandler {
@@ -34,6 +35,11 @@ func (h *notifyPositionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 	event, err := h.rideService.RecordLocationUpdate(r.Context(), rideEvent)
 
 	if err != nil {
+		presenter.ErrorResponse(w, r, presenter.ErrFrom(err))
+		return
+	}
+
+	if err = h.rideService.SetRideCurrentStatus(r.Context(), event); err != nil {
 		presenter.ErrorResponse(w, r, presenter.ErrFrom(err))
 		return
 	}

@@ -17,7 +17,7 @@ import (
 
 type updateRideLocationHandlerTestSuite struct {
 	suite.Suite
-	usecase *ride.RideServiceMock
+	rideService *ride.RideServiceMock
 }
 
 type updateRideLocationFailedValidationResponse struct {
@@ -34,9 +34,9 @@ func TestUpdateRideLocationHandlerTestSuite(t *testing.T) {
 }
 
 func (s *updateRideLocationHandlerTestSuite) SetupTest() {
-	s.usecase = &ride.RideServiceMock{}
+	s.rideService = &ride.RideServiceMock{}
 
-	defer mock.AssertExpectationsForObjects(s.T(), s.usecase)
+	defer mock.AssertExpectationsForObjects(s.T(), s.rideService)
 }
 
 func (s *updateRideLocationHandlerTestSuite) TestFormRequestHandlesLatLonValidation() {
@@ -82,7 +82,10 @@ func (s *updateRideLocationHandlerTestSuite) TestRequestFailsWithoutFormData() {
 func (s *updateRideLocationHandlerTestSuite) TestRideLocationUpdatesSuccessfully() {
 	data := testutil.FakeRecordRideEventRequest()
 
-	s.usecase.On("UpdateRideLocation").Return(*(data.ToRideEvent()), nil).Once()
+	s.rideService.On("GetRideEventByUuid").Return(*(data.ToRideEvent()), nil).Once()
+	s.rideService.On("IsInRoute").Return(false).Once()
+	s.rideService.On("UpdateRideLocation").Return(*(data.ToRideEvent()), nil).Once()
+	s.rideService.On("SetRideCurrentStatus").Return(nil).Once()
 
 	res := s.response(testutil.RecordRideEventToUrlValues(data))
 
@@ -104,7 +107,7 @@ func (s *updateRideLocationHandlerTestSuite) response(data url.Values) *httptest
 		Method(http.MethodPost).
 		URL("/api/v1/ride/activate").
 		Body(data).
-		Handler(NewUpdateRideLocationHandler(s.usecase).ServeHTTP).
+		Handler(NewUpdateRideLocationHandler(s.rideService).ServeHTTP).
 		IsFormUrlEncoded().
 		Build()
 

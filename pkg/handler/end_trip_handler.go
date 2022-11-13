@@ -18,6 +18,7 @@ type endTripRideService interface {
 	EnterCooldownMode(ctx context.Context, event entity.Event) error
 	GetRideEventByUuid(ctx context.Context, rideUuid string) (entity.Event, error)
 	TripHasEnded(event entity.Event) bool
+	SetRideCurrentStatus(ctx context.Context, event entity.Event) error
 }
 
 func NewEndTripHandler(riderSvc endTripRideService) *endTripHandler {
@@ -32,7 +33,6 @@ func (h *endTripHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// @TODO check if trip exists with same status or not
 	rideEvent := eventRequest.ToRideEvent()
 
 	tripEvent, err := h.rideService.GetRideEventByUuid(r.Context(), rideEvent.RideUuid)
@@ -63,6 +63,11 @@ func (h *endTripHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err = h.rideService.EnterCooldownMode(r.Context(), recordedEvent)
 
 	if err != nil {
+		presenter.ErrorResponse(w, r, presenter.ErrFrom(err))
+		return
+	}
+
+	if err = h.rideService.SetRideCurrentStatus(r.Context(), recordedEvent); err != nil {
 		presenter.ErrorResponse(w, r, presenter.ErrFrom(err))
 		return
 	}

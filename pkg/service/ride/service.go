@@ -156,3 +156,7 @@ func (s *RideService) isRoaming(state string) bool {
 func (s *RideService) isInCooldown(state string) bool {
 	return state == entity.StateInCooldown
 }
+
+func (s *RideService) IsInRoute(state string) bool {
+	return state == entity.StateInRoute
+}
