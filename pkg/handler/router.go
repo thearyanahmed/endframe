@@ -23,7 +23,7 @@ func NewRouter(conf *config.Specification, svcAggregator *service.ServiceAggrega
 	r.Route("/api", func(r chi.Router) {
 		r.Route("/v1", func(r chi.Router) {
 			// Return health check status of these services and pings redis, kafka and db(ping all related services)
-			r.Get("/health-check", NewHealthCheckHandler().ServeHTTP)
+			r.Get("/health-check", NewHealthCheckHandler(svcAggregator.GetKeyValueDataStore()).ServeHTTP)
 
 			// This endpoint should return all available vehicles within an area also
 			// should support filter by query params
