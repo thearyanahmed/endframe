@@ -3,9 +3,13 @@ package repository
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/go-redis/redis/v8"
+	"github.com/mmcloughlin/geohash"
+	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 	"github.com/thearyanahmed/nordsec/pkg/service/location/schema"
+	"strings"
 	"sync"
 )
 
@@ -45,7 +49,7 @@ func (r *RideRepository) SetToCooldown(ctx context.Context, details schema.RideC
 }
 
 func (r *RideRepository) getCooldownKey(key string) string {
-	return fmt.Sprintf("cooldown:%s", key)
+	return fmt.Sprintf("%s:cooldown:%s", r.ridesKey, key)
 }
 
 func (r *RideRepository) getIds(ctx context.Context, ids []string) ([]interface{}, error) {
@@ -96,13 +100,29 @@ func (r *RideRepository) ApplyCooldownStateFilter(ctx context.Context, m map[str
 
 	for i := 0; i < keyLen; i++ {
 		if res[i] != nil {
-			eventSchema := m[keys[i]]
-			eventSchema.State = fmt.Sprintf("%v", res[i])
-			m[keys[i]] = eventSchema
+			if mapIdentifier, err := r.getRideUuidFromCooldownKey(keys[i]); err != nil {
+				continue
+			} else {
+				eventSchema := m[mapIdentifier]
+				eventSchema.State = entity.StateInCooldown
+
+				m[keys[i]] = eventSchema
+			}
 		}
 	}
 
 	return m
+}
+
+func (r *RideRepository) getRideUuidFromCooldownKey(key string) (string, error) {
+	keyPrefix := fmt.Sprintf("%s:cooldown:", r.ridesKey)
+	parts := strings.SplitAfter(key, keyPrefix)
+
+	if len(parts) < 2 {
+		return "", errors.New("could not extract key")
+	}
+
+	return parts[1], nil
 }
 
 func (r *RideRepository) GetRideEventsFromMultiGeohash(ctx context.Context, geohashKeys []string) (map[string]schema.RideEventSchema, error) {
@@ -125,7 +145,6 @@ func (r *RideRepository) GetRideEventsFromMultiGeohash(ctx context.Context, geoh
 	// @improvement: maybe we can have something like r.applyFilter(function, data)
 	m := r.applyUniqueFilter(collection)
 
-	// @todo apply PostFilters // extract to different method
 	m = r.ApplyCooldownStateFilter(ctx, m)
 
 	return m, nil
@@ -184,7 +203,6 @@ func (r *RideRepository) UpdateRideCurrentStatus(ctx context.Context, eventSchem
 	}
 
 	_, err = r.datastore.Set(ctx, key, val, 0).Result()
-	fmt.Println("LOOK FOR KEY", key)
 	return err
 }
 
@@ -204,5 +222,50 @@ func (r *RideRepository) FindRideEventStatus(ctx context.Context, rideUuid strin
 }
 
 func (r *RideRepository) getRideCurrentStatusKey(from string) string {
-	return fmt.Sprintf("ride:%s", from)
+	return fmt.Sprintf("%s:ride:%s", r.ridesKey, from)
+}
+
+func (r *RideRepository) ApplyCurrentLocationFilter(ctx context.Context, rides map[string]schema.RideEventSchema, neighbours []string) map[string]schema.RideEventSchema {
+	var keys []string
+
+	for k := range rides {
+		keys = append(keys, r.getRideCurrentStatusKey(k))
+	}
+
+	keyLen := len(keys)
+	if keyLen == 0 {
+		return rides
+	}
+
+	res, err := r.getIds(ctx, keys)
+
+	if err != nil {
+		return rides
+	}
+
+	neighboursMap := make(map[string]bool)
+
+	for _, n := range neighbours {
+		neighboursMap[n] = true
+	}
+
+	// get the results
+	// for each result, calculate the geohash, if it's not in this map, delete
+	for i := 0; i < keyLen; i++ {
+		if res[i] != nil {
+			var ev schema.RideEventSchema
+
+			b := []byte(fmt.Sprintf("%v", res[i]))
+
+			// @NOTE we are ignoring the error case for this demonstration.
+			if err = json.Unmarshal(b, &ev); err == nil {
+				evGeohash := geohash.EncodeWithPrecision(ev.Lat, ev.Lon, 5)
+				if _, ok := neighboursMap[evGeohash]; !ok {
+					delete(rides, ev.RideUuid)
+				}
+			}
+		}
+	}
+
+	return rides
 }

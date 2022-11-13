@@ -32,20 +32,15 @@ type TestCode struct {
 
 func poc() {
 	twoPair := getTwoPair()
-	fmt.Println(twoPair)
 
 	box := makeBox(getCorners(twoPair))
-
-	fmt.Println(box)
 
 	centerX, centerY := box.Center()
 
 	encodedCenter := geohash.EncodeWithPrecision(centerX, centerY, 6)
-	fmt.Println(encodedCenter)
 
 	neighbours := geohash.Neighbors(encodedCenter)
 
-	fmt.Println("neighbours")
 	for _, v := range neighbours {
 		lat, lon := geohash.Decode(v)
 		fmt.Printf("lat: %.5f lon: %.5f geo: %v\n", lat, lon, v)

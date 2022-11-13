@@ -31,10 +31,10 @@ func ErrFrom(err error) *Response {
 	}
 }
 
-func ErrNotFound(err error) *Response {
+func ErrNotFound() *Response {
 	return &Response{
 		HttpStatusCode: http.StatusNotFound,
-		Message:        err.Error(),
+		Message:        "resource not found",
 	}
 }
 

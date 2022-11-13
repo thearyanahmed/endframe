@@ -14,7 +14,6 @@ type ServiceAggregator struct {
 }
 
 func NewServiceAggregator(config *config.Specification, _ *log.Logger) (*ServiceAggregator, error) {
-	// @todo extract to different layer
 	redis, err := repository.NewRedisClient(config.GetRedisAddr(), config.GetRedisPassword())
 
 	if err != nil {

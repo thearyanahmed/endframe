@@ -37,7 +37,7 @@ func (h *endTripHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	tripEvent, err := h.rideService.GetRideEventByUuid(r.Context(), rideEvent.RideUuid)
 	if err != nil {
-		presenter.ErrorResponse(w, r, presenter.ErrNotFound(err))
+		presenter.ErrorResponse(w, r, presenter.ErrNotFound())
 		return
 	}
 

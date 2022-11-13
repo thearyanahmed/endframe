@@ -39,7 +39,7 @@ func (h *updateRideLocationHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 	// In a real life scenario there will be a persistent storage where we can make a query and see the ride's
 	// current stations.
 	if tripEvent, err := h.rideService.GetRideEventByUuid(r.Context(), eventRequest.RideUuid); err == nil && h.rideService.IsInRoute(tripEvent.State) {
-		presenter.ErrorResponse(w, r, presenter.ErrNotFound(err))
+		presenter.ErrorResponse(w, r, presenter.ErrNotFound())
 		return
 	}
 

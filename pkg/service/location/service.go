@@ -23,6 +23,7 @@ type rideRepository interface {
 	UpdateLocation(ctx context.Context, ghash string, trip schema.RideEventSchema) error
 	GetRideEventsFromMultiGeohash(ctx context.Context, geohashKeys []string) (map[string]schema.RideEventSchema, error)
 	ApplyCooldownStateFilter(ctx context.Context, m map[string]schema.RideEventSchema) map[string]schema.RideEventSchema
+	ApplyCurrentLocationFilter(ctx context.Context, rides map[string]schema.RideEventSchema, neighbours []string) map[string]schema.RideEventSchema
 	SetToCooldown(ctx context.Context, details schema.RideCooldownEvent) error
 	FindRideEventStatus(ctx context.Context, rideUuid string) (schema.RideEventSchema, error)
 
@@ -32,7 +33,7 @@ type rideRepository interface {
 func NewLocationService(ds *redis.Client, redisKey string) *Service {
 	repo := repository.NewRideRepository(ds, redisKey)
 	return &Service{
-		geohashLength: uint(6), // could have taken from config as well
+		geohashLength: uint(5), // could have taken from config as well
 		repo:          repo,
 	}
 }
@@ -70,6 +71,8 @@ func (s *Service) GetRidesInArea(ctx context.Context, area entity.Area) ([]entit
 		return []entity.Ride{}, err
 	}
 
+	rides = s.repo.ApplyCurrentLocationFilter(ctx, rides, neighbours)
+
 	rides = s.repo.ApplyCooldownStateFilter(ctx, rides)
 
 	return schema.FromRideEventCollectionToEntity(rides), nil
@@ -94,6 +97,8 @@ func (s *Service) FindRideInLocation(ctx context.Context, rideUuid string, origi
 	}
 
 	m := map[string]schema.RideEventSchema{rideUuid: rideEvent}
+
+	rides = s.repo.ApplyCurrentLocationFilter(ctx, rides, neighbours)
 
 	rides = s.repo.ApplyCooldownStateFilter(ctx, m)
 

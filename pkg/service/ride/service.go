@@ -2,6 +2,7 @@ package ride
 
 import (
 	"context"
+	"fmt"
 	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 	"time"
 )
@@ -29,8 +30,8 @@ func NewRideService(locationSvc locationService) *RideService {
 	return &RideService{
 		locationService:       locationSvc,
 		minTripDistance:       500,
-		inRouteIntervalPoints: 15, // how many points will be plotted between origin and destination (origin and destination are inclusive)
-		cooldownMode:          3,  // in second
+		inRouteIntervalPoints: 15,  // how many points will be plotted between origin and destination (origin and destination are inclusive)
+		cooldownMode:          300, // in second
 	}
 }
 
@@ -57,8 +58,7 @@ func (s *RideService) RecordLocationUpdate(ctx context.Context, event entity.Eve
 func (s *RideService) RecordEndRideEvent(ctx context.Context, event entity.Event) (entity.Event, error) {
 	event.SetStateAsRoaming().SetCurrentTimestamp()
 
-	// @todo update ride:uuid current status
-
+	fmt.Println("EVENT SHOULD BE", event)
 	return s.locationService.RecordRideEvent(ctx, event)
 }
 
@@ -67,13 +67,7 @@ func (s *RideService) EnterCooldownMode(ctx context.Context, event entity.Event)
 }
 
 func (s *RideService) UpdateRideLocation(ctx context.Context, event entity.Event) (entity.Event, error) {
-	rideEvent, err := s.locationService.RecordRideEvent(ctx, event)
-
-	if err != nil {
-		return entity.Event{}, err
-	}
-
-	return rideEvent, nil
+	return s.locationService.RecordRideEvent(ctx, event)
 }
 
 func (s *RideService) GetRoute(origin, dest entity.Coordinate) []entity.Coordinate {
