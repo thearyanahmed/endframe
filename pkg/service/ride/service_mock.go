@@ -10,12 +10,22 @@ type RideServiceMock struct {
 	mock.Mock
 }
 
-func (s *RideServiceMock) RecordEndRideEvent(ctx context.Context, event entity.Event) (entity.Event, error) {
+func (s *RideServiceMock) GetRideEventByUuid(_ context.Context, _ string) (entity.Event, error) {
 	args := s.Called()
 	return args.Get(0).(entity.Event), args.Error(1)
 }
 
-func (s *RideServiceMock) EnterCooldownMode(ctx context.Context, event entity.Event) error {
+func (s *RideServiceMock) TripHasEnded(_ entity.Event) bool {
+	args := s.Called()
+	return args.Get(0).(bool)
+}
+
+func (s *RideServiceMock) RecordEndRideEvent(_ context.Context, _ entity.Event) (entity.Event, error) {
+	args := s.Called()
+	return args.Get(0).(entity.Event), args.Error(1)
+}
+
+func (s *RideServiceMock) EnterCooldownMode(_ context.Context, _ entity.Event) error {
 	args := s.Called()
 	return args.Get(0).(error)
 }
@@ -30,42 +40,42 @@ func (s *RideServiceMock) GetMinimumTripDistance() float64 {
 	return args.Get(0).(float64)
 }
 
-func (s *RideServiceMock) IsRideAvailable(ride entity.Ride) bool {
+func (s *RideServiceMock) IsRideAvailable(_ entity.Ride) bool {
 	args := s.Called()
 	return args.Get(0).(bool)
 }
 
-func (s *RideServiceMock) GetRoute(origin, dest entity.Coordinate) []entity.Coordinate {
+func (s *RideServiceMock) GetRoute(_, _ entity.Coordinate) []entity.Coordinate {
 	args := s.Called()
 	return args.Get(0).([]entity.Coordinate)
 }
 
-func (s *RideServiceMock) RecordNewRideEvent(ctx context.Context, event entity.Event) (entity.Event, error) {
+func (s *RideServiceMock) RecordNewRideEvent(_ context.Context, _ entity.Event) (entity.Event, error) {
 	args := s.Called()
 	return args.Get(0).(entity.Event), args.Error(1)
 }
 
-func (s *RideServiceMock) RecordLocationUpdate(ctx context.Context, event entity.Event) (entity.Event, error) {
+func (s *RideServiceMock) RecordLocationUpdate(_ context.Context, _ entity.Event) (entity.Event, error) {
 	args := s.Called()
 	return args.Get(0).(entity.Event), args.Error(1)
 }
 
-func (s *RideServiceMock) DistanceIsGreaterThanMinimumDistance(origin, destination entity.Coordinate) bool {
+func (s *RideServiceMock) DistanceIsGreaterThanMinimumDistance(_, _ entity.Coordinate) bool {
 	args := s.Called()
 	return args.Get(0).(bool)
 }
 
-func (s *RideServiceMock) FindRideInLocation(ctx context.Context, rideUuid string, rideLocation entity.Coordinate) (entity.Ride, error) {
+func (s *RideServiceMock) FindRideInLocation(_ context.Context, _ string, _ entity.Coordinate) (entity.Ride, error) {
 	args := s.Called()
 	return args.Get(0).(entity.Ride), args.Error(1)
 }
 
-func (s *RideServiceMock) UpdateRideLocation(ctx context.Context, event entity.Event) (entity.Event, error) {
+func (s *RideServiceMock) UpdateRideLocation(_ context.Context, _ entity.Event) (entity.Event, error) {
 	args := s.Called()
 	return args.Get(0).(entity.Event), args.Error(1)
 }
 
-func (s *RideServiceMock) CanBeUpdatedViaRiderApp(ctx context.Context, rideUuid string, loc entity.Coordinate) (bool, error) {
+func (s *RideServiceMock) CanBeUpdatedViaRiderApp(_ context.Context, _ string, _ entity.Coordinate) (bool, error) {
 	args := s.Called()
 	return args.Get(0).(bool), args.Error(1)
 }

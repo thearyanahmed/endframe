@@ -7,6 +7,7 @@ import (
 	"github.com/thearyanahmed/nordsec/pkg/serializer"
 	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 	"net/url"
+	"time"
 )
 
 func FakeRecordRideEventRequest() serializer.RecordRideEventRequest {
@@ -279,4 +280,17 @@ func EndTripRequestToUrlValues(request serializer.EndTripRequest) url.Values {
 	req.Set("longitude", fmt.Sprintf("%.6f", request.Longitude))
 
 	return req
+}
+
+func FakeRideStatusRoaming() entity.Event {
+	return entity.Event{
+		Uuid:          uuid.New().String(),
+		RideUuid:      uuid.New().String(),
+		Lat:           gofakeit.Latitude(),
+		Lon:           gofakeit.Longitude(),
+		PassengerUuid: uuid.New().String(),
+		TripUuid:      uuid.New().String(),
+		Timestamp:     time.Now().Unix(),
+		State:         entity.StateRoaming,
+	}
 }

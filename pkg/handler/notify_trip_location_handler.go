@@ -34,7 +34,7 @@ func (h *notifyPositionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 	event, err := h.rideService.RecordLocationUpdate(r.Context(), rideEvent)
 
 	if err != nil {
-		presenter.ErrorResponse(w, r, presenter.FromErr(err))
+		presenter.ErrorResponse(w, r, presenter.ErrFrom(err))
 		return
 	}
 

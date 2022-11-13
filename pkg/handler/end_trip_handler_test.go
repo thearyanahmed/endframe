@@ -2,10 +2,12 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"github.com/thearyanahmed/nordsec/pkg/serializer"
+	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 	"github.com/thearyanahmed/nordsec/pkg/service/ride"
 	"github.com/thearyanahmed/nordsec/pkg/testutil"
 	"net/http"
@@ -48,6 +50,34 @@ func (h *endTripHandlerTestSuite) TestItFailsWithoutProperFormData() {
 		// Make sure the response is for validation failed and not something else
 		assert.Equal(h.T(), "validation failed", result.Message)
 	}
+}
+
+func (h *endTripHandlerTestSuite) TestItFailsIfTripDoesNotExist() {
+	scene := testutil.FakeEndTripRequest()
+
+	h.rideService.On("GetRideEventByUuid").Return(entity.Event{}, errors.New("ride event not found")).Once()
+	defer h.rideService.ResetMock()
+
+	res := h.response(testutil.EndTripRequestToUrlValues(scene))
+
+	assert.Equal(h.T(), http.StatusNotFound, res.Code)
+}
+
+func (h *endTripHandlerTestSuite) TestItFailsIfRideEventHasAlreadyEnded() {
+	scene := testutil.FakeEndTripRequest()
+
+	fakeEvent := testutil.FakeRideStatusRoaming()
+	fakeEvent.TripUuid = ""
+	fakeEvent.PassengerUuid = ""
+
+	h.rideService.On("GetRideEventByUuid").Return(fakeEvent, nil).Once()
+	h.rideService.On("TripHasEnded").Return(true).Once()
+
+	defer h.rideService.ResetMock()
+
+	res := h.response(testutil.EndTripRequestToUrlValues(scene))
+
+	assert.Equal(h.T(), http.StatusBadRequest, res.Code)
 }
 
 func (h *endTripHandlerTestSuite) response(data url.Values) *httptest.ResponseRecorder {

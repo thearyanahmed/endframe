@@ -45,3 +45,10 @@ func TripEndedResponse(tripUuid string) TripEnded {
 		TripUuid: tripUuid,
 	}
 }
+
+func ErrTripHasAlreadyEnded() *Response {
+	return &Response{
+		HttpStatusCode: http.StatusBadRequest,
+		Message:        "trip has already ended",
+	}
+}

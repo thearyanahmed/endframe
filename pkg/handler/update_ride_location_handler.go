@@ -41,7 +41,7 @@ func (h *updateRideLocationHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 	//can, err := h.rideService.CanBeUpdatedViaRiderApp(r.Context(), eventRequest.RideUuid, eventRequest.ToLocationCoordinate())
 	//
 	//if err != nil {
-	//	presenter.ErrorResponse(w, r, presenter.FromErr(err))
+	//	presenter.ErrorResponse(w, r, presenter.ErrFrom(err))
 	//	return
 	//}
 	//
@@ -55,7 +55,7 @@ func (h *updateRideLocationHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 	loc, err := h.usecase.UpdateRideLocation(r.Context(), *rideEvent)
 
 	if err != nil {
-		presenter.ErrorResponse(w, r, presenter.FromErr(err))
+		presenter.ErrorResponse(w, r, presenter.ErrFrom(err))
 		return
 	}
 

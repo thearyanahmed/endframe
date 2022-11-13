@@ -24,9 +24,16 @@ func ErrUnauthorized() *Response {
 	}
 }
 
-func FromErr(err error) *Response {
+func ErrFrom(err error) *Response {
 	return &Response{
-		HttpStatusCode: http.StatusUnprocessableEntity, // @todo update here
+		HttpStatusCode: http.StatusUnprocessableEntity,
+		Message:        err.Error(),
+	}
+}
+
+func ErrNotFound(err error) *Response {
+	return &Response{
+		HttpStatusCode: http.StatusNotFound,
 		Message:        err.Error(),
 	}
 }

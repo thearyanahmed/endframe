@@ -44,7 +44,7 @@ func (h *startTripHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	ride, err := h.rideService.FindRideInLocation(r.Context(), tripRequest.RideUuid, origin)
 	if err != nil {
-		presenter.ErrorResponse(w, r, presenter.FromErr(err))
+		presenter.ErrorResponse(w, r, presenter.ErrFrom(err))
 		return
 	}
 
@@ -59,7 +59,7 @@ func (h *startTripHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	event, err := h.rideService.RecordNewRideEvent(r.Context(), rideEvent)
 
 	if err != nil {
-		presenter.ErrorResponse(w, r, presenter.FromErr(err))
+		presenter.ErrorResponse(w, r, presenter.ErrFrom(err))
 		return
 	}
 

@@ -33,7 +33,7 @@ func (h *nearByRidesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	rides, err := h.riderService.FindNearByRides(r.Context(), filterRequest.ToArea(r), r.URL.Query().Get("state"))
 
 	if err != nil {
-		presenter.ErrorResponse(w, r, presenter.FromErr(err))
+		presenter.ErrorResponse(w, r, presenter.ErrFrom(err))
 		return
 	}
 

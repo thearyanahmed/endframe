@@ -188,6 +188,21 @@ func (r *RideRepository) UpdateRideCurrentStatus(ctx context.Context, eventSchem
 	return err
 }
 
+func (r *RideRepository) FindRideEventStatus(ctx context.Context, rideUuid string) (schema.RideEventSchema, error) {
+	result, err := r.datastore.Get(ctx, r.getRideCurrentStatusKey(rideUuid)).Result()
+	if err != nil {
+		return schema.RideEventSchema{}, err
+	}
+
+	var eventSchema schema.RideEventSchema
+
+	if err = json.Unmarshal([]byte(result), &eventSchema); err != nil {
+		return schema.RideEventSchema{}, err
+	}
+
+	return eventSchema, nil
+}
+
 func (r *RideRepository) getRideCurrentStatusKey(from string) string {
 	return fmt.Sprintf("ride:%s", from)
 }

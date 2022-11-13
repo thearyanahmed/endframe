@@ -15,6 +15,7 @@ type locationService interface {
 	StartCooldownForRide(ctx context.Context, rideUuid string, timestamp int64, duration time.Duration) error
 
 	UpdateRideEventCurrentStatus(ctx context.Context, event entity.Event) error
+	GetRideEventByUuid(ctx context.Context, rideUuid string) (entity.Event, error)
 }
 
 type RideService struct {
@@ -88,7 +89,11 @@ func (s *RideService) CanBeUpdatedViaRiderApp(ctx context.Context, rideUuid stri
 }
 
 func (s *RideService) IsRideAvailable(ride entity.Ride) bool {
-	return ride.State != entity.StateInCooldown && ride.State != entity.StateInRoute
+	return s.isAvailableByState(ride.State)
+}
+
+func (s *RideService) isAvailableByState(state string) bool {
+	return state != entity.StateInCooldown && state != entity.StateInRoute
 }
 
 func (s *RideService) DistanceIsGreaterThanMinimumDistance(origin, dest entity.Coordinate) bool {
@@ -131,4 +136,21 @@ func (s *RideService) filterByState(collection []entity.Ride, state string) []en
 
 func (s *RideService) SetRideCurrentStatus(ctx context.Context, event entity.Event) error {
 	return s.locationService.UpdateRideEventCurrentStatus(ctx, event)
+}
+
+func (s *RideService) GetRideEventByUuid(ctx context.Context, rideUuid string) (entity.Event, error) {
+	return s.locationService.GetRideEventByUuid(ctx, rideUuid)
+}
+
+// TripHasEnded when a trip has ended, it should have any trip uuid and should be available
+func (s *RideService) TripHasEnded(event entity.Event) bool {
+	return event.TripUuid == "" && event.PassengerUuid == "" && (s.isRoaming(event.State) || s.isInCooldown(event.State))
+}
+
+func (s *RideService) isRoaming(state string) bool {
+	return state == entity.StateRoaming
+}
+
+func (s *RideService) isInCooldown(state string) bool {
+	return state == entity.StateInCooldown
 }
