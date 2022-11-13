@@ -227,3 +227,56 @@ func FakeRandomState() string {
 
 	return entity.StateRoaming
 }
+
+func FakeEndTripRequest() serializer.EndTripRequest {
+	return serializer.EndTripRequest{
+		RideUuid:      uuid.New().String(),
+		Latitude:      gofakeit.Latitude(),
+		Longitude:     gofakeit.Longitude(),
+		ClientUuid:    uuid.New().String(),
+		PassengerUuid: uuid.New().String(),
+		TripUuid:      uuid.New().String(),
+	}
+}
+
+func FakeEndTripRequestWithInvalidUuid() serializer.EndTripRequest {
+	r := FakeEndTripRequest()
+
+	r.ClientUuid = "not-an-uuid"
+	r.RideUuid = "not-an-uuid"
+	r.PassengerUuid = "not-an-uuid"
+
+	return r
+}
+
+func FakeEndTripRequestWithInvalidCoordinates() serializer.EndTripRequest {
+	r := FakeEndTripRequest()
+
+	r.Latitude = 1203123.123
+	r.Longitude = 1203123.123
+
+	return r
+}
+
+func FakeEndTripRequestWithMissingRequiredField() serializer.EndTripRequest {
+	r := FakeEndTripRequest()
+
+	r.ClientUuid = ""
+	r.PassengerUuid = ""
+	r.RideUuid = ""
+
+	return r
+}
+
+func EndTripRequestToUrlValues(request serializer.EndTripRequest) url.Values {
+	req := url.Values{}
+
+	req.Set("ride_uuid", request.RideUuid)
+	req.Set("trip_uuid", request.TripUuid)
+	req.Set("client_uuid", request.ClientUuid)
+	req.Set("passenger_uuid", request.PassengerUuid)
+	req.Set("latitude", fmt.Sprintf("%.6f", request.Latitude))
+	req.Set("longitude", fmt.Sprintf("%.6f", request.Longitude))
+
+	return req
+}
