@@ -1,0 +1,375 @@
+{
+	"info": {
+		"_postman_id": "793ed145-1ed6-4513-a7b7-6c649482ccd8",
+		"name": "API / V1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17877358"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{api_base_url}}/health-check",
+					"host": [
+						"{{api_base_url}}"
+					],
+					"path": [
+						"health-check"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Rides Near By",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "client-key",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{api_base_url}}/rides/near-by?x1=52.3251&y1=13.453&x3=52.3361&y3=13.475",
+					"host": [
+						"{{api_base_url}}"
+					],
+					"path": [
+						"rides",
+						"near-by"
+					],
+					"query": [
+						{
+							"key": "x1",
+							"value": "52.3251"
+						},
+						{
+							"key": "y1",
+							"value": "13.453"
+						},
+						{
+							"key": "x3",
+							"value": "52.3361"
+						},
+						{
+							"key": "y3",
+							"value": "13.475"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Start trip",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "client-key",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "origin_latitude",
+							"value": "52.332425",
+							"type": "text"
+						},
+						{
+							"key": "origin_longitude",
+							"value": "13.533946",
+							"type": "text"
+						},
+						{
+							"key": "ride_uuid",
+							"value": "efb2eeb1-dfbb-4692-bdcd-3148a93eddab",
+							"type": "text"
+						},
+						{
+							"key": "client_uuid",
+							"value": "91122e1b-a36b-4d39-8267-95fe6c5eeb1f",
+							"type": "text"
+						},
+						{
+							"key": "destination_latitude",
+							"value": "53.885487",
+							"type": "text"
+						},
+						{
+							"key": "destination_longitude",
+							"value": "13.380731",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{api_base_url}}/trip/start",
+					"host": [
+						"{{api_base_url}}"
+					],
+					"path": [
+						"trip",
+						"start"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Notify Trip Location",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "client-key",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "latitude",
+							"value": "52.00001",
+							"type": "text"
+						},
+						{
+							"key": "longitude",
+							"value": "13.00001",
+							"type": "text"
+						},
+						{
+							"key": "ride_uuid",
+							"value": "1cc846eb-9f14-4c2b-8879-e796d618afb5",
+							"type": "text"
+						},
+						{
+							"key": "client_uuid",
+							"value": "8757fc35-45f9-49aa-b0b0-9b482496d79d",
+							"type": "text"
+						},
+						{
+							"key": "passenger_uuid",
+							"value": "91122e1b-a36b-4d39-8267-95fe6c5eeb1f",
+							"type": "text"
+						},
+						{
+							"key": "trip_uuid",
+							"value": "74f3efaf-3363-47f3-94be-eecc1ed1fd89",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{api_base_url}}/trip/notify/location",
+					"host": [
+						"{{api_base_url}}"
+					],
+					"path": [
+						"trip",
+						"notify",
+						"location"
+					],
+					"query": [
+						{
+							"key": "ride_uuid",
+							"value": "47204c95-6bcd-4899-8247-d37498acd397",
+							"disabled": true
+						},
+						{
+							"key": "latitude",
+							"value": "52.009719540000006",
+							"disabled": true
+						},
+						{
+							"key": "longitude",
+							"value": "13.00602",
+							"disabled": true
+						},
+						{
+							"key": "client_uuid",
+							"value": "91122e1b-a36b-4d39-8267-95fe6c5eeb0f",
+							"disabled": true
+						},
+						{
+							"key": "trip_uuid",
+							"value": "47204c95-6bcd-4899-8247-d37498acd397",
+							"disabled": true
+						},
+						{
+							"key": "passenger_uuid",
+							"value": "91122e1b-a36b-4d39-8267-95fe6c5eeb0f",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "End Trip",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "client-key",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "latitude",
+							"value": "52.331425",
+							"type": "text"
+						},
+						{
+							"key": "longitude",
+							"value": "13.531946",
+							"type": "text"
+						},
+						{
+							"key": "ride_uuid",
+							"value": "efb2eeb1-dfbb-4692-bdcd-3148a93eddab",
+							"type": "text"
+						},
+						{
+							"key": "client_uuid",
+							"value": "91122e1b-a36b-4d39-8267-95fe6c5eeb0f",
+							"type": "text"
+						},
+						{
+							"key": "passenger_uuid",
+							"value": "91122e1b-a36b-4d39-8267-95fe6c5eeb1f",
+							"type": "text"
+						},
+						{
+							"key": "trip_uuid",
+							"value": "1a7c24e1-b9c2-4df4-913e-6fcd05ad125e",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{api_base_url}}/trip/end",
+					"host": [
+						"{{api_base_url}}"
+					],
+					"path": [
+						"trip",
+						"end"
+					],
+					"query": [
+						{
+							"key": "ride_uuid",
+							"value": "47204c95-6bcd-4899-8247-d37498acd397",
+							"disabled": true
+						},
+						{
+							"key": "latitude",
+							"value": "52.009719540000006",
+							"disabled": true
+						},
+						{
+							"key": "longitude",
+							"value": "13.00602",
+							"disabled": true
+						},
+						{
+							"key": "client_uuid",
+							"value": "91122e1b-a36b-4d39-8267-95fe6c5eeb0f",
+							"disabled": true
+						},
+						{
+							"key": "trip_uuid",
+							"value": "47204c95-6bcd-4899-8247-d37498acd397",
+							"disabled": true
+						},
+						{
+							"key": "passenger_uuid",
+							"value": "91122e1b-a36b-4d39-8267-95fe6c5eeb0f",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update ride location",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "rider-key",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "ride_uuid",
+							"value": "91122e1b-a36b-4d39-8267-95fe6c5eeb0f",
+							"type": "text"
+						},
+						{
+							"key": "latitude",
+							"value": "52.323551",
+							"type": "text"
+						},
+						{
+							"key": "longitude",
+							"value": "13.47453",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{api_base_url}}/ride/activate",
+					"host": [
+						"{{api_base_url}}"
+					],
+					"path": [
+						"ride",
+						"activate"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
