@@ -19,6 +19,7 @@ type rideService interface {
 	RecordNewRideEvent(ctx context.Context, event entity.Event) (entity.Event, error)
 	DistanceIsGreaterThanMinimumDistance(origin, destination entity.Coordinate) bool
 	FindRideInLocation(ctx context.Context, rideUuid string, rideLocation entity.Coordinate) (entity.Ride, error)
+	SetRideCurrentStatus(ctx context.Context, event entity.Event) error
 }
 
 func NewStartTripHandler(rideService rideService) *startTripHandler {
@@ -59,6 +60,11 @@ func (h *startTripHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	event, err := h.rideService.RecordNewRideEvent(r.Context(), rideEvent)
 
 	if err != nil {
+		presenter.ErrorResponse(w, r, presenter.ErrFrom(err))
+		return
+	}
+
+	if err = h.rideService.SetRideCurrentStatus(r.Context(), event); err != nil {
 		presenter.ErrorResponse(w, r, presenter.ErrFrom(err))
 		return
 	}

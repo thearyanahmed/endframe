@@ -10,6 +10,11 @@ type RideServiceMock struct {
 	mock.Mock
 }
 
+func (s *RideServiceMock) SetRideCurrentStatus(ctx context.Context, event entity.Event) error {
+	args := s.Called()
+	return args.Error(0)
+}
+
 func (s *RideServiceMock) GetRideEventByUuid(_ context.Context, _ string) (entity.Event, error) {
 	args := s.Called()
 	return args.Get(0).(entity.Event), args.Error(1)

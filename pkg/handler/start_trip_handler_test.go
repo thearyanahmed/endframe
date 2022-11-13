@@ -160,6 +160,7 @@ func (s *startTripHandlerTestSuite) TestTripStartsSuccessfullyGivenValidData() {
 	s.rideService.On("IsRideAvailable").Return(true).Once()
 	s.rideService.On("GetRoute").Return(route).Once()
 	s.rideService.On("RecordNewRideEvent").Return(event, nil).Once()
+	s.rideService.On("SetRideCurrentStatus").Return(nil).Once()
 
 	defer s.rideService.ResetMock()
 
