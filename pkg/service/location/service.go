@@ -31,7 +31,7 @@ type rideRepository interface {
 }
 
 func NewLocationService(ds *redis.Client, redisKey string) *Service {
-	ghashTileLen := uint(6) // could have taken from config as well
+	ghashTileLen := uint(5) // could have taken from config as well
 	repo := repository.NewRideRepository(ds, redisKey, ghashTileLen)
 	return &Service{
 		geohashTileLength: ghashTileLen,

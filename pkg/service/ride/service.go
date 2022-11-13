@@ -30,7 +30,7 @@ func NewRideService(locationSvc locationService, minTripDistance float64, cooldo
 	return &RideService{
 		locationService:       locationSvc,
 		minTripDistance:       minTripDistance,
-		inRouteIntervalPoints: 15,           // how many points will be plotted between origin and destination (origin and destination are inclusive)
+		inRouteIntervalPoints: 15,           // @improvement: could be taken from config , how many points will be plotted between origin and destination (origin and destination are inclusive)
 		cooldownMode:          cooldownMode, // in second
 	}
 }

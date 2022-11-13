@@ -15,9 +15,8 @@ ps:
 	@docker-compose ps
 
 simulate:
-	@echo "[+] Running outside of container. Spawning 1000 riders."
-	#@for i in {1..20}; do go run cmd/simulation.go 1000 ${RIDER_API_KEY} ${CORE_URL}; done;
-	@go run cmd/simulation.go 1000 ${RIDER_API_KEY} ${CORE_URL}
+	@echo "[+] Running outside of container."
+	@source .env; go run cmd/simulation/main.go 5 ${RIDER_API_KEY} ${CLIENT_API_KEY} ${CORE_URL}
 # core
 ssh:
 	@docker-compose exec $(CONTAINER) bash
