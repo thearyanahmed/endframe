@@ -13,8 +13,8 @@ Length	Tile Size
 2	1,252.3km x 624.1km
 3	156.5km x 156km
 4	39.1km x 19.5km
-5	4.9km x 4.9km
-6	1.2km x 609.4m # | Our default value 
+5	4.9km x 4.9km # | Our default value 
+6	1.2km x 609.4m 
 7	152.9m x 152.4m
 8	38.2m x 19m
 9	4.8m x 4.8m
@@ -32,8 +32,6 @@ Length	Tile Size
 │(x1,y1)            (x2,y2)│    
 └──────────────────────────┘    
 ```
-
-## NEXT TODOS
 
 ## Task
 A company called Scootin' Aboot will deploy electric scooters in Ottawa and
@@ -60,19 +58,3 @@ movement in straight line will be good enough.
 authenticate with the server using a static API key (i.e. no individual
 credentials necessary but will most probably be introduced as the project
 develops further).
-
-```javascript
-ZADD s4 1 "{\"state\":\"roaming\",\"timestamp\":\"1\", \"pos\":\"1\", \"ride_id\":\"ride-01\"}"
-ZADD s4 2 "{\"state\":\"in_route\",\"timestamp\":\"2\", \"pos\":\"1\", \"ride_id\":\"ride-01\"}"
-ZADD s4 2 "{\"state\":\"roaming\",\"timestamp\":\"2\", \"pos\":\"1\", \"ride_id\":\"ride-02\"}"
-ZADD s4 3 "{\"state\":\"in_route\",\"timestamp\":\"3\", \"pos\":\"2\", \"ride_id\":\"ride-01\"}"
-ZADD s4 4 "{\"state\":\"in_route\",\"timestamp\":\"4\", \"pos\":\"3\", \"ride_id\":\"ride-01\"}"
-ZADD s4 5 "{\"state\":\"cool_down\",\"timestamp\":\"5\", \"pos\":\"3\", \"ride_id\":\"ride-01\"}"
-ZADD s4 6 "{\"state\":\"roaming\",\"timestamp\":\"6\", \"pos\":\"4\", \"ride_id\":\"ride-01\"}"
-
-
-ZADD u339gf 1668087835 "\{\"uuid\":\"321261f8-22cb-49ed-abdf-093de5657f4f\",\"ride_uuid\":\"35ac7da9-577b-4f29-860e-ab176894d693\",\"lat\":\"52.351873\",\"lon\":\"13.533073\",\"passenger_uuid\":\"\",\"timestamp\":\"1668087835\",\"state\":\"available\"}"
-ZADD u339gf 1668087855 "\{\"uuid\":\"321261f8-22cb-49ed-abdf-093de5657f4f\",\"ride_uuid\":\"35ac7da9-577b-4f29-860e-ab176894d693\",\"lat\":\"52.351873\",\"lon\":\"13.533073\",\"passenger_uuid\":\"\",\"timestamp\":\"1668087855\",\"state\":\"available\"}"
-ZADD u339gf 1668087999 "\{\"uuid\":\"321261f8-22cb-49ed-abdf-093de5657f4g\",\"ride_uuid\":\"35ac7da9-577b-4f29-860e-ab176894d693\",\"lat\":\"52.351873\",\"lon\":\"13.533073\",\"passenger_uuid\":\"\",\"timestamp\":\"1668087999\",\"state\":\"available\"}"
-ZADD u339gf 1668088001 "\{\"uuid\":\"321261f8-22cb-49ed-abdf-093de5657f4g\",\"ride_uuid\":\"35ac7da9-577b-4f29-860e-ab176894d693\",\"lat\":\"52.351873\",\"lon\":\"13.533073\",\"passenger_uuid\":\"\",\"timestamp\":\"1668088001\",\"state\":\"available\"}"
-```

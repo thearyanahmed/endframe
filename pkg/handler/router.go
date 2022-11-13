@@ -45,7 +45,7 @@ func NewRouter(conf *config.Specification, svcAggregator *service.ServiceAggrega
 				With(apiMiddleware.NewAuthorizeClientMiddleware(conf.ClientApiKey, logger).Handle).
 				Post("/trip/notify/location", NewNotifyPositionHandler(svcAggregator.RideService).ServeHTTP)
 
-			// Notify when trip has ended
+			// Notify when trip has ended, enter cooldown mode
 			r.With(apiMiddleware.ValidateContentTypeMiddleware).
 				With(apiMiddleware.NewAuthorizeClientMiddleware(conf.ClientApiKey, logger).Handle).
 				Post("/trip/end", NewEndTripHandler(svcAggregator.RideService).ServeHTTP)
