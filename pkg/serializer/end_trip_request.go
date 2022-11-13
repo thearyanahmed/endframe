@@ -3,7 +3,6 @@ package serializer
 import (
 	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 	"github.com/thedevsaddam/govalidator"
-	"time"
 )
 
 type EndTripRequest struct {
@@ -32,7 +31,5 @@ func (r *EndTripRequest) ToRideEvent() entity.Event {
 		Lon:           r.Longitude,
 		PassengerUuid: r.PassengerUuid,
 		TripUuid:      r.TripUuid,
-		State:         "in_route",
-		Timestamp:     time.Now().Unix(),
 	}
 }

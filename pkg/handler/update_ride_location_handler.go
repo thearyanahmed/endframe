@@ -38,7 +38,7 @@ func (h *updateRideLocationHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 
 	// @TODO implement update ride's status in REDIS ride:status:uuid roaming, in-route
 
-	//can, err := h.rideSrvice.CanBeUpdatedViaRiderApp(r.Context(), eventRequest.RideUuid, eventRequest.ToLocationCoordinate())
+	//can, err := h.rideService.CanBeUpdatedViaRiderApp(r.Context(), eventRequest.RideUuid, eventRequest.ToLocationCoordinate())
 	//
 	//if err != nil {
 	//	presenter.ErrorResponse(w, r, presenter.FromErr(err))

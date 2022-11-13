@@ -10,6 +10,16 @@ type RideServiceMock struct {
 	mock.Mock
 }
 
+func (s *RideServiceMock) RecordEndRideEvent(ctx context.Context, event entity.Event) (entity.Event, error) {
+	args := s.Called()
+	return args.Get(0).(entity.Event), args.Error(1)
+}
+
+func (s *RideServiceMock) EnterCooldownMode(ctx context.Context, event entity.Event) error {
+	args := s.Called()
+	return args.Get(0).(error)
+}
+
 func (s *RideServiceMock) FindNearByRides(_ context.Context, _ entity.Area, _ string) ([]entity.Ride, error) {
 	args := s.Called()
 	return args.Get(0).([]entity.Ride), args.Error(1)

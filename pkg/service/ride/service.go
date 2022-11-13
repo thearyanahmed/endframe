@@ -3,6 +3,7 @@ package ride
 import (
 	"context"
 	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
+	"time"
 )
 
 type locationService interface {
@@ -11,20 +12,27 @@ type locationService interface {
 	RecordRideEvent(ctx context.Context, event entity.Event) (entity.Event, error)
 	GetRoute(origin, destination entity.Coordinate, intervalPoints int) []entity.Coordinate
 	FindRideInLocation(ctx context.Context, rideUuid string, origin entity.Coordinate) (entity.Ride, error)
+	StartCooldownForRide(ctx context.Context, rideUuid string, timestamp int64, duration time.Duration) error
 }
 
 type RideService struct {
 	locationService       locationService
 	minTripDistance       float64 // minimum distance between origin and destination, in meters
 	inRouteIntervalPoints int
+	cooldownMode          int64
 }
 
 func NewRideService(locationSvc locationService) *RideService {
 	return &RideService{
 		locationService:       locationSvc,
 		minTripDistance:       500,
-		inRouteIntervalPoints: 15,
+		inRouteIntervalPoints: 15, // how many points will be plotted between origin and destination (origin and destination are inclusive)
+		cooldownMode:          3,  // in second
 	}
+}
+
+func (s *RideService) getCooldownModeDurationInSeconds() time.Duration {
+	return time.Duration(s.cooldownMode) * time.Second
 }
 
 func (s *RideService) GetMinimumTripDistance() float64 {
@@ -41,6 +49,16 @@ func (s *RideService) RecordLocationUpdate(ctx context.Context, event entity.Eve
 	event.SetStateAsInRoute().SetCurrentTimestamp()
 
 	return s.UpdateRideLocation(ctx, event)
+}
+
+func (s *RideService) RecordEndRideEvent(ctx context.Context, event entity.Event) (entity.Event, error) {
+	event.SetStateAsRoaming().SetCurrentTimestamp()
+
+	return s.locationService.RecordRideEvent(ctx, event)
+}
+
+func (s *RideService) EnterCooldownMode(ctx context.Context, event entity.Event) error {
+	return s.locationService.StartCooldownForRide(ctx, event.RideUuid, time.Now().Unix(), s.getCooldownModeDurationInSeconds())
 }
 
 func (s *RideService) UpdateRideLocation(ctx context.Context, event entity.Event) (entity.Event, error) {

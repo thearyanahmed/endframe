@@ -1,19 +1,24 @@
 package handler
 
 import (
+	"context"
 	"github.com/thearyanahmed/nordsec/pkg/presenter"
 	"github.com/thearyanahmed/nordsec/pkg/serializer"
-	"github.com/thearyanahmed/nordsec/pkg/service/location"
+	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 	"net/http"
-	"time"
 )
 
 type endTripHandler struct {
-	locationSvc *location.Service
+	rideService endTripRideService
 }
 
-func NewEndTripHandler(locSvc *location.Service) *endTripHandler {
-	return &endTripHandler{locationSvc: locSvc}
+type endTripRideService interface {
+	RecordEndRideEvent(ctx context.Context, event entity.Event) (entity.Event, error)
+	EnterCooldownMode(ctx context.Context, event entity.Event) error
+}
+
+func NewEndTripHandler(riderSvc endTripRideService) *endTripHandler {
+	return &endTripHandler{rideService: riderSvc}
 }
 
 func (h *endTripHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -24,19 +29,19 @@ func (h *endTripHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// @todo check if trip exists with same status or not
+	// @TODO check if trip exists with same status or not
 	rideEvent := eventRequest.ToRideEvent()
 
 	// @save in database
-	loc, err := h.locationSvc.RecordRideEvent(r.Context(), rideEvent)
 
+	recordedEvent, err := h.rideService.RecordEndRideEvent(r.Context(), rideEvent)
 	if err != nil {
 		presenter.ErrorResponse(w, r, presenter.FromErr(err))
 		return
 	}
 
 	// add to cool down mode
-	err = h.locationSvc.StartCooldownForRide(r.Context(), loc.RideUuid, time.Now().Unix(), time.Second*10)
+	err = h.rideService.EnterCooldownMode(r.Context(), recordedEvent)
 
 	if err != nil {
 		presenter.ErrorResponse(w, r, presenter.FromErr(err))

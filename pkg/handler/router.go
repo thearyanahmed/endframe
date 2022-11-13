@@ -48,7 +48,7 @@ func NewRouter(conf *config.Specification, svcAggregator *service.ServiceAggrega
 			// Notify when trip has ended
 			r.With(apiMiddleware.ValidateContentTypeMiddleware).
 				With(apiMiddleware.NewAuthorizeClientMiddleware(conf.ClientApiKey, logger).Handle).
-				Post("/trip/end", NewEndTripHandler(svcAggregator.LocationSvc).ServeHTTP)
+				Post("/trip/end", NewEndTripHandler(svcAggregator.RideService).ServeHTTP)
 		})
 	})
 
