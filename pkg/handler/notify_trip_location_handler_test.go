@@ -81,6 +81,7 @@ func (s *notifyPositionHandlerTestSuite) TestRideLocationUpdatesSuccessfullyWith
 
 	s.rideService.On("RecordLocationUpdate").Return(rideEvent, nil).Once()
 	s.rideService.On("SetRideCurrentStatus").Return(nil).Once()
+	s.rideService.On("GetRideEventByUuid").Return(rideEvent, nil).Once()
 	defer s.rideService.ResetMock()
 
 	res := s.response(formData)
