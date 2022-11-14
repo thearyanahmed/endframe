@@ -5,7 +5,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 )
 
-const DefaultCooldownDuration = int64(300)      // in seconds
+const DefaultCooldownDuration = int64(10)       // in seconds
 const DefaultMinimumTripDistance = float64(500) // in meters
 
 type (

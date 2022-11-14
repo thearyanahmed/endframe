@@ -210,7 +210,7 @@ func randomTripData() url.Values {
 }
 
 func latitudeRange() (float64, float64) {
-	return 52.50000, 52.50000
+	return 52.50000, 52.70000
 }
 
 func longitudeRange() (float64, float64) {
@@ -307,7 +307,7 @@ func SpawnRiders() {
 	}
 
 	endpoint := fmt.Sprintf("%s/ride/activate", GetBaseUrl())
-	requests := 500
+	requests := 1000
 	apiKey := GetRiderApiKey()
 
 	ch := make(chan string)

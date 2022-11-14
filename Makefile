@@ -16,7 +16,7 @@ ps:
 	@docker-compose ps
 
 simulate:
-	@echo "running outside of container."
+	@echo "requesting as client, from outside of container."
 	@source .env; go run cmd/simulation/main.go 5 ${RIDER_API_KEY} ${CLIENT_API_KEY} ${APP_URL}
 
 ssh:
