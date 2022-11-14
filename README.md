@@ -113,6 +113,7 @@ Length	Tile Size
 ```
 
 ## API Endpoints
+Postman collection can be found inside [docs](docs/)
 
 **health check**
 ```bash
@@ -209,8 +210,10 @@ Some things have been left out.
 - in multiple places, I've used `fmt.Sprintf()` to format float64 to string, this should have been extracted to a dedicated method, so we have single source of truth
 - the docker image is for development purpose only
 - `index` can be added to gain a performance boost
-
-
+- testing does not cover 100%, unit tests can be added to improve reliability of the software we built
+- RESTful routes can have a lot of header values and can be bit slower in terms of performance in contrast to other alternatives, we can look into others as well
+- load balancer config has been left out
+- redis clustering config has been left out
 
 ## Task
 A company called Scootin' Aboot will deploy electric scooters in Ottawa and
