@@ -1,3 +1,7 @@
+# NdFrame
+
+The name comes from "and-(another)-framework", a framework for serving restful apis over http using go. Everything exposed via interfaces.
+
 ## Running the project
 Run the following commands to run the project.
 
