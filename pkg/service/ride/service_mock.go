@@ -2,8 +2,9 @@ package ride
 
 import (
 	"context"
+
 	"github.com/stretchr/testify/mock"
-	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
+	"github.com/thearyanahmed/endframe/pkg/service/location/entity"
 )
 
 type RideServiceMock struct {

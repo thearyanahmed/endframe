@@ -2,12 +2,13 @@ package testutil
 
 import (
 	"fmt"
-	"github.com/brianvoe/gofakeit/v6"
-	"github.com/google/uuid"
-	"github.com/thearyanahmed/nordsec/pkg/serializer"
-	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 	"net/url"
 	"time"
+
+	"github.com/brianvoe/gofakeit/v6"
+	"github.com/google/uuid"
+	"github.com/thearyanahmed/endframe/pkg/serializer"
+	"github.com/thearyanahmed/endframe/pkg/service/location/entity"
 )
 
 func FakeRecordRideEventRequest() serializer.RecordRideEventRequest {

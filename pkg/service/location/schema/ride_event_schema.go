@@ -2,8 +2,9 @@ package schema
 
 import (
 	"encoding/json"
+
 	"github.com/google/uuid"
-	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
+	"github.com/thearyanahmed/endframe/pkg/service/location/entity"
 )
 
 // @todo BIG REFACTOR

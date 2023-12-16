@@ -1,21 +1,20 @@
-# NdFrame
-
-The name comes from "and-(another)-framework", a framework for serving restful apis over http using go. Everything exposed via interfaces.
+# Endframe
 
 ## Running the project
+
 Run the following commands to run the project.
 
-- `git clone git@github.com:thearyanahmed/nordsec.git`
-- `cd nordsec`
+- `git clone git@github.com:thearyanahmed/endframe.git`
+- `cd endframe`
 - `cp .env.example .env`
 - Update proper values with `.env`. For this demo `.env` values have be filled in `.env.example`
-- `make start` will start the necessary containers. 
+- `make start` will start the necessary containers.
 
 ## Running tests
-While running the container, run `make test` to run the tests. Or to run outside of container run `go test -v ./...` 
 
+While running the container, run `make test` to run the tests. Or to run outside of container run `go test -v ./...`
 
-```
+```txt
 ┌──────────┐    ┌──────────┐    ┌───────────┐    ┌────────────────────────────────────────┐
 │          │    │          │    │           │    │           Request Serializer           │
 │  Server  ├────►  Router  ├────►  Handler  ├────►────────────────────┬───────────────────┼───┐
@@ -26,12 +25,12 @@ While running the container, run `make test` to run the tests. Or to run outside
      │
 ┌────▼────┐                                       ┌─────────────────┐
 │ Service ├─────────────────────────────────────► │     Response    │
-│         │                                       └─────────────────┘    
-└────↑────┘ ┌──────────────────────┐                 ┌─────────────────────┐             
+│         │                                       └─────────────────┘
+└────↑────┘ ┌──────────────────────┐                 ┌─────────────────────┐
      │      │                      │                 │                     │
      └──────►  Other Service       │←───────│──────► │ Repository (Redis ) │
      │      │                      │        │        │                     │
      │      └──────────────────────┘        │        └─────────────────────┘
-     │                                      │ 
+     │                                      │
      │ ─────────────────────────────────────│
 ```

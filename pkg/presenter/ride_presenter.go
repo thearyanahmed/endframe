@@ -2,8 +2,9 @@ package presenter
 
 import (
 	"fmt"
-	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 	"net/http"
+
+	"github.com/thearyanahmed/endframe/pkg/service/location/entity"
 )
 
 type RideLocationUpdateResponse struct {

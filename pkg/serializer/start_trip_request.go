@@ -1,7 +1,7 @@
 package serializer
 
 import (
-	entity2 "github.com/thearyanahmed/nordsec/pkg/service/location/entity"
+	entity2 "github.com/thearyanahmed/endframe/pkg/service/location/entity"
 	"github.com/thedevsaddam/govalidator"
 )
 

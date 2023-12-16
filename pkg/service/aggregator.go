@@ -3,10 +3,10 @@ package service
 import (
 	"github.com/go-redis/redis/v8"
 	log "github.com/sirupsen/logrus"
-	"github.com/thearyanahmed/nordsec/pkg/config"
-	"github.com/thearyanahmed/nordsec/pkg/repository"
-	"github.com/thearyanahmed/nordsec/pkg/service/location"
-	"github.com/thearyanahmed/nordsec/pkg/service/ride"
+	"github.com/thearyanahmed/endframe/pkg/config"
+	"github.com/thearyanahmed/endframe/pkg/repository"
+	"github.com/thearyanahmed/endframe/pkg/service/location"
+	"github.com/thearyanahmed/endframe/pkg/service/ride"
 )
 
 type ServiceAggregator struct {

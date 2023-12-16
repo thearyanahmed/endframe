@@ -3,16 +3,17 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/thearyanahmed/nordsec/pkg/config"
-	"github.com/thearyanahmed/nordsec/pkg/handler"
-	"github.com/thearyanahmed/nordsec/pkg/logger"
-	"github.com/thearyanahmed/nordsec/pkg/service"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/thearyanahmed/endframe/pkg/config"
+	"github.com/thearyanahmed/endframe/pkg/handler"
+	"github.com/thearyanahmed/endframe/pkg/logger"
+	"github.com/thearyanahmed/endframe/pkg/service"
 )
 
 func main() {

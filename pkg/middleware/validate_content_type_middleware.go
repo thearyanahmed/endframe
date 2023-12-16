@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/thearyanahmed/nordsec/pkg/presenter"
+	"github.com/thearyanahmed/endframe/pkg/presenter"
 )
 
 func ValidateContentTypeMiddleware(next http.Handler) http.Handler {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-chi/chi/v5/middleware"
 	log "github.com/sirupsen/logrus"
-	"github.com/thearyanahmed/nordsec/pkg/presenter"
+	"github.com/thearyanahmed/endframe/pkg/presenter"
 )
 
 type authorizeRiderMiddleware struct {

@@ -5,12 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/go-redis/redis/v8"
-	"github.com/mmcloughlin/geohash"
-	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
-	"github.com/thearyanahmed/nordsec/pkg/service/location/schema"
 	"strings"
 	"sync"
+
+	"github.com/go-redis/redis/v8"
+	"github.com/mmcloughlin/geohash"
+	"github.com/thearyanahmed/endframe/pkg/service/location/entity"
+	"github.com/thearyanahmed/endframe/pkg/service/location/schema"
 )
 
 type RideRepository struct {

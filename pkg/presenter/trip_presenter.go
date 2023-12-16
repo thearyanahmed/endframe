@@ -2,8 +2,9 @@ package presenter
 
 import (
 	"fmt"
-	entity2 "github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 	"net/http"
+
+	entity2 "github.com/thearyanahmed/endframe/pkg/service/location/entity"
 )
 
 type TripStarted struct {

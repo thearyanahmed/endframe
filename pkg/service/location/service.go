@@ -3,13 +3,14 @@ package location
 import (
 	"context"
 	"errors"
+	"time"
+
 	"github.com/go-redis/redis/v8"
 	"github.com/mmcloughlin/geohash"
-	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
-	"github.com/thearyanahmed/nordsec/pkg/service/location/repository"
-	"github.com/thearyanahmed/nordsec/pkg/service/location/schema"
+	"github.com/thearyanahmed/endframe/pkg/service/location/entity"
+	"github.com/thearyanahmed/endframe/pkg/service/location/repository"
+	"github.com/thearyanahmed/endframe/pkg/service/location/schema"
 	"github.com/umahmood/haversine"
-	"time"
 )
 
 var RideNotInLocation = errors.New("ride not in nearby location")

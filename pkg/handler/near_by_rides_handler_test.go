@@ -3,14 +3,15 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
-	"github.com/thearyanahmed/nordsec/pkg/service/ride"
-	"github.com/thearyanahmed/nordsec/pkg/testutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/suite"
+	"github.com/thearyanahmed/endframe/pkg/service/ride"
+	"github.com/thearyanahmed/endframe/pkg/testutil"
 )
 
 type nearByRidesHandlerTestSuite struct {

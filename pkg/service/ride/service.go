@@ -2,8 +2,9 @@ package ride
 
 import (
 	"context"
-	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 	"time"
+
+	"github.com/thearyanahmed/endframe/pkg/service/location/entity"
 )
 
 type locationService interface {

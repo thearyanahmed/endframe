@@ -6,9 +6,9 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/thearyanahmed/nordsec/pkg/config"
-	apiMiddleware "github.com/thearyanahmed/nordsec/pkg/middleware"
-	"github.com/thearyanahmed/nordsec/pkg/service"
+	"github.com/thearyanahmed/endframe/pkg/config"
+	apiMiddleware "github.com/thearyanahmed/endframe/pkg/middleware"
+	"github.com/thearyanahmed/endframe/pkg/service"
 
 	"github.com/go-chi/chi/v5"
 )

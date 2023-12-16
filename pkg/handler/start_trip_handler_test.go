@@ -4,17 +4,18 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
-	"github.com/thearyanahmed/nordsec/pkg/serializer"
-	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
-	"github.com/thearyanahmed/nordsec/pkg/service/ride"
-	"github.com/thearyanahmed/nordsec/pkg/testutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/suite"
+	"github.com/thearyanahmed/endframe/pkg/serializer"
+	"github.com/thearyanahmed/endframe/pkg/service/location/entity"
+	"github.com/thearyanahmed/endframe/pkg/service/ride"
+	"github.com/thearyanahmed/endframe/pkg/testutil"
 )
 
 type startTripHandlerTestSuite struct {

@@ -3,10 +3,11 @@ package handler
 import (
 	"context"
 	"errors"
-	"github.com/thearyanahmed/nordsec/pkg/presenter"
-	"github.com/thearyanahmed/nordsec/pkg/serializer"
-	"github.com/thearyanahmed/nordsec/pkg/service/location/entity"
 	"net/http"
+
+	"github.com/thearyanahmed/endframe/pkg/presenter"
+	"github.com/thearyanahmed/endframe/pkg/serializer"
+	"github.com/thearyanahmed/endframe/pkg/service/location/entity"
 )
 
 type endTripHandler struct {

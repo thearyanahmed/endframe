@@ -1,4 +1,4 @@
-module github.com/thearyanahmed/nordsec
+module github.com/thearyanahmed/endframe
 
 go 1.19
 
