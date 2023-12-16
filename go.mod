@@ -6,12 +6,9 @@ require (
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-chi/render v1.0.2
 	github.com/go-redis/redis/v8 v8.11.5
-	github.com/google/uuid v1.3.0
 	github.com/hellofresh/health-go/v4 v4.7.0
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/mmcloughlin/geohash v0.10.0
 	github.com/stretchr/testify v1.8.0
-	github.com/umahmood/haversine v0.0.0-20151105152445-808ab04add26
 )
 
 require (
@@ -39,7 +36,6 @@ require (
 
 require (
 	github.com/ajg/form v1.5.1 // indirect
-	github.com/brianvoe/gofakeit/v6 v6.19.0
 	github.com/gorilla/schema v1.2.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/thedevsaddam/govalidator v1.9.10

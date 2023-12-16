@@ -5,36 +5,32 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/thearyanahmed/endframe/pkg/config"
 	"github.com/thearyanahmed/endframe/pkg/repository"
-	"github.com/thearyanahmed/endframe/pkg/service/location"
-	"github.com/thearyanahmed/endframe/pkg/service/ride"
+	"github.com/thearyanahmed/endframe/pkg/service/user"
 )
 
 type ServiceAggregator struct {
-	*ride.RideService
-	keyValueDatastore *redis.Client
-	LocationSvc       *location.Service
+	UserSvc *user.UserService
+	kvStore *redis.Client
 }
 
 func NewServiceAggregator(config *config.Specification, _ *log.Logger) (*ServiceAggregator, error) {
-	datastore, err := repository.NewRedisClient(config.GetRedisAddr(), config.GetRedisPassword())
+	kvStore, err := repository.NewRedisClient(config.GetRedisAddr(), config.GetRedisPassword())
 
 	if err != nil {
 		return &ServiceAggregator{}, err
 	}
 
-	locationService := location.NewLocationService(datastore, config.GetRedisLocationsKey())
-
-	rideSvc := ride.NewRideService(locationService, config.GetMinimumTripDistance(), config.GetCooldownDuration())
+	userRepo := user.NewUserRepository()
+	userSvc := user.NewUserService(userRepo)
 
 	aggregator := &ServiceAggregator{
-		RideService:       rideSvc,
-		LocationSvc:       locationService,
-		keyValueDatastore: datastore,
+		UserSvc: userSvc,
+		kvStore: kvStore,
 	}
 
 	return aggregator, nil
 }
 
 func (s *ServiceAggregator) GetKeyValueDataStore() *redis.Client {
-	return s.keyValueDatastore
+	return s.kvStore
 }

@@ -1,9 +1,9 @@
-package location
+package user
 
 import (
 	"github.com/stretchr/testify/mock"
 )
 
-type LocationServiceMock struct {
+type UserServiceMock struct {
 	mock.Mock
 }

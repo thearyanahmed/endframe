@@ -7,7 +7,6 @@ import (
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/thearyanahmed/endframe/pkg/config"
-	apiMiddleware "github.com/thearyanahmed/endframe/pkg/middleware"
 	"github.com/thearyanahmed/endframe/pkg/service"
 
 	"github.com/go-chi/chi/v5"
@@ -27,28 +26,8 @@ func NewRouter(conf *config.Specification, svcAggregator *service.ServiceAggrega
 
 			// This endpoint should return all available vehicles within an area also
 			// should support filter by query params
-			r.With(apiMiddleware.NewAuthorizeClientMiddleware(conf.ClientApiKey, logger).Handle).
-				Get("/rides/near-by", NewNearByRidesHandler(svcAggregator.RideService).ServeHTTP)
-
-			// This simulates the idea of a rider, who just came online
-			r.With(apiMiddleware.ValidateContentTypeMiddleware).
-				With(apiMiddleware.NewAuthorizeRiderMiddleware(conf.RiderApiKey, logger).Handle).
-				Post("/ride/activate", NewUpdateRideLocationHandler(svcAggregator.RideService).ServeHTTP)
-
-			// Start a trip.
-			r.With(apiMiddleware.ValidateContentTypeMiddleware).
-				With(apiMiddleware.NewAuthorizeClientMiddleware(conf.ClientApiKey, logger).Handle).
-				Post("/trip/start", NewStartTripHandler(svcAggregator.RideService).ServeHTTP)
-
-			// Update location while on trip
-			r.With(apiMiddleware.ValidateContentTypeMiddleware).
-				With(apiMiddleware.NewAuthorizeClientMiddleware(conf.ClientApiKey, logger).Handle).
-				Post("/trip/notify/location", NewNotifyPositionHandler(svcAggregator.RideService).ServeHTTP)
-
-			// Notify when trip has ended, enter cooldown mode
-			r.With(apiMiddleware.ValidateContentTypeMiddleware).
-				With(apiMiddleware.NewAuthorizeClientMiddleware(conf.ClientApiKey, logger).Handle).
-				Post("/trip/end", NewEndTripHandler(svcAggregator.RideService).ServeHTTP)
+			// r.With(apiMiddleware.NewAuthorizeClientMiddleware(conf.ClientApiKey, logger).Handle).
+			// Get("/users/{id}", NewUserHandler(svcAggregator.UserSvc).ServeHTTP)
 		})
 	})
 
