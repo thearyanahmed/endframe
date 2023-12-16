@@ -43,3 +43,4 @@ While running the container, run `make test` to run the tests. Or to run outside
      │ ─────────────────────────────────────│
 ```
 
+Special thanks to [Tawsif Aqib](https://github.com/munza)
